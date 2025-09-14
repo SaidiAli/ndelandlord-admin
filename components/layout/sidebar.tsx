@@ -64,8 +64,13 @@ export function Sidebar() {
 
       <div className="px-4 py-4 border-t border-gray-200">
         <Link
-          href="/dashboard/settings"
-          className="flex items-center px-3 py-2 text-sm font-medium text-gray-600 rounded-md hover:text-gray-900 hover:bg-gray-50"
+          href="/settings"
+          className={cn(
+                'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+                pathname.startsWith('/settings')
+                  ? 'bg-primary text-white'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              )}
         >
           <Settings className="w-5 h-5 mr-3" />
           Settings

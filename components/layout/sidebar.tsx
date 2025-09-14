@@ -21,7 +21,7 @@ const navigation = [
   { name: 'Tenants', href: '/tenants', icon: Users },
   { name: 'Leases', href: '/leases', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
-  { name: 'Maintenance', href: '/maintenance', icon: Wrench },
+  // { name: 'Maintenance', href: '/maintenance', icon: Wrench },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
 ];
 

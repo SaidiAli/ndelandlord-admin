@@ -180,6 +180,39 @@ export const paymentsApi = {
     const response = await api.put(`/payments/${id}`, data);
     return response.data;
   },
+
+  initiate: async (data: { leaseId: string; amount: number; phoneNumber: string; provider: string }) => {
+    const response = await api.post('/payments/initiate', data);
+    return response.data;
+  },
+
+  getStatus: async (paymentId: string) => {
+    const response = await api.get(`/payments/status/${paymentId}`);
+    return response.data;
+  },
+
+  getLeaseBalance: async (leaseId: string) => {
+    const response = await api.get(`/payments/lease/${leaseId}/balance`);
+    return response.data;
+  },
+
+  getReceipt: async (paymentId: string) => {
+    const response = await api.get(`/payments/${paymentId}/receipt`);
+    return response.data;
+  },
+
+  getByLease: async (leaseId: string) => {
+    const response = await api.get(`/payments?leaseId=${leaseId}`);
+    return response.data;
+  },
+
+  getAnalytics: async (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    const response = await api.get(`/payments/analytics?${params.toString()}`);
+    return response.data;
+  },
 };
 
 // Maintenance API functions

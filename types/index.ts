@@ -65,11 +65,13 @@ export interface Payment {
   id: string;
   leaseId: string;
   amount: number;
-  dueDate: string;
+  dueDate?: string;
   paidDate?: string;
-  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   paymentMethod?: string;
   transactionId?: string;
+  mobileMoneyProvider?: 'mtn' | 'airtel' | 'm-sente';
+  phoneNumber?: string;
   notes?: string;
   createdAt: string;
   updatedAt: string;
@@ -140,4 +142,62 @@ export interface DashboardMetrics {
   pendingMaintenance: number;
   recentPayments: Payment[];
   recentMaintenanceRequests: MaintenanceRequest[];
+}
+
+// Payment specific types
+export interface PaymentInitiateRequest {
+  leaseId: string;
+  amount: number;
+  phoneNumber: string;
+  provider: string;
+}
+
+export interface PaymentBalance {
+  leaseId: string;
+  outstandingAmount: number;
+  monthlyRent: number;
+  totalPaid: number;
+  lastPaymentDate?: string;
+}
+
+export interface PaymentReceipt {
+  id: string;
+  paymentId: string;
+  receiptNumber: string;
+  amount: number;
+  paidDate: string;
+  tenant: {
+    name: string;
+    email: string;
+  };
+  property: {
+    name: string;
+    address: string;
+  };
+  unit: {
+    unitNumber: string;
+  };
+  transactionId: string;
+  paymentMethod: string;
+}
+
+export interface PaymentAnalytics {
+  totalPayments: number;
+  totalAmount: number;
+  averagePaymentTime: number;
+  paymentsByStatus: {
+    status: string;
+    count: number;
+    amount: number;
+  }[];
+  paymentsByProvider: {
+    provider: string;
+    count: number;
+    amount: number;
+  }[];
+  monthlyTrends: {
+    month: string;
+    totalPayments: number;
+    totalAmount: number;
+  }[];
 }

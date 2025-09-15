@@ -17,7 +17,7 @@ export function Header() {
       <div className="flex items-center space-x-4">
         <div>
           <h1 className="text-xl font-semibold text-gray-900">
-            Hello, {user?.firstName || user?.username || 'User'}!
+            Hello, {user?.firstName || user?.userName || 'User'}!
           </h1>
           <p className="text-sm text-gray-500">
             Explore information and activity about your property

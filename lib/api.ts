@@ -42,35 +42,32 @@ api.interceptors.response.use(
   }
 );
 
+export const usersApi = {
+  createWithLease: async (data: any) => {
+    const response = await api.post('/users/tenants/with-lease', data);
+    return response.data;
+  },
+};
+
 // Auth API functions
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    // Transform username to userName for backend compatibility
-    const requestData = {
-      userName: credentials.username,
-      password: credentials.password,
-    };
-    const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', requestData);
+    const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
     return response.data.data!;
   },
 
   register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    // Transform username to userName for backend compatibility
-    const requestData = {
-      userName: userData.username,
-      email: userData.email,
-      password: userData.password,
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      phone: userData.phone,
-      role: userData.role,
-    };
-    const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', requestData);
+    const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', userData);
     return response.data.data!;
   },
 
   getCurrentUser: async (): Promise<User> => {
     const response = await api.get<ApiResponse<User>>('/auth/me');
+    return response.data.data!;
+  },
+  
+  updateProfile: async (data: Partial<User>): Promise<User> => {
+    const response = await api.put<ApiResponse<User>>('/users/profile', data);
     return response.data.data!;
   },
 };
@@ -112,6 +109,11 @@ export const unitsApi = {
 
   getById: async (id: string) => {
     const response = await api.get(`/units/${id}`);
+    return response.data;
+  },
+
+  getAvailable: async () => { // New function
+    const response = await api.get('/units/available');
     return response.data;
   },
 
@@ -239,6 +241,13 @@ export const maintenanceApi = {
 
   delete: async (id: string) => {
     const response = await api.delete(`/maintenance/${id}`);
+    return response.data;
+  },
+};
+
+export const landlordApi = {
+  getDashboardData: async () => {
+    const response = await api.get('/landlords/dashboard/complete');
     return response.data;
   },
 };

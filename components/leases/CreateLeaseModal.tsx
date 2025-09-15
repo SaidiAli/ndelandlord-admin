@@ -1,0 +1,185 @@
+'use client';
+
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { unitsApi, leasesApi, usersApi } from '@/lib/api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose,
+} from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Unit, User } from '@/types';
+import { toast } from 'sonner';
+
+const createLeaseSchema = z.object({
+  unitId: z.string().uuid('Please select a unit'),
+  tenantId: z.string().uuid('Please select a tenant'),
+  startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
+  endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
+  monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
+  deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
+  terms: z.string().optional(),
+});
+
+type CreateLeaseFormData = z.infer<typeof createLeaseSchema>;
+
+interface CreateLeaseModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
+  const queryClient = useQueryClient();
+
+  const { data: unitsData, isLoading: unitsLoading } = useQuery({
+    queryKey: ['available-units'],
+    queryFn: () => unitsApi.getAvailable(),
+  });
+  const availableUnits: any[] = unitsData?.data || [];
+
+  const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: () => leasesApi.getAll(), // Re-using leasesApi to get tenant info for now
+  });
+  const tenants: User[] = tenantsData?.data.map((l: { tenant: any; }) => l.tenant).filter(Boolean) || [];
+
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<CreateLeaseFormData>({
+    resolver: zodResolver(createLeaseSchema),
+  });
+
+  const mutation = useMutation({
+    mutationFn: (newLease: CreateLeaseFormData) => leasesApi.create(newLease),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['leases'] });
+      queryClient.invalidateQueries({ queryKey: ['units'] });
+       queryClient.invalidateQueries({ queryKey: ['available-units'] });
+      toast.success('Lease created successfully!');
+      handleClose();
+    },
+    onError: (error: any) => {
+      console.error('Failed to create lease:', error);
+      toast.error(`Failed to create lease: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  const onSubmit = (data: CreateLeaseFormData) => {
+    mutation.mutate(data);
+  };
+
+  const handleClose = () => {
+    reset();
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Create New Lease</DialogTitle>
+          <DialogDescription>
+            Assign a tenant to a unit by creating a new lease agreement.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+           <div className="space-y-2">
+            <Label htmlFor="unitId">Unit</Label>
+             <Controller
+              name="unitId"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={unitsLoading}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an available unit" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableUnits.map((item) => (
+                      <SelectItem key={item.unit.id} value={item.unit.id}>
+                        {item.property.name} - Unit {item.unit.unitNumber}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.unitId && <p className="text-sm text-red-500">{errors.unitId.message}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="tenantId">Tenant</Label>
+             <Controller
+              name="tenantId"
+              control={control}
+              render={({ field }) => (
+                <Select onValueChange={field.onChange} defaultValue={field.value} disabled={tenantsLoading}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a tenant" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {tenants.map((tenant) => (
+                      <SelectItem key={tenant.id} value={tenant.id}>
+                        {tenant.firstName} {tenant.lastName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.tenantId && <p className="text-sm text-red-500">{errors.tenantId.message}</p>}
+          </div>
+
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="space-y-2">
+              <Label htmlFor="startDate">Lease Start Date</Label>
+              <Input id="startDate" type="date" {...register('startDate')} />
+              {errors.startDate && <p className="text-sm text-red-500">{errors.startDate.message}</p>}
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="endDate">Lease End Date</Label>
+              <Input id="endDate" type="date" {...register('endDate')} />
+              {errors.endDate && <p className="text-sm text-red-500">{errors.endDate.message}</p>}
+            </div>
+          </div>
+          
+           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div className="space-y-2">
+              <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
+              <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
+              {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="deposit">Deposit (UGX)</Label>
+              <Input id="deposit" type="number" {...register('deposit')} />
+              {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button type="submit" disabled={isSubmitting || mutation.isPending}>
+              {isSubmitting || mutation.isPending ? 'Saving...' : 'Create Lease'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}

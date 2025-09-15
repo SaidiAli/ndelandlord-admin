@@ -10,6 +10,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, KeyRound, Bell } from 'lucide-react';
+import { authApi } from '@/lib/api';
+import { toast } from 'sonner';
 
 const profileSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -38,12 +40,14 @@ export default function SettingsPage() {
   });
 
   const onProfileSubmit = async (data: ProfileFormData) => {
-    // This is where you would call the API to update the user profile
-    console.log('Profile update submitted:', data);
-    // await authApi.updateProfile(data);
-    // await refreshUser();
-    // TODO: Add toast notification for success/error
-    alert('Profile updated successfully! (API call is mocked)');
+    try {
+      await authApi.updateProfile(data);
+      await refreshUser();
+      toast.success('Profile updated successfully!');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      toast.error('Failed to update profile.');
+    }
   };
 
   return (
@@ -136,7 +140,7 @@ export default function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="notifications">
-           <Card>
+          <Card>
             <CardHeader>
               <CardTitle>Notification Settings</CardTitle>
               <CardDescription>Manage how you receive notifications.</CardDescription>

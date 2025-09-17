@@ -61,7 +61,6 @@ export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
   });
 
   const onSubmit = (data: AddPropertyFormData) => {
-    console.log(data)
     mutation.mutate(data);
   };
 

@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -25,7 +24,7 @@ const registerSchema = z.object({
 type RegisterFormData = z.infer<typeof registerSchema>;
 
 export default function RegisterPage() {
-  const { login } = useAuth(); // We'll use login to automatically sign in the user after registration
+  const router = useRouter();
 
   const {
     register,
@@ -43,10 +42,7 @@ export default function RegisterPage() {
         role: 'landlord'
       });
 
-      // console.log(data);
-      
-      // Automatically log in the user after successful registration
-      // await login(data.username, data.password);
+      router.push('/login');
 
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Registration failed');

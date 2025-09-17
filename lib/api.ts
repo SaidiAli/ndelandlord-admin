@@ -33,8 +33,8 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Token expired or invalid
       authStorage.clear();
-      // Redirect to login
-      if (typeof window !== 'undefined') {
+      // Only redirect if not already on login page to prevent refresh during login attempts
+      if (typeof window !== 'undefined' && !window.location.pathname.includes('/login')) {
         window.location.href = '/login';
       }
     }
@@ -85,8 +85,7 @@ export const authApi = {
 // Properties API functions
 export const propertiesApi = {
   getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering
-    const response = await api.get('/landlords/properties');
+    const response = await api.get('/properties');
     return response.data;
   },
 

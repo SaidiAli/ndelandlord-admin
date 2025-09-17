@@ -10,13 +10,17 @@ import { Property } from '@/types';
 import { AddPropertyModal } from '@/components/properties/AddPropertyModal';
 import { columns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
+import { useAuth } from '@/hooks/useAuth';
 
 
 export default function PropertiesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const { user } = useAuth();
+  
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
-    queryKey: ['properties'],
+    queryKey: ['properties', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => propertiesApi.getAll(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const properties: Property[] = propertiesData?.data || [];

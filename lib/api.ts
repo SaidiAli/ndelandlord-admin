@@ -85,7 +85,8 @@ export const authApi = {
 // Properties API functions
 export const propertiesApi = {
   getAll: async () => {
-    const response = await api.get('/properties');
+    // Add timestamp to prevent caching issues between different users
+    const response = await api.get(`/properties?_t=${Date.now()}`);
     return response.data;
   },
 

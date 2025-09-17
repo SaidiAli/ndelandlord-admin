@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { User } from '@/types';
 import { authStorage } from '@/lib/auth';
 import { authApi } from '@/lib/api';
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const isAuthenticated = !!user && !!authStorage.getToken();
 
@@ -37,14 +39,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             setUser(currentUser);
             authStorage.setUser(currentUser); // Update stored user data
           } catch (error) {
-            // Token is invalid, clear auth data
+            // Token is invalid, clear auth data and cache
             authStorage.clear();
+            queryClient.clear();
             setUser(null);
           }
         }
       } catch (error) {
         console.error('Auth initialization error:', error);
         authStorage.clear();
+        queryClient.clear();
         setUser(null);
       } finally {
         setIsLoading(false);
@@ -68,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = () => {
     authStorage.clear();
+    queryClient.clear(); // Clear all cached queries to prevent data leakage between users
     setUser(null);
     router.push('/login');
   };

@@ -8,16 +8,21 @@ import { landlordApi, paymentsApi } from '@/lib/api';
 import { formatUGX } from '@/lib/currency';
 import { Payment } from '@/types';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
-    queryKey: ['landlord-dashboard'],
+    queryKey: ['landlord-dashboard', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => landlordApi.getDashboardData(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
-    queryKey: ['recent-payments'],
+    queryKey: ['recent-payments', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => paymentsApi.getAll(), // We still need this for the detailed recent payments list
+    enabled: !!user, // Only fetch when user is available
   });
 
   const summary = dashboardData?.data?.summary;

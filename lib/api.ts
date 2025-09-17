@@ -114,8 +114,8 @@ export const propertiesApi = {
 // Units API functions
 export const unitsApi = {
   getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering
-    const response = await api.get('/landlords/units');
+    // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
+    const response = await api.get(`/units?_t=${Date.now()}`);
     return response.data;
   },
 
@@ -149,8 +149,8 @@ export const unitsApi = {
 // Leases API functions
 export const leasesApi = {
   getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering
-    const response = await api.get('/landlords/leases');
+    // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
+    const response = await api.get(`/leases?_t=${Date.now()}`);
     return response.data;
   },
 
@@ -178,8 +178,8 @@ export const leasesApi = {
 // Payments API functions
 export const paymentsApi = {
   getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering
-    const response = await api.get('/landlords/payments');
+    // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
+    const response = await api.get(`/payments?_t=${Date.now()}`);
     return response.data;
   },
 
@@ -227,6 +227,7 @@ export const paymentsApi = {
     const params = new URLSearchParams();
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
+    params.append('_t', Date.now().toString()); // Add timestamp to prevent caching
     // Use landlord-specific endpoint for payment analytics
     const response = await api.get(`/landlords/payments/analytics?${params.toString()}`);
     return response.data;
@@ -263,7 +264,8 @@ export const maintenanceApi = {
 
 export const landlordApi = {
   getDashboardData: async () => {
-    const response = await api.get('/landlords/dashboard/complete');
+    // Add timestamp to prevent caching issues between different users
+    const response = await api.get(`/landlords/dashboard/complete?_t=${Date.now()}`);
     return response.data;
   },
 };

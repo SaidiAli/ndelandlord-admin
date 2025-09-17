@@ -20,6 +20,7 @@ import {
 import { Property } from '@/types';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
 
 const editPropertySchema = z.object({
   name: z.string().min(1, 'Property name is required'),
@@ -40,6 +41,7 @@ interface EditPropertyModalProps {
 
 export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyModalProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const {
     register,
@@ -60,8 +62,8 @@ export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyMod
     mutationFn: (updatedProperty: EditPropertyFormData) =>
       propertiesApi.update(property!.id, updatedProperty),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
-      queryClient.invalidateQueries({ queryKey: ['property-details', property?.id] });
+      queryClient.invalidateQueries({ queryKey: ['properties', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['property-details', property?.id, user?.id] });
       toast.success('Property updated successfully!');
       handleClose();
     },

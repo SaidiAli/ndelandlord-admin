@@ -20,6 +20,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Property } from '@/types';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const addUnitSchema = z.object({
   propertyId: z.string().uuid('Please select a property'),
@@ -41,10 +42,12 @@ interface AddUnitModalProps {
 
 export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
-    queryKey: ['properties'],
+    queryKey: ['properties', user?.id],
     queryFn: () => propertiesApi.getAll(),
+    enabled: !!user,
   });
   const properties: Property[] = propertiesData?.data || [];
 
@@ -52,7 +55,6 @@ export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
     register,
     handleSubmit,
     control,
-    setValue,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<AddUnitFormData>({
@@ -62,7 +64,7 @@ export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
   const mutation = useMutation({
     mutationFn: (newUnit: AddUnitFormData) => unitsApi.create(newUnit),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['units'] });
+      queryClient.invalidateQueries({ queryKey: ['units', user?.id] });
       toast.success('Unit added successfully!');
       handleClose();
     },

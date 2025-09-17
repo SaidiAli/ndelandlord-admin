@@ -11,15 +11,18 @@ import { CreateLeaseModal } from '@/components/leases/CreateLeaseModal';
 import { EditLeaseModal } from '@/components/leases/EditLeaseModal';
 import { getColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LeasesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedLease, setSelectedLease] = useState<Lease | null>(null);
+  const { user } = useAuth();
 
   const { data: leasesData, isLoading: leasesLoading } = useQuery({
-    queryKey: ['leases'],
+    queryKey: ['leases', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => leasesApi.getAll(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const leases: Lease[] = leasesData?.data || [];

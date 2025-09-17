@@ -7,11 +7,15 @@ import { PaymentAnalytics } from '@/types';
 import { PaymentAnalyticsChart } from '@/components/analytics/PaymentAnalyticsChart';
 import { BarChart3, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function ReportsPage() {
+  const { user } = useAuth();
+  
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['payment-analytics'],
+    queryKey: ['payment-analytics', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => paymentsApi.getAnalytics(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const analytics: PaymentAnalytics = analyticsData?.data || {

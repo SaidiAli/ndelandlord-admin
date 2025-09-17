@@ -42,6 +42,19 @@ export interface Unit {
   updatedAt: string;
   property?: Property;
   leases?: Lease[];
+  currentLease?: {
+    id: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+  };
+  currentTenant?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+  };
 }
 
 export interface Lease {

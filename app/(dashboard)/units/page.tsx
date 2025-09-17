@@ -11,15 +11,18 @@ import { AddUnitModal } from '@/components/units/AddUnitModal';
 import { EditUnitModal } from '@/components/units/EditUnitModal';
 import { getColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function UnitsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const { user } = useAuth();
 
   const { data: unitsData, isLoading: unitsLoading } = useQuery({
-    queryKey: ['units'],
+    queryKey: ['units', user?.id],
     queryFn: () => unitsApi.getAll(),
+    enabled: !!user,
   });
 
   const units: Unit[] = unitsData?.data || [];

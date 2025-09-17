@@ -11,16 +11,18 @@ import { formatUGX } from '@/lib/currency';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function PropertyDetailsPage() {
   const params = useParams();
   const propertyId = params.id as string;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { user } = useAuth();
 
   const { data: propertyData, isLoading: propertyLoading } = useQuery({
-    queryKey: ['property-details', propertyId],
+    queryKey: ['property-details', propertyId, user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => propertiesApi.getById(propertyId),
-    enabled: !!propertyId,
+    enabled: !!propertyId && !!user, // Only fetch when property ID and user are available
   });
 
   const propertyDetails = propertyData?.data;

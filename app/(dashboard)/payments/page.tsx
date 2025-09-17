@@ -25,12 +25,14 @@ import { formatUGX, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
 import { Payment, PaymentAnalytics } from '@/types';
 import { PaymentDetailsModal } from '@/components/payments/PaymentDetailsModal';
 import { PaymentAnalyticsChart } from '@/components/analytics/PaymentAnalyticsChart';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   
   // Real-time payment updates
   const { showNotification } = usePaymentNotifications();
@@ -46,20 +48,22 @@ export default function PaymentsPage() {
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
-    queryKey: ['payments'],
+    queryKey: ['payments', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => paymentsApi.getAll(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['payment-analytics'],
+    queryKey: ['payment-analytics', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => paymentsApi.getAnalytics(),
+    enabled: !!user, // Only fetch when user is available
   });
 
   const refreshMutation = useMutation({
     mutationFn: () => paymentsApi.getAll(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payments'] });
-      queryClient.invalidateQueries({ queryKey: ['payment-analytics'] });
+      queryClient.invalidateQueries({ queryKey: ['payments', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['payment-analytics', user?.id] });
     },
   });
 

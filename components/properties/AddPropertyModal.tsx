@@ -18,6 +18,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const addPropertySchema = z.object({
   name: z.string().min(1, 'Property name is required'),
@@ -37,6 +38,7 @@ interface AddPropertyModalProps {
 
 export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const {
     register,
@@ -50,7 +52,7 @@ export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
   const mutation = useMutation({
     mutationFn: (newProperty: AddPropertyFormData) => propertiesApi.create(newProperty),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
+      queryClient.invalidateQueries({ queryKey: ['properties', user?.id] });
       toast.success('Property added successfully!');
       handleClose();
     },

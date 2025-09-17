@@ -4,7 +4,7 @@ import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User } from '
 
 // Create axios instance
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -44,7 +44,17 @@ api.interceptors.response.use(
 
 export const usersApi = {
   createWithLease: async (data: any) => {
-    const response = await api.post('/users/tenants/with-lease', data);
+    // Use landlord-specific tenant creation endpoint
+    const response = await api.post('/landlords/tenants/create-with-lease', data);
+    return response.data;
+  },
+};
+
+// Tenants API functions  
+export const tenantsApi = {
+  getAll: async () => {
+    // Get all tenants for the current landlord
+    const response = await api.get('/landlords/tenants');
     return response.data;
   },
 };
@@ -75,7 +85,8 @@ export const authApi = {
 // Properties API functions
 export const propertiesApi = {
   getAll: async () => {
-    const response = await api.get('/properties');
+    // Use landlord-specific endpoint to ensure ownership filtering
+    const response = await api.get('/landlords/properties');
     return response.data;
   },
 
@@ -103,7 +114,8 @@ export const propertiesApi = {
 // Units API functions
 export const unitsApi = {
   getAll: async () => {
-    const response = await api.get('/units');
+    // Use landlord-specific endpoint to ensure ownership filtering
+    const response = await api.get('/landlords/units');
     return response.data;
   },
 
@@ -112,8 +124,9 @@ export const unitsApi = {
     return response.data;
   },
 
-  getAvailable: async () => { // New function
-    const response = await api.get('/units/available');
+  getAvailable: async () => {
+    // Use landlord-specific endpoint for available units
+    const response = await api.get('/landlords/units/available');
     return response.data;
   },
 
@@ -136,7 +149,8 @@ export const unitsApi = {
 // Leases API functions
 export const leasesApi = {
   getAll: async () => {
-    const response = await api.get('/leases');
+    // Use landlord-specific endpoint to ensure ownership filtering
+    const response = await api.get('/landlords/leases');
     return response.data;
   },
 
@@ -164,7 +178,8 @@ export const leasesApi = {
 // Payments API functions
 export const paymentsApi = {
   getAll: async () => {
-    const response = await api.get('/payments');
+    // Use landlord-specific endpoint to ensure ownership filtering
+    const response = await api.get('/landlords/payments');
     return response.data;
   },
 
@@ -212,7 +227,8 @@ export const paymentsApi = {
     const params = new URLSearchParams();
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
-    const response = await api.get(`/payments/analytics?${params.toString()}`);
+    // Use landlord-specific endpoint for payment analytics
+    const response = await api.get(`/landlords/payments/analytics?${params.toString()}`);
     return response.data;
   },
 };

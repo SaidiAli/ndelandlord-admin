@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/hooks/useAuth';
 import Link from 'next/link';
 import { toast } from 'sonner';
+import { authApi } from '@/lib/api';
 
 const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -36,14 +37,16 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: RegisterFormData) => {
     try {
-      // The backend authApi.register function is not yet in the frontend api.ts
-      // For now, we'll simulate the call and then log the user in.
-      // In a real scenario, you would call authApi.register(data)
-      console.log("Registration data:", { ...data, role: 'landlord' });
-      toast.success('Registration successful! Logging you in...');
+
+      const response = authApi.register({
+        ...data,
+        role: 'landlord'
+      });
+
+      // console.log(data);
       
       // Automatically log in the user after successful registration
-      await login(data.username, data.password);
+      // await login(data.username, data.password);
 
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Registration failed');

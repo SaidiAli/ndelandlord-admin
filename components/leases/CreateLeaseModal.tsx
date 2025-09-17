@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { unitsApi, leasesApi, usersApi } from '@/lib/api';
+import { unitsApi, leasesApi, tenantsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -49,9 +49,9 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
 
   const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
     queryKey: ['tenants'],
-    queryFn: () => leasesApi.getAll(), // Re-using leasesApi to get tenant info for now
+    queryFn: () => tenantsApi.getAll(),
   });
-  const tenants: User[] = tenantsData?.data.map((l: { tenant: any; }) => l.tenant).filter(Boolean) || [];
+  const tenants: User[] = tenantsData?.data || [];
 
 
   const {

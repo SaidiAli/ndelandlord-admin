@@ -360,3 +360,58 @@ export interface TenantWithFullDetails {
     paymentStatus: 'current' | 'overdue' | 'advance';
   };
 }
+
+// Property Details API Response Types (from /properties/{id}/details endpoint)
+export interface PropertyDashboardData {
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode?: string;
+    description?: string;
+    landlordId: string;
+    createdAt: string;
+    updatedAt: string;
+    units: Array<{
+      unit: {
+        id: string;
+        unitNumber: string;
+        bedrooms: number;
+        bathrooms: number;
+        squareFeet?: number;
+        monthlyRent: string;
+        deposit: string;
+        isAvailable: boolean;
+        description?: string;
+      };
+      lease?: {
+        id: string;
+        status: string;
+        monthlyRent: string;
+        startDate: string;
+        endDate: string;
+      };
+      tenant?: {
+        id: string;
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone: string;
+      };
+    }>;
+  };
+  stats: {
+    totalUnits: number;
+    occupiedUnits: number;
+    availableUnits: number;
+    monthlyRevenue: number;
+    occupancyRate: number;
+  };
+  recentActivity: {
+    newLeases: number;
+    expiredLeases: number;
+    maintenanceRequests: number;
+  };
+}

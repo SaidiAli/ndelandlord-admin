@@ -8,7 +8,6 @@ import { PlusCircle, Building } from 'lucide-react';
 import { propertiesApi } from '@/lib/api';
 import { Property } from '@/types';
 import { AddPropertyModal } from '@/components/properties/AddPropertyModal';
-import { PropertyDetailsModal } from '@/components/properties/PropertyDetailsModal';
 import { getColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,8 +15,6 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function PropertiesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const { user } = useAuth();
   
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
@@ -27,18 +24,7 @@ export default function PropertiesPage() {
   });
 
   const properties: Property[] = propertiesData?.data || [];
-
-  const handleViewDetails = (propertyId: string) => {
-    setSelectedPropertyId(propertyId);
-    setIsDetailsModalOpen(true);
-  };
-
-  const handleCloseDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedPropertyId(null);
-  };
-
-  const columns = getColumns({ onViewDetails: handleViewDetails });
+  const columns = getColumns();
 
   return (
     <>
@@ -82,11 +68,6 @@ export default function PropertiesPage() {
         </Card>
       </div>
       <AddPropertyModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-      <PropertyDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={handleCloseDetailsModal}
-        propertyId={selectedPropertyId}
-      />
     </>
   );
 }

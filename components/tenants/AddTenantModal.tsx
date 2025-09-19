@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { unitsApi, usersApi } from '@/lib/api';
+import { tenantsApi, unitsApi, usersApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -18,19 +18,16 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Unit } from '@/types';
 import { toast } from 'sonner';
 import { Separator } from '../ui/separator';
 
 const addTenantSchema = z.object({
-  tenantData: z.object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email().optional(),
-    phone: z.string().min(1, 'Phone number is required'),
-    username: z.string().min(1, 'Username is required'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-  }),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
+  email: z.string().email().optional(),
+  phone: z.string().min(1, 'Phone number is required'),
+  userName: z.string().min(1, 'Username is required'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   unitId: z.string().uuid('Please select a unit'),
   leaseData: z.object({
     startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
@@ -81,7 +78,16 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
   });
 
   const onSubmit = (data: AddTenantFormData) => {
-    mutation.mutate(data);
+    // Convert dates to ISO datetime format for server validation
+    const formattedData = {
+      ...data,
+      leaseData: {
+        ...data.leaseData,
+        startDate: new Date(data.leaseData.startDate).toISOString(),
+        endDate: new Date(data.leaseData.endDate).toISOString(),
+      }
+    };
+    mutation.mutate(formattedData);
   };
 
   const handleClose = () => {
@@ -104,23 +110,23 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" {...register('tenantData.firstName')} />
-              {errors.tenantData?.firstName && <p className="text-sm text-red-500">{errors.tenantData.firstName.message}</p>}
+              <Input id="firstName" {...register('firstName')} />
+              {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" {...register('tenantData.lastName')} />
-              {errors.tenantData?.lastName && <p className="text-sm text-red-500">{errors.tenantData.lastName.message}</p>}
+              <Input id="lastName" {...register('lastName')} />
+              {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" {...register('tenantData.phone')} />
-              {errors.tenantData?.phone && <p className="text-sm text-red-500">{errors.tenantData.phone.message}</p>}
+              <Input id="phone" {...register('phone')} />
+              {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="email">Email (Optional)</Label>
-              <Input id="email" type="email" {...register('tenantData.email')} />
-              {errors.tenantData?.email && <p className="text-sm text-red-500">{errors.tenantData.email.message}</p>}
+              <Input id="email" type="email" {...register('email')} />
+              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
             </div>
           </div>
 
@@ -128,13 +134,13 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Username</Label>
-                <Input id="username" {...register('tenantData.username')} />
-                {errors.tenantData?.username && <p className="text-sm text-red-500">{errors.tenantData.username.message}</p>}
+                <Input id="username" {...register('userName')} />
+                {errors.userName && <p className="text-sm text-red-500">{errors.userName.message}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" {...register('tenantData.password')} />
-                {errors.tenantData?.password && <p className="text-sm text-red-500">{errors.tenantData.password.message}</p>}
+                <Input id="password" type="password" {...register('password')} />
+                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
               </div>
           </div>
           
@@ -153,8 +159,8 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {availableUnits.map((item) => (
-                      <SelectItem key={item.unit.id} value={item.unit.id}>
-                        {item.property.name} - Unit {item.unit.unitNumber}
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.property.name} - Unit {item.unitNumber}
                       </SelectItem>
                     ))}
                   </SelectContent>

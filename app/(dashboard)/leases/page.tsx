@@ -20,9 +20,9 @@ export default function LeasesPage() {
   const { user } = useAuth();
 
   const { data: leasesData, isLoading: leasesLoading } = useQuery({
-    queryKey: ['leases', user?.id], // Include user ID to prevent cache sharing between users
+    queryKey: ['leases', user?.id],
     queryFn: () => leasesApi.getAll(),
-    enabled: !!user, // Only fetch when user is available
+    enabled: !!user,
   });
 
   const leases: Lease[] = leasesData?.data || [];

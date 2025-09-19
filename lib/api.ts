@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { authStorage } from './auth';
-import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User } from '@/types';
+import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse } from '@/types';
 
 // Create axios instance
 const api = axios.create({
@@ -45,7 +45,7 @@ api.interceptors.response.use(
 export const usersApi = {
   createWithLease: async (data: any) => {
     // Use landlord-specific tenant creation endpoint
-    const response = await api.post('/landlords/tenants/create-with-lease', data);
+    const response = await api.post('/users/tenants/with-lease', data);
     return response.data;
   },
 };
@@ -54,7 +54,7 @@ export const usersApi = {
 export const tenantsApi = {
   getAll: async () => {
     // Get all tenants for the current landlord
-    const response = await api.get('/landlords/tenants');
+    const response = await api.get('/tenants');
     return response.data;
   },
 };
@@ -75,7 +75,7 @@ export const authApi = {
     const response = await api.get<ApiResponse<User>>('/auth/me');
     return response.data.data!;
   },
-  
+
   updateProfile: async (data: Partial<User>): Promise<User> => {
     const response = await api.put<ApiResponse<User>>('/users/profile', data);
     return response.data.data!;
@@ -150,22 +150,56 @@ export const unitsApi = {
 export const leasesApi = {
   getAll: async () => {
     // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
-    const response = await api.get(`/leases?_t=${Date.now()}`);
-    return response.data;
+    const response = await api.get<ApiResponse<LeaseApiResponse[]>>(`/leases?_t=${Date.now()}`);
+    if (response.data?.data && Array.isArray(response.data.data)) {
+      return {
+        ...response.data,
+        data: response.data.data.map(transformLeaseResponse)
+      };
+    }
+    // Return empty array if no data to maintain consistent type
+    return {
+      success: false,
+      data: [],
+      error: 'No lease data received'
+    };
   },
 
   getById: async (id: string) => {
-    const response = await api.get(`/leases/${id}`);
-    return response.data;
+    const response = await api.get<ApiResponse<LeaseApiResponse>>(`/leases/${id}`);
+    if (response.data?.data) {
+      return {
+        ...response.data,
+        data: transformLeaseResponse(response.data.data)
+      };
+    }
+    // Return null for lease data if not found
+    return {
+      success: false,
+      data: null,
+      error: 'Lease not found'
+    };
   },
 
   create: async (data: any) => {
-    const response = await api.post('/leases', data);
+    const response = await api.post<ApiResponse<LeaseApiResponse>>('/leases', data);
+    if (response.data?.data) {
+      return {
+        ...response.data,
+        data: transformLeaseResponse(response.data.data)
+      };
+    }
     return response.data;
   },
 
   update: async (id: string, data: any) => {
-    const response = await api.put(`/leases/${id}`, data);
+    const response = await api.put<ApiResponse<LeaseApiResponse>>(`/leases/${id}`, data);
+    if (response.data?.data) {
+      return {
+        ...response.data,
+        data: transformLeaseResponse(response.data.data)
+      };
+    }
     return response.data;
   },
 

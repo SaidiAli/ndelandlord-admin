@@ -15,7 +15,11 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { TenantWithFullDetails } from "@/types"
 
-export const columns: ColumnDef<TenantWithFullDetails>[] = [
+interface ColumnsProps {
+  onViewDetails: (tenantId: string) => void;
+}
+
+export const createColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<TenantWithFullDetails>[] => [
   {
     accessorKey: "tenant",
     header: ({ column }) => {
@@ -122,11 +126,14 @@ export const columns: ColumnDef<TenantWithFullDetails>[] = [
               Copy tenant ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewDetails(tenant.id)}>View details</DropdownMenuItem>
             <DropdownMenuItem>Edit tenant</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       )
     },
   },
-]
+];
+
+// For backward compatibility, export a default columns function
+export const columns = createColumns({ onViewDetails: () => {} });

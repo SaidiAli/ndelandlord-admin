@@ -29,6 +29,13 @@ const createLeaseSchema = z.object({
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   terms: z.string().optional(),
+}).refine((data) => {
+  const startDate = new Date(data.startDate);
+  const endDate = new Date(data.endDate);
+  return endDate > startDate;
+}, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
 });
 
 type CreateLeaseFormData = z.infer<typeof createLeaseSchema>;
@@ -75,7 +82,34 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
     },
     onError: (error: any) => {
       console.error('Failed to create lease:', error);
-      toast.error(`Failed to create lease: ${error.response?.data?.message || error.message}`);
+      
+      // Extract specific error message from backend
+      let errorMessage = 'Failed to create lease';
+      
+      if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      // Handle common validation errors with more user-friendly messages
+      if (errorMessage.includes('End date must be after start date')) {
+        errorMessage = 'The lease end date must be after the start date. Please check your dates.';
+      } else if (errorMessage.includes('Invalid start date') || errorMessage.includes('Invalid end date') || errorMessage.includes('Invalid start date format') || errorMessage.includes('Invalid end date format')) {
+        errorMessage = 'Please enter valid dates for the lease period.';
+      } else if (errorMessage.includes('overlaps with existing')) {
+        errorMessage = 'This lease period conflicts with an existing lease for this unit. Please choose different dates.';
+      } else if (errorMessage.includes('Unit already has an active lease')) {
+        errorMessage = 'This unit already has an active lease. Please select a different unit or terminate the existing lease first.';
+      } else if (errorMessage.includes('Invalid unit ID')) {
+        errorMessage = 'Please select a valid unit from the dropdown.';
+      } else if (errorMessage.includes('Invalid tenant ID')) {
+        errorMessage = 'Please select a valid tenant from the dropdown.';
+      }
+      
+      toast.error(errorMessage);
     },
   });
 
@@ -168,6 +202,19 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               <Input id="deposit" type="number" {...register('deposit')} />
               {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="terms">Lease Terms (Optional)</Label>
+            <textarea
+              id="terms"
+              className="w-full min-h-[100px] px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="Enter any special terms or conditions for this lease..."
+              {...register('terms')}
+            />
+            <p className="text-xs text-gray-500">
+              Include any special conditions, restrictions, or additional terms for this lease agreement.
+            </p>
           </div>
           
           <DialogFooter>

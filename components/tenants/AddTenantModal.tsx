@@ -26,7 +26,7 @@ const addTenantSchema = z.object({
   tenantData: z.object({
     firstName: z.string().min(1, 'First name is required'),
     lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().email('Invalid email address').optional(),
+    email: z.string().email().optional(),
     phone: z.string().min(1, 'Phone number is required'),
     username: z.string().min(1, 'Username is required'),
     password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -65,7 +65,6 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
   } = useForm<AddTenantFormData>({
     resolver: zodResolver(addTenantSchema),
   });
-
   const mutation = useMutation({
     mutationFn: (newTenantWithLease: AddTenantFormData) => usersApi.createWithLease(newTenantWithLease),
     onSuccess: () => {

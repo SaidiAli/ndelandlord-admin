@@ -9,6 +9,8 @@ import { unitsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Dialog,
   DialogContent,
@@ -21,11 +23,29 @@ import {
 import { Unit } from '@/types';
 import { toast } from 'sonner';
 
+// Form interface for inputs (strings)
+interface EditUnitFormInputs {
+  unitNumber: string;
+  bedrooms: string;
+  bathrooms: string;
+  squareFeet: string;
+  monthlyRent: string;
+  deposit: string;
+  isAvailable: boolean;
+  description: string;
+}
+
+// Schema for validation and transformation
 const editUnitSchema = z.object({
   unitNumber: z.string().min(1, 'Unit number is required'),
   bedrooms: z.coerce.number().int().min(0, 'Bedrooms must be non-negative'),
   bathrooms: z.coerce.number().min(0, 'Bathrooms must be non-negative'),
-  squareFeet: z.coerce.number().int().positive('Square feet must be positive').optional(),
+  squareFeet: z.string().optional().transform(val => {
+    if (!val || val.trim() === '') return undefined;
+    const num = Number(val);
+    if (isNaN(num) || num <= 0) throw new Error('Square feet must be a positive number');
+    return Math.floor(num);
+  }),
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   isAvailable: z.boolean(),
@@ -49,25 +69,32 @@ export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
     control,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<EditUnitFormData>({
+  } = useForm<EditUnitFormInputs>({
     resolver: zodResolver(editUnitSchema),
   });
   
   useEffect(() => {
     if (unit) {
       reset({
-          ...unit,
-          bathrooms: parseFloat(unit.bathrooms as any),
-          monthlyRent: parseFloat(unit.monthlyRent as any),
-          deposit: parseFloat(unit.deposit as any),
+          unitNumber: unit.unitNumber,
+          bedrooms: unit.bedrooms.toString(),
+          bathrooms: unit.bathrooms.toString(),
+          monthlyRent: unit.monthlyRent.toString(),
+          deposit: unit.deposit.toString(),
+          squareFeet: unit.squareFeet ? unit.squareFeet.toString() : '',
+          isAvailable: unit.isAvailable,
+          description: unit.description || '',
       });
     }
   }, [unit, reset]);
 
 
   const mutation = useMutation({
-    mutationFn: (updatedUnit: EditUnitFormData) =>
-      unitsApi.update(unit!.id, updatedUnit),
+    mutationFn: (updatedUnit: EditUnitFormInputs) => {
+      // Transform and validate the data
+      const validatedData = editUnitSchema.parse(updatedUnit);
+      return unitsApi.update(unit!.id, validatedData);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['property-details', unit?.propertyId] });
@@ -80,7 +107,7 @@ export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
     },
   });
 
-  const onSubmit = (data: EditUnitFormData) => {
+  const onSubmit = (data: EditUnitFormInputs) => {
     mutation.mutate(data);
   };
 
@@ -117,18 +144,51 @@ export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
               {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms.message}</p>}
             </div>
           </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="squareFeet">Square Feet (Optional)</Label>
+            <Input id="squareFeet" type="number" {...register('squareFeet')} />
+            {errors.squareFeet && <p className="text-sm text-red-500">{errors.squareFeet.message}</p>}
+          </div>
           
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="space-y-2">
-                <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
-                <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
-                {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
-              </div>
-               <div className="space-y-2">
-                <Label htmlFor="deposit">Deposit (UGX)</Label>
-                <Input id="deposit" type="number" {...register('deposit')} />
-                {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
+              <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
+              {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="deposit">Deposit (UGX)</Label>
+              <Input id="deposit" type="number" {...register('deposit')} />
+              {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <Controller
+              name="isAvailable"
+              control={control}
+              render={({ field }) => (
+                <Switch
+                  id="isAvailable"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              )}
+            />
+            <Label htmlFor="isAvailable" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              Unit Available for Rent
+            </Label>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="description">Description (Optional)</Label>
+            <Textarea 
+              id="description" 
+              placeholder="Enter unit description, amenities, or special features..."
+              {...register('description')} 
+            />
+            {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
           </div>
 
 

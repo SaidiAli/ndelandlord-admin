@@ -126,7 +126,7 @@ export const unitsApi = {
 
   getAvailable: async () => {
     // Use landlord-specific endpoint for available units
-    const response = await api.get('/landlords/units/available');
+    const response = await api.get('/units/available');
     return response.data;
   },
 

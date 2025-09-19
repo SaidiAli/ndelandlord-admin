@@ -34,10 +34,6 @@ export default function TenantsPage() {
         </div>
         
         <Card>
-          <CardHeader>
-            <CardTitle>All Tenants</CardTitle>
-            <CardDescription>A list of all tenants with active leases.</CardDescription>
-          </CardHeader>
           <CardContent>
             {tenantsLoading ? (
               <div className="text-center py-8">

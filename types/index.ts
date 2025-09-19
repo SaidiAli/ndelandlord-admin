@@ -415,3 +415,66 @@ export interface PropertyDashboardData {
     maintenanceRequests: number;
   };
 }
+
+// Unit Details API Response Type (from /units/:id/details endpoint)
+export interface UnitWithDetails {
+  unit: {
+    id: string;
+    unitNumber: string;
+    bedrooms: number;
+    bathrooms: string;
+    squareFeet?: number;
+    monthlyRent: string;
+    deposit: string;
+    isAvailable: boolean;
+    description?: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+  property: {
+    id: string;
+    name: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode?: string;
+  };
+  currentLease?: {
+    id: string;
+    startDate: string;
+    endDate: string;
+    monthlyRent: string;
+    deposit: string;
+    status: string;
+    terms?: string;
+  };
+  currentTenant?: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone?: string;
+    userName?: string;
+  };
+  leaseHistory: Array<{
+    lease: {
+      id: string;
+      startDate: string;
+      endDate: string;
+      monthlyRent: string;
+      status: string;
+      createdAt: string;
+    };
+    tenant: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+  }>;
+  analytics: {
+    occupancyRate: number;
+    totalRevenue: number;
+    averageLeaseLength: number;
+    daysVacant: number;
+  };
+}

@@ -123,6 +123,11 @@ export const unitsApi = {
     return response.data;
   },
 
+  getDetails: async (id: string) => {
+    const response = await api.get(`/units/${id}/details`);
+    return response.data;
+  },
+
   getAvailable: async () => {
     // Use landlord-specific endpoint for available units
     const response = await api.get('/units/available');

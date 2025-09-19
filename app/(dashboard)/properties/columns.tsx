@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,7 +14,11 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Property } from "@/types"
 
-export const columns: ColumnDef<Property>[] = [
+interface ColumnsProps {
+  onViewDetails: (propertyId: string) => void;
+}
+
+export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Property>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -67,9 +70,9 @@ export const columns: ColumnDef<Property>[] = [
               Copy property ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <Link href={`/properties/${property.id}`}>
-              <DropdownMenuItem>View details</DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem onClick={() => onViewDetails(property.id)}>
+              View details
+            </DropdownMenuItem>
             <DropdownMenuItem>Edit property</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -90,7 +90,7 @@ export const propertiesApi = {
   },
 
   getById: async (id: string) => {
-    const response = await api.get(`/properties/${id}`);
+    const response = await api.get(`/properties/${id}/details`);
     return response.data;
   },
 

@@ -35,19 +35,54 @@ export const columns: ColumnDef<TenantWithFullDetails>[] = [
     },
   },
   {
-    accessorKey: "unit",
-    header: "Property & Unit",
+    accessorKey: "leases",
+    header: "Properties & Units",
     cell: ({ row }) => {
-        const { property, unit } = row.original;
-        return <span>{property.name} - Unit {unit.unitNumber}</span>
+        const { leases } = row.original;
+        if (leases.length === 0) {
+          return <span className="text-gray-500">No leases</span>;
+        }
+        if (leases.length === 1) {
+          const { property, unit } = leases[0];
+          return <span>{property.name} - Unit {unit.unitNumber}</span>;
+        }
+        return (
+          <div className="space-y-1">
+            {leases.slice(0, 2).map((leaseInfo, index) => (
+              <div key={index} className="text-sm">
+                {leaseInfo.property.name} - Unit {leaseInfo.unit.unitNumber}
+              </div>
+            ))}
+            {leases.length > 2 && (
+              <div className="text-xs text-gray-500">+{leases.length - 2} more</div>
+            )}
+          </div>
+        );
     }
   },
   {
     accessorKey: "status",
     header: "Lease Status",
     cell: ({ row }) => {
-      const { lease } = row.original;
-      return <Badge variant={lease.status === 'active' ? 'default' : 'secondary'}>{lease.status}</Badge>
+      const { leases } = row.original;
+      if (leases.length === 0) {
+        return <Badge variant="outline">No leases</Badge>;
+      }
+      
+      // Show status of most recent lease (first in array since backend orders by createdAt desc)
+      const mostRecentLease = leases[0];
+      const hasMultiple = leases.length > 1;
+      
+      return (
+        <div className="space-y-1">
+          <Badge variant={mostRecentLease.lease.status === 'active' ? 'default' : 'secondary'}>
+            {mostRecentLease.lease.status}
+          </Badge>
+          {hasMultiple && (
+            <div className="text-xs text-gray-500">+{leases.length - 1} more</div>
+          )}
+        </div>
+      );
     }
   },
   {

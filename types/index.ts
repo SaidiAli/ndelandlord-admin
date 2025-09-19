@@ -336,21 +336,23 @@ export interface TenantWithFullDetails {
     isActive: boolean;
     createdAt: string;
   };
-  lease: {
-    id: string;
-    status: string;
-    startDate: string;
-    endDate: string;
-    monthlyRent: string;
-  };
-  unit: {
-    id: string;
-    unitNumber: string;
-  };
-  property: {
-    id: string;
-    name: string;
-  };
+  leases: Array<{
+    lease: {
+      id: string;
+      status: string;
+      startDate: string;
+      endDate: string;
+      monthlyRent: string;
+    };
+    unit: {
+      id: string;
+      unitNumber: string;
+    };
+    property: {
+      id: string;
+      name: string;
+    };
+  }>;
   paymentSummary: {
     totalPaid: number;
     outstandingBalance: number;

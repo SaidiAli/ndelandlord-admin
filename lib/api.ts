@@ -53,7 +53,6 @@ export const usersApi = {
 // Tenants API functions  
 export const tenantsApi = {
   getAll: async () => {
-    // Get all tenants for the current landlord
     const response = await api.get('/tenants');
     return response.data;
   },
@@ -149,7 +148,6 @@ export const unitsApi = {
 // Leases API functions
 export const leasesApi = {
   getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
     const response = await api.get<ApiResponse<LeaseApiResponse[]>>(`/leases?_t=${Date.now()}`);
     if (response.data?.data && Array.isArray(response.data.data)) {
       return {
@@ -157,7 +155,7 @@ export const leasesApi = {
         data: response.data.data.map(transformLeaseResponse)
       };
     }
-    // Return empty array if no data to maintain consistent type
+    
     return {
       success: false,
       data: [],

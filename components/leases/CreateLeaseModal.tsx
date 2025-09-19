@@ -110,8 +110,8 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
                   </SelectTrigger>
                   <SelectContent>
                     {availableUnits.map((item) => (
-                      <SelectItem key={item.unit.id} value={item.unit.id}>
-                        {item.property.name} - Unit {item.unit.unitNumber}
+                      <SelectItem key={item.id} value={item.id}>
+                        {item.property.name} - Unit {item.unitNumber}
                       </SelectItem>
                     ))}
                   </SelectContent>

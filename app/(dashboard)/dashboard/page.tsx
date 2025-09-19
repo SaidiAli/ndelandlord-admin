@@ -14,15 +14,15 @@ export default function DashboardPage() {
   const { user } = useAuth();
   
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
-    queryKey: ['landlord-dashboard', user?.id], // Include user ID to prevent cache sharing between users
+    queryKey: ['landlord-dashboard', user?.id],
     queryFn: () => landlordApi.getDashboardData(),
-    enabled: !!user, // Only fetch when user is available
+    enabled: !!user,
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
-    queryKey: ['recent-payments', user?.id], // Include user ID to prevent cache sharing between users
-    queryFn: () => paymentsApi.getAll(), // We still need this for the detailed recent payments list
-    enabled: !!user, // Only fetch when user is available
+    queryKey: ['recent-payments', user?.id],
+    queryFn: () => paymentsApi.getAll(), 
+    enabled: !!user,
   });
 
   const summary = dashboardData?.data?.summary;

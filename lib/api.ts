@@ -296,7 +296,6 @@ export const maintenanceApi = {
 
 export const landlordApi = {
   getDashboardData: async () => {
-    // Add timestamp to prevent caching issues between different users
     const response = await api.get(`/landlords/dashboard/complete?_t=${Date.now()}`);
     return response.data;
   },

@@ -18,7 +18,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Unit, User } from '@/types';
+import { TenantWithFullDetails, Unit, User } from '@/types';
 import { toast } from 'sonner';
 
 const createLeaseSchema = z.object({
@@ -51,7 +51,7 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
     queryKey: ['tenants'],
     queryFn: () => tenantsApi.getAll(),
   });
-  const tenants: User[] = tenantsData?.data || [];
+  const tenants: TenantWithFullDetails[] = tenantsData?.data || [];
 
 
   const {
@@ -132,9 +132,9 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
                     <SelectValue placeholder="Select a tenant" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tenants.map((tenant) => (
-                      <SelectItem key={tenant.id} value={tenant.id}>
-                        {tenant.firstName} {tenant.lastName}
+                    {tenants.map((t) => (
+                      <SelectItem key={t.tenant.id} value={t.tenant.id}>
+                        {t.tenant.firstName} {t.tenant.lastName}
                       </SelectItem>
                     ))}
                   </SelectContent>

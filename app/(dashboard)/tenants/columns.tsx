@@ -13,9 +13,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
-import { Lease } from "@/types"
+import { TenantWithFullDetails } from "@/types"
 
-export const columns: ColumnDef<Lease>[] = [
+export const columns: ColumnDef<TenantWithFullDetails>[] = [
   {
     accessorKey: "tenant",
     header: ({ column }) => {
@@ -31,29 +31,45 @@ export const columns: ColumnDef<Lease>[] = [
     },
     cell: ({ row }) => {
       const tenant = row.original.tenant;
-      return <div className="font-medium">{tenant?.firstName} {tenant?.lastName}</div>
+      return <div className="font-medium">{tenant.firstName} {tenant.lastName}</div>
     },
   },
   {
     accessorKey: "unit",
     header: "Property & Unit",
     cell: ({ row }) => {
-        const lease = row.original;
-        return <span>{lease.unit?.property?.name} - Unit {lease.unit?.unitNumber}</span>
+        const { property, unit } = row.original;
+        return <span>{property.name} - Unit {unit.unitNumber}</span>
     }
   },
   {
     accessorKey: "status",
     header: "Lease Status",
     cell: ({ row }) => {
-      const lease = row.original;
+      const { lease } = row.original;
       return <Badge variant={lease.status === 'active' ? 'default' : 'secondary'}>{lease.status}</Badge>
+    }
+  },
+  {
+    accessorKey: "paymentStatus",
+    header: "Payment Status",
+    cell: ({ row }) => {
+      const { paymentSummary } = row.original;
+      const getStatusVariant = (status: string) => {
+        switch (status) {
+          case 'current': return 'default';
+          case 'overdue': return 'destructive';
+          case 'advance': return 'secondary';
+          default: return 'outline';
+        }
+      };
+      return <Badge variant={getStatusVariant(paymentSummary.paymentStatus)}>{paymentSummary.paymentStatus}</Badge>
     }
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const lease = row.original
+      const { tenant } = row.original
  
       return (
         <DropdownMenu>
@@ -66,7 +82,7 @@ export const columns: ColumnDef<Lease>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(lease.tenant?.id || '')}
+              onClick={() => navigator.clipboard.writeText(tenant.id)}
             >
               Copy tenant ID
             </DropdownMenuItem>

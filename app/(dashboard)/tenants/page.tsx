@@ -5,20 +5,19 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Users } from 'lucide-react';
-import { leasesApi } from '@/lib/api';
-import { Lease } from '@/types';
+import { tenantsApi } from '@/lib/api';
 import { AddTenantModal } from '@/components/tenants/AddTenantModal';
 import { columns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 
 export default function TenantsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const { data: leasesData, isLoading: leasesLoading } = useQuery({
-    queryKey: ['leases'],
-    queryFn: () => leasesApi.getAll(),
+  const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
+    queryKey: ['tenants'],
+    queryFn: () => tenantsApi.getAll(),
   });
 
-  const leases: Lease[] = leasesData?.data || [];
+  const tenants = tenantsData?.data || [];
 
   return (
     <>
@@ -40,12 +39,12 @@ export default function TenantsPage() {
             <CardDescription>A list of all tenants with active leases.</CardDescription>
           </CardHeader>
           <CardContent>
-            {leasesLoading ? (
+            {tenantsLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
                 <p className="text-sm text-gray-500 mt-2">Loading tenants...</p>
               </div>
-            ) : leases.length === 0 ? (
+            ) : tenants.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 <Users className="h-12 w-12 mx-auto text-gray-400" />
                 <p className="mt-4 font-semibold">No tenants found</p>
@@ -56,7 +55,7 @@ export default function TenantsPage() {
                 </Button>
               </div>
             ) : (
-              <DataTable columns={columns} data={leases} searchKey="tenant" />
+              <DataTable columns={columns} data={tenants} searchKey="tenant" />
             )}
           </CardContent>
         </Card>

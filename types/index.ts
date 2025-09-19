@@ -324,3 +324,37 @@ export interface PaymentAnalytics {
     totalAmount: number;
   }[];
 }
+
+export interface TenantWithFullDetails {
+  tenant: {
+    id: string;
+    userName: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    phone: string;
+    isActive: boolean;
+    createdAt: string;
+  };
+  lease: {
+    id: string;
+    status: string;
+    startDate: string;
+    endDate: string;
+    monthlyRent: string;
+  };
+  unit: {
+    id: string;
+    unitNumber: string;
+  };
+  property: {
+    id: string;
+    name: string;
+  };
+  paymentSummary: {
+    totalPaid: number;
+    outstandingBalance: number;
+    lastPaymentDate?: string;
+    paymentStatus: 'current' | 'overdue' | 'advance';
+  };
+}

@@ -53,7 +53,7 @@ export const usersApi = {
 // Tenants API functions  
 export const tenantsApi = {
   getAll: async () => {
-    const response = await api.get('/tenants');
+    const response = await api.get('/users/tenants/my-tenants');
     return response.data;
   },
 };

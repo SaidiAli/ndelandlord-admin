@@ -17,7 +17,10 @@ import { Badge } from "@/components/ui/badge"
 import { Lease } from "@/types"
 import { formatUGX } from "@/lib/currency"
 
-export const getColumns = (onEdit: (lease: Lease) => void): ColumnDef<Lease>[] => [
+export const getColumns = (
+  onEdit: (lease: Lease) => void,
+  onViewDetails?: (leaseId: string) => void
+): ColumnDef<Lease>[] => [
   {
     accessorKey: "tenant",
     header: "Tenant",
@@ -144,7 +147,7 @@ export const getColumns = (onEdit: (lease: Lease) => void): ColumnDef<Lease>[] =
               Copy lease ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>View details</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onViewDetails?.(lease.id)}>View details</DropdownMenuItem>
             <DropdownMenuItem onClick={() => onEdit(lease)}>Edit lease</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -9,6 +9,7 @@ import { leasesApi } from '@/lib/api';
 import { Lease } from '@/types';
 import { CreateLeaseModal } from '@/components/leases/CreateLeaseModal';
 import { EditLeaseModal } from '@/components/leases/EditLeaseModal';
+import { LeaseDetailsModal } from '@/components/leases/LeaseDetailsModal';
 import { getColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,7 +17,9 @@ import { useAuth } from '@/hooks/useAuth';
 export default function LeasesPage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedLease, setSelectedLease] = useState<Lease | null>(null);
+  const [selectedLeaseId, setSelectedLeaseId] = useState<string | null>(null);
   const { user } = useAuth();
 
   const { data: leasesData, isLoading: leasesLoading } = useQuery({
@@ -32,7 +35,17 @@ export default function LeasesPage() {
     setIsEditModalOpen(true);
   };
 
-  const columns = getColumns(handleEdit);
+  const handleViewDetails = (leaseId: string) => {
+    setSelectedLeaseId(leaseId);
+    setIsDetailsModalOpen(true);
+  };
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedLeaseId(null);
+  };
+
+  const columns = getColumns(handleEdit, handleViewDetails);
 
   return (
     <>
@@ -77,6 +90,11 @@ export default function LeasesPage() {
       </div>
       <CreateLeaseModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
       <EditLeaseModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} lease={selectedLease} />
+      <LeaseDetailsModal 
+        isOpen={isDetailsModalOpen} 
+        onClose={handleCloseDetailsModal} 
+        leaseId={selectedLeaseId} 
+      />
     </>
   );
 }

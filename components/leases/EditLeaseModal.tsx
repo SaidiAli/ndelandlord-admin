@@ -29,6 +29,13 @@ const editLeaseSchema = z.object({
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   status: z.enum(['draft', 'active', 'expired', 'terminated']),
   terms: z.string().optional(),
+}).refine((data) => {
+  const startDate = new Date(data.startDate);
+  const endDate = new Date(data.endDate);
+  return endDate > startDate;
+}, {
+  message: 'End date must be after start date',
+  path: ['endDate'],
 });
 
 type EditLeaseFormData = z.infer<typeof editLeaseSchema>;
@@ -79,6 +86,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
   });
 
   const onSubmit = (data: EditLeaseFormData) => {
+    console.log(data)
     mutation.mutate(data);
   };
 

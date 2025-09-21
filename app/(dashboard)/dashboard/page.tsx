@@ -9,6 +9,11 @@ import { formatUGX } from '@/lib/currency';
 import { Payment } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { OverduePaymentsWidget } from '@/components/dashboard/OverduePaymentsWidget';
+import { RevenueForecastWidget } from '@/components/dashboard/RevenueForecastWidget';
+import { LeasePerformanceWidget } from '@/components/dashboard/LeasePerformanceWidget';
+import { CollectionRateWidget } from '@/components/dashboard/CollectionRateWidget';
+import { UpcomingPaymentsWidget } from '@/components/dashboard/UpcomingPaymentsWidget';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -27,6 +32,7 @@ export default function DashboardPage() {
 
   const summary = dashboardData?.data?.summary;
   const recentPayments: Payment[] = paymentsData?.data?.slice(0, 5) || [];
+  const isLoading = dashboardLoading || paymentsLoading;
 
   return (
     <div className="space-y-6">
@@ -36,7 +42,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Loading State */}
-      {dashboardLoading && (
+      {isLoading && (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-sm text-gray-500 mt-2">Loading dashboard data...</p>
@@ -93,6 +99,14 @@ export default function DashboardPage() {
       )}
 
       {/* Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <OverduePaymentsWidget />
+        <RevenueForecastWidget />
+        <LeasePerformanceWidget />
+        <CollectionRateWidget />
+        <UpcomingPaymentsWidget />
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">

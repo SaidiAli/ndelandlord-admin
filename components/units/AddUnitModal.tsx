@@ -28,8 +28,6 @@ const addUnitSchema = z.object({
   bedrooms: z.coerce.number().int().min(0, 'Bedrooms must be non-negative'),
   bathrooms: z.coerce.number().min(0, 'Bathrooms must be non-negative'),
   squareFeet: z.coerce.number().int().positive('Square feet must be positive').optional(),
-  monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
-  deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   description: z.string().optional(),
 });
 
@@ -131,18 +129,6 @@ export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
               <Input id="bathrooms" type="number" step="0.5" {...register('bathrooms')} />
               {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms.message}</p>}
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
-            <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
-            {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="deposit">Deposit (UGX)</Label>
-            <Input id="deposit" type="number" {...register('deposit')} />
-            {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
           </div>
 
           <DialogFooter>

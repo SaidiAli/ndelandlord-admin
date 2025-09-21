@@ -9,15 +9,14 @@ import { BarChart3, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { MonthlyCollectionChart } from '@/components/analytics/MonthlyCollectionChart';
-import { PaymentComplianceDashboard } from '@/components/analytics/PaymentComplianceDashboard';
 
 export default function ReportsPage() {
   const { user } = useAuth();
   
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['payment-analytics', user?.id],
+    queryKey: ['payment-analytics', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => paymentsApi.getAnalytics(),
-    enabled: !!user,
+    enabled: !!user, // Only fetch when user is available
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
@@ -50,8 +49,6 @@ export default function ReportsPage() {
           Export Reports
         </Button>
       </div>
-
-      <PaymentComplianceDashboard />
 
       <Card>
         <CardHeader>

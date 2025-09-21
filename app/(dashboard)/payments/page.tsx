@@ -9,11 +9,11 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Search, 
-  Filter, 
-  Download, 
-  Eye, 
+import {
+  Search,
+  Filter,
+  Download,
+  Eye,
   RefreshCw,
   CreditCard,
   TrendingUp,
@@ -200,16 +200,9 @@ export default function PaymentsPage() {
                         <p className="font-medium">
                           {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
                         </p>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm text-gray-500">
-                            {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
-                          </p>
-                          {payment.paymentSchedule && (
-                            <Badge variant="outline" className="text-xs">
-                              {new Date(payment.paymentSchedule.periodStart).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                            </Badge>
-                          )}
-                        </div>
+                        <p className="text-sm text-gray-500">
+                          {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -273,6 +266,7 @@ export default function PaymentsPage() {
                 ) : (
                   filteredPayments.map((payment) => {
                     const providerInfo = getProviderInfo(payment.mobileMoneyProvider);
+                    const periodCovered = (payment as any).periodCovered;
                     return (
                       <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                         <div className="flex items-center space-x-4">
@@ -296,21 +290,14 @@ export default function PaymentsPage() {
                             <p className="text-sm text-gray-500">
                               {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
                             </p>
-                            <div className="flex items-center gap-2">
-                              <p className="text-xs text-gray-400">
-                                ID: {payment.transactionId || payment.id}
-                              </p>
-                              {payment.paymentSchedule && (
-                                <Badge variant="outline" className="text-xs">
-                                  Covers: {new Date(payment.paymentSchedule.periodStart).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                                </Badge>
-                              )}
-                              {payment.scheduleId && !payment.paymentSchedule && (
-                                <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700">
-                                  Scheduled Payment
-                                </Badge>
-                              )}
-                            </div>
+                            <p className="text-xs text-gray-400">
+                              ID: {payment.transactionId || payment.id}
+                            </p>
+                            {periodCovered && (
+                                <p className="text-xs text-gray-500">
+                                    Covers: {periodCovered}
+                                </p>
+                            )}
                           </div>
                         </div>
                         <div className="text-right">

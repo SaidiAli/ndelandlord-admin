@@ -12,6 +12,7 @@ import {
   Wrench,
   BarChart3,
   Settings,
+  History,
 } from 'lucide-react';
 
 const navigation = [
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Tenants', href: '/tenants', icon: Users },
   { name: 'Leases', href: '/leases', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
+  { name: 'Payment History', href: '/payments/history', icon: History },
   // { name: 'Maintenance', href: '/maintenance', icon: Wrench },
   { name: 'Reports', href: '/reports', icon: BarChart3 },
 ];

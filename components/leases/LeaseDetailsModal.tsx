@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { leasesApi, paymentScheduleApi } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
+import { leasesApi, paymentsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,80 +11,37 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Clock, CheckCircle, AlertCircle, Settings, RefreshCw } from 'lucide-react';
+import { CalendarDays, Home, Phone, Mail, User, MapPin, FileText } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
-import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PaymentScheduleTab } from './PaymentScheduleTab';
 
 interface LeaseDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  leaseId: string | null;
+  leaseId: string;
 }
 
 export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModalProps) {
-  const queryClient = useQueryClient();
-
-  const { data: leaseDetailsData, isLoading } = useQuery({
+  const { data: leaseDetailsData, isLoading: leaseLoading } = useQuery({
     queryKey: ['lease-details', leaseId],
-    queryFn: () => leasesApi.getById(leaseId!),
+    queryFn: () => leasesApi.getById(leaseId),
     enabled: !!leaseId && isOpen,
   });
 
-  const { data: paymentScheduleData, isLoading: scheduleLoading } = useQuery({
-    queryKey: ['payment-schedule', leaseId],
-    queryFn: () => paymentScheduleApi.getByLease(leaseId!),
+  const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
+    queryKey: ['lease-payments', leaseId],
+    queryFn: () => paymentsApi.getByLease(leaseId),
     enabled: !!leaseId && isOpen,
   });
 
-  const { data: leaseBalanceData } = useQuery({
-    queryKey: ['lease-balance', leaseId],
-    queryFn: () => leasesApi.getBalance(leaseId!),
-    enabled: !!leaseId && isOpen,
-  });
+  console.log("lease details", leaseDetailsData?.data)
 
   const leaseDetails = leaseDetailsData?.data;
-  const paymentSchedule = paymentScheduleData?.data || [];
-  const leaseBalance = leaseBalanceData?.data;
-
-  // Lease lifecycle mutations
-  const activateMutation = useMutation({
-    mutationFn: () => leasesApi.activate(leaseId!, leaseDetails?.paymentDay || 1),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      toast.success('Lease activated successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to activate lease');
-    },
-  });
-
-  const approveMutation = useMutation({
-    mutationFn: () => leasesApi.approve(leaseId!),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      toast.success('Lease approved successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to approve lease');
-    },
-  });
-
-  const terminateMutation = useMutation({
-    mutationFn: (reason?: string) => leasesApi.terminate(leaseId!, reason),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      toast.success('Lease terminated successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to terminate lease');
-    },
-  });
+  const payments = paymentsData?.data || [];
+  const isLoading = leaseLoading || paymentsLoading;
 
   if (!isOpen || !leaseId) return null;
 
@@ -163,72 +120,16 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
             <span className="ml-2 text-sm text-gray-500">Loading lease details...</span>
           </div>
         ) : leaseDetails ? (
-          <div className="space-y-6">
-            {/* Lease Actions Bar */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center gap-4">
-                <div>
-                  <h3 className="font-semibold">Lease Status: </h3>
-                  <Badge variant={getStatusVariant(leaseDetails.status)} className="mt-1">
-                    {leaseDetails.status}
-                  </Badge>
-                </div>
-                {leaseBalance && (
-                  <div>
-                    <h3 className="font-semibold">Current Balance: </h3>
-                    <p className={`font-bold ${leaseBalance.currentBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                      {formatUGX(leaseBalance.currentBalance)}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className="flex items-center gap-2">
-                {leaseDetails.status === 'draft' && (
-                  <Button 
-                    onClick={() => approveMutation.mutate()}
-                    disabled={approveMutation.isPending}
-                    variant="outline"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Approve
-                  </Button>
-                )}
-                {leaseDetails.status === 'approved' && (
-                  <Button 
-                    onClick={() => activateMutation.mutate()}
-                    disabled={activateMutation.isPending}
-                  >
-                    <Settings className="h-4 w-4 mr-2" />
-                    Activate
-                  </Button>
-                )}
-                {(leaseDetails.status === 'active' || leaseDetails.status === 'expiring') && (
-                  <Button 
-                    onClick={() => terminateMutation.mutate()}
-                    disabled={terminateMutation.isPending}
-                    variant="destructive"
-                  >
-                    <AlertCircle className="h-4 w-4 mr-2" />
-                    Terminate
-                  </Button>
-                )}
-                <Button onClick={onClose} variant="outline">Close</Button>
-              </div>
-            </div>
-
-            <Tabs defaultValue="overview" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="payments">Payment Schedule</TabsTrigger>
-                <TabsTrigger value="property">Property & Unit</TabsTrigger>
-                <TabsTrigger value="tenant">Tenant Info</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="overview" className="space-y-6">
-                {/* Lease Summary */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+          <Tabs defaultValue="overview" className="space-y-4">
+            <TabsList>
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="payment-schedule">Payment Schedule</TabsTrigger>
+            </TabsList>
+            <TabsContent value="overview" className="space-y-6">
+            {/* Lease Summary */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
                   <FileText className="h-5 w-5" />
                   Lease Summary
                 </CardTitle>
@@ -439,10 +340,14 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
               </Card>
             )}
 
+            </TabsContent>
+            <TabsContent value="payment-schedule">
+              <PaymentScheduleTab lease={leaseDetails} payments={payments} />
+            </TabsContent>
             <div className="flex justify-end">
               <Button onClick={onClose}>Close</Button>
             </div>
-          </div>
+          </Tabs>
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500">Lease details not found.</p>

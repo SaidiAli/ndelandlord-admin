@@ -126,6 +126,8 @@ NDI Landlord Property Management
     }
   };
 
+  const periodCovered = (payment as any).periodCovered;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -184,6 +186,11 @@ NDI Landlord Property Management
                     Paid on {new Date(payment.paidDate).toLocaleDateString()} at{' '}
                     {new Date(payment.paidDate).toLocaleTimeString()}
                   </div>
+                )}
+                {periodCovered && (
+                    <div className="text-sm text-gray-500 mt-1">
+                        Covers period: {periodCovered}
+                    </div>
                 )}
               </div>
             </CardContent>

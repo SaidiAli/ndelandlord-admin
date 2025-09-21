@@ -23,7 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { TenantWithFullDetails, Unit, User } from '@/types';
 import { toast } from 'sonner';
 import { formatUGX } from '@/lib/currency';
-import { Calendar, Clock } from 'lucide-react';
+import { Calendar, Clock, Info } from 'lucide-react';
 
 const createLeaseSchema = z.object({
   unitId: z.string().uuid('Please select a unit'),
@@ -82,7 +82,7 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
   // Watch form values for preview
   const watchedValues = watch();
 
-  // Calculate payment schedule preview
+  // Calculate payment schedule preview with proration
   const calculatePaymentPreview = () => {
     const { startDate, endDate, monthlyRent, paymentDay } = watchedValues;
     
@@ -103,6 +103,24 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
     let currentDate = new Date(start);
     let paymentNumber = 1;
 
+    // Helper function to calculate proration
+    const calculateProration = (periodStart: Date, periodEnd: Date, monthlyAmount: number) => {
+      const month = periodStart.getMonth();
+      const year = periodStart.getFullYear();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      
+      // Calculate actual days in the period
+      const actualStart = new Date(Math.max(periodStart.getTime(), start.getTime()));
+      const actualEnd = new Date(Math.min(periodEnd.getTime(), end.getTime()));
+      
+      if (actualEnd <= actualStart) return 0;
+      
+      const timeDiff = actualEnd.getTime() - actualStart.getTime();
+      const daysUsed = Math.ceil(timeDiff / (1000 * 60 * 60 * 24)) + 1; // +1 to include both start and end days
+      
+      return (daysUsed / daysInMonth) * monthlyAmount;
+    };
+
     while (currentDate <= end) {
       const dueDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), payDay);
       
@@ -114,10 +132,42 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
       // Stop if due date exceeds lease end
       if (dueDate > end) break;
 
+      // Calculate period for this payment
+      const periodStart = paymentNumber === 1 ? new Date(start) : new Date(dueDate.getFullYear(), dueDate.getMonth() - 1, payDay);
+      const periodEnd = new Date(dueDate.getFullYear(), dueDate.getMonth(), payDay - 1);
+      
+      // Check if this is first or last payment that needs proration
+      let amount = rent;
+      let isProrated = false;
+      let prorationNote = '';
+
+      // First payment proration
+      if (paymentNumber === 1 && start.getDate() !== payDay) {
+        amount = calculateProration(periodStart, periodEnd, rent);
+        isProrated = true;
+        prorationNote = 'First month (prorated)';
+      }
+      
+      // Check if this is the last payment
+      const nextDueDate = new Date(dueDate);
+      nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+      if (nextDueDate > end) {
+        // This is the last payment, check if it needs proration
+        if (end.getDate() !== payDay - 1) {
+          amount = calculateProration(periodStart, periodEnd, rent);
+          isProrated = true;
+          prorationNote = paymentNumber === 1 ? 'Single month (prorated)' : 'Last month (prorated)';
+        }
+      }
+
       payments.push({
         number: paymentNumber,
         dueDate: dueDate.toLocaleDateString(),
-        amount: rent,
+        amount: Math.round(amount * 100) / 100, // Round to 2 decimal places
+        isProrated,
+        prorationNote,
+        periodStart: periodStart.toLocaleDateString(),
+        periodEnd: periodEnd.toLocaleDateString(),
       });
 
       paymentNumber++;
@@ -304,23 +354,56 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               <CardContent>
                 <div className="space-y-2">
                   {paymentPreview.map((payment, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-md">
-                      <div className="flex items-center gap-3">
-                        <Badge variant="outline">Payment {payment.number}</Badge>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Clock className="h-3 w-3" />
-                          Due: {payment.dueDate}
+                    <div key={index} className={`p-3 border rounded-md ${payment.isProrated ? 'bg-blue-50 border-blue-200' : ''}`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Badge variant={payment.isProrated ? "secondary" : "outline"}>
+                            Payment {payment.number}
+                          </Badge>
+                          <div className="flex items-center gap-1 text-sm text-gray-600">
+                            <Clock className="h-3 w-3" />
+                            Due: {payment.dueDate}
+                          </div>
+                          {payment.isProrated && (
+                            <div 
+                              className="flex items-center gap-1 cursor-help"
+                              title="This payment is prorated based on the actual days in the rental period. Amount calculated as: (Days in period ÷ Days in month) × Monthly rent"
+                            >
+                              <Info className="h-3 w-3 text-blue-600" />
+                              <span className="text-xs text-blue-600 font-medium">
+                                {payment.prorationNote}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className={`font-semibold ${payment.isProrated ? 'text-blue-600' : 'text-green-600'}`}>
+                          {formatUGX(payment.amount)}
                         </div>
                       </div>
-                      <div className="font-semibold text-green-600">
-                        {formatUGX(payment.amount)}
-                      </div>
+                      {payment.isProrated && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          Period: {payment.periodStart} - {payment.periodEnd}
+                        </div>
+                      )}
                     </div>
                   ))}
                   {calculatePaymentPreview().length > 5 && (
                     <p className="text-xs text-gray-500 text-center mt-2">
                       ... and {calculatePaymentPreview().length - 5} more payments
                     </p>
+                  )}
+                  
+                  {paymentPreview.some(p => p.isProrated) && (
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Info className="h-4 w-4 text-blue-600" />
+                        <span className="text-sm font-medium text-blue-700">About Proration</span>
+                      </div>
+                      <p className="text-xs text-blue-600">
+                        Prorated payments are calculated based on the actual number of days in the rental period. 
+                        This ensures fair billing when the lease doesn't start or end exactly on the payment day.
+                      </p>
+                    </div>
                   )}
                 </div>
               </CardContent>

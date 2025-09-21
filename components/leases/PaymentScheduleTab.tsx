@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatUGX } from '@/lib/currency';
 import { PaymentSchedule, LeaseBalance } from '@/types';
-import { Calendar, Clock, CheckCircle, AlertCircle, DollarSign } from 'lucide-react';
+import { Calendar, Clock, CheckCircle, AlertCircle, DollarSign, Info } from 'lucide-react';
 
 interface PaymentScheduleTabProps {
   paymentSchedule: PaymentSchedule[];
@@ -35,6 +35,31 @@ export function PaymentScheduleTab({ paymentSchedule, leaseBalance, isLoading }:
     } else {
       return <Badge variant="outline"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
     }
+  };
+
+  // Helper function to check if payment is prorated
+  const isProrated = (schedule: PaymentSchedule, scheduleList: PaymentSchedule[]) => {
+    const isFirst = schedule.paymentNumber === 1;
+    const isLast = schedule.paymentNumber === scheduleList.length;
+    
+    if (!isFirst && !isLast) return false;
+    
+    // Check if amount differs from typical monthly amount
+    const typicalAmount = scheduleList.find(s => s.paymentNumber === 2)?.amount || schedule.amount;
+    return Math.abs(schedule.amount - typicalAmount) > 0.01;
+  };
+
+  const getProrationNote = (schedule: PaymentSchedule, scheduleList: PaymentSchedule[]) => {
+    if (!isProrated(schedule, scheduleList)) return null;
+    
+    if (schedule.paymentNumber === 1 && schedule.paymentNumber === scheduleList.length) {
+      return 'Single month (prorated)';
+    } else if (schedule.paymentNumber === 1) {
+      return 'First month (prorated)';
+    } else if (schedule.paymentNumber === scheduleList.length) {
+      return 'Last month (prorated)';
+    }
+    return null;
   };
 
   const upcomingPayments = paymentSchedule.filter(p => !p.isPaid);
@@ -132,38 +157,64 @@ export function PaymentScheduleTab({ paymentSchedule, leaseBalance, isLoading }:
 
               {/* Payment List */}
               <div className="space-y-2 max-h-96 overflow-y-auto">
-                {paymentSchedule.map((payment) => (
-                  <div
-                    key={payment.id}
-                    className={`flex items-center justify-between p-4 border rounded-lg ${
-                      payment.isPaid ? 'bg-green-50 border-green-200' : 
-                      new Date(payment.dueDate) < new Date() ? 'bg-red-50 border-red-200' : 
-                      'bg-white border-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="font-semibold">Payment {payment.paymentNumber}</div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(payment.periodStart).toLocaleDateString()} - {new Date(payment.periodEnd).toLocaleDateString()}
+                {paymentSchedule.map((payment) => {
+                  const prorated = isProrated(payment, paymentSchedule);
+                  const prorationNote = getProrationNote(payment, paymentSchedule);
+                  
+                  return (
+                    <div
+                      key={payment.id}
+                      className={`p-4 border rounded-lg ${
+                        payment.isPaid ? 'bg-green-50 border-green-200' : 
+                        new Date(payment.dueDate) < new Date() ? 'bg-red-50 border-red-200' : 
+                        prorated ? 'bg-blue-50 border-blue-200' :
+                        'bg-white border-gray-200'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="text-center">
+                            <div className="font-semibold flex items-center gap-2">
+                              Payment {payment.paymentNumber}
+                              {prorated && (
+                                <div className="flex items-center gap-1">
+                                  <Info className="h-3 w-3 text-blue-600" />
+                                  <span className="text-xs text-blue-600 font-medium">
+                                    {prorationNote}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {new Date(payment.periodStart).toLocaleDateString()} - {new Date(payment.periodEnd).toLocaleDateString()}
+                            </div>
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-1 text-sm text-gray-600">
+                              <Clock className="h-3 w-3" />
+                              Due: {new Date(payment.dueDate).toLocaleDateString()}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center gap-4">
+                          <div className="text-right">
+                            <div className={`font-semibold ${prorated ? 'text-blue-600' : ''}`}>
+                              {formatUGX(payment.amount)}
+                            </div>
+                          </div>
+                          {getPaymentStatusBadge(payment)}
                         </div>
                       </div>
-                      <div>
-                        <div className="flex items-center gap-1 text-sm text-gray-600">
-                          <Clock className="h-3 w-3" />
-                          Due: {new Date(payment.dueDate).toLocaleDateString()}
+                      
+                      {payment.paidPaymentId && (
+                        <div className="mt-2 text-xs text-gray-500">
+                          Payment ID: {payment.paidPaymentId}
                         </div>
-                      </div>
+                      )}
                     </div>
-                    
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="font-semibold">{formatUGX(payment.amount)}</div>
-                      </div>
-                      {getPaymentStatusBadge(payment)}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

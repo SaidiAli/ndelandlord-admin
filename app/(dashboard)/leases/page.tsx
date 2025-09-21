@@ -1,13 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { PlusCircle, FileText, Filter, Search, Calendar, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { PlusCircle, FileText, Filter, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { leasesApi } from '@/lib/api';
 import { Lease } from '@/types';
 import { CreateLeaseModal } from '@/components/leases/CreateLeaseModal';

@@ -13,31 +13,30 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CalendarDays, Home, Phone, Mail, User, MapPin, FileText } from 'lucide-react';
+import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Clock } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PaymentScheduleTab } from './PaymentScheduleTab';
+import { useEffect } from 'react';
 
 interface LeaseDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  leaseId: string;
+  leaseId: string | null;
 }
 
 export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModalProps) {
   const { data: leaseDetailsData, isLoading: leaseLoading } = useQuery({
     queryKey: ['lease-details', leaseId],
-    queryFn: () => leasesApi.getById(leaseId),
+    queryFn: () => leasesApi.getById(leaseId!),
     enabled: !!leaseId && isOpen,
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
     queryKey: ['lease-payments', leaseId],
-    queryFn: () => paymentsApi.getByLease(leaseId),
+    queryFn: () => paymentsApi.getByLease(leaseId!),
     enabled: !!leaseId && isOpen,
   });
-
-  console.log("lease details", leaseDetailsData?.data)
 
   const leaseDetails = leaseDetailsData?.data;
   const payments = paymentsData?.data || [];
@@ -342,7 +341,7 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
 
             </TabsContent>
             <TabsContent value="payment-schedule">
-              <PaymentScheduleTab lease={leaseDetails} payments={payments} />
+              {leaseDetails && <PaymentScheduleTab lease={leaseDetails} payments={payments} />}
             </TabsContent>
             <div className="flex justify-end">
               <Button onClick={onClose}>Close</Button>

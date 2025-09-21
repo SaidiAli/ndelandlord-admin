@@ -24,7 +24,10 @@ const calculateProratedAmount = (date: Date, monthlyRent: number, isEndDate: boo
 };
 
 export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps) {
-  console.log("PaymentScheduleTab lease", lease)
+  if (!lease) {
+    return <div>Loading schedule...</div>;
+  }
+
   const paymentSchedules: { month: string; amount: number; isProrated: boolean; status: string; payment?: Payment }[] = [];
   const startDate = new Date(lease.startDate);
   const endDate = new Date(lease.endDate);

@@ -65,7 +65,7 @@ export interface Lease {
   endDate: string;
   monthlyRent: number;
   deposit: number;
-  paymentDay: number; // Day of month (1-31) when rent is due
+  paymentDay: number;
   status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
   terms?: string;
   previousLeaseId?: string; // For lease renewals
@@ -100,13 +100,13 @@ export interface Payment {
 export interface PaymentSchedule {
   id: string;
   leaseId: string;
-  paymentNumber: number; // 1, 2, 3, etc.
+  paymentNumber: number;
   dueDate: string;
   amount: number;
   periodStart: string;
   periodEnd: string;
   isPaid: boolean;
-  paidPaymentId?: string; // Links to actual payment when paid
+  paidPaymentId?: string;
   createdAt: string;
   updatedAt: string;
   lease?: Lease;
@@ -174,8 +174,8 @@ export interface LeaseApiResponse {
     id: string;
     startDate: Date | string;
     endDate: Date | string;
-    monthlyRent: string; // Backend stores as decimal string
-    deposit: string; // Backend stores as decimal string
+    monthlyRent: string;
+    deposit: string;
     paymentDay: number;
     status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
     terms?: string;

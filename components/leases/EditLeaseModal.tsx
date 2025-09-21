@@ -27,7 +27,8 @@ const editLeaseSchema = z.object({
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
-  status: z.enum(['draft', 'active', 'expired', 'terminated']),
+  paymentDay: z.coerce.number().int().min(1, 'Day must be between 1 and 31').max(31, 'Day must be between 1 and 31').default(1),
+  status: z.enum(['draft', 'active', 'expiring', 'expired', 'terminated']),
   terms: z.string().optional(),
 }).refine((data) => {
   const startDate = new Date(data.startDate);
@@ -67,6 +68,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
         endDate: new Date(lease.endDate).toISOString().split('T')[0],
         monthlyRent: parseFloat(lease.monthlyRent as any),
         deposit: parseFloat(lease.deposit as any),
+        paymentDay: (lease as any).paymentDay || 1,
       });
     }
   }, [lease, reset]);
@@ -86,7 +88,6 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
   });
 
   const onSubmit = (data: EditLeaseFormData) => {
-    console.log(data)
     mutation.mutate(data);
   };
 
@@ -118,7 +119,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
               <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
@@ -129,9 +130,14 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
               <Input id="deposit" type="number" {...register('deposit')} />
               {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="paymentDay">Payment Day</Label>
+              <Input id="paymentDay" type="number" {...register('paymentDay')} />
+              {errors.paymentDay && <p className="text-sm text-red-500">{errors.paymentDay.message}</p>}
+            </div>
           </div>
 
-           <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="status">Lease Status</Label>
             <Controller
               name="status"

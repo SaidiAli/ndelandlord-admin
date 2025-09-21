@@ -156,8 +156,14 @@ export const unitsApi = {
 
 // Leases API functions
 export const leasesApi = {
-  getAll: async () => {
-    const response = await api.get<ApiResponse<LeaseApiResponse[]>>(`/leases?_t=${Date.now()}`);
+  getAll: async (filters?: { status?: string; propertyId?: string; unitId?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.propertyId) params.append('propertyId', filters.propertyId);
+    if (filters?.unitId) params.append('unitId', filters.unitId);
+    params.append('_t', Date.now().toString());
+
+    const response = await api.get<ApiResponse<LeaseApiResponse[]>>(`/leases?${params.toString()}`);
     if (response.data?.data && Array.isArray(response.data.data)) {
       return {
         ...response.data,
@@ -180,7 +186,6 @@ export const leasesApi = {
         data: transformLeaseResponse(response.data.data)
       };
     }
-    // Return null for lease data if not found
     return {
       success: false,
       data: null,
@@ -214,13 +219,20 @@ export const leasesApi = {
     const response = await api.delete(`/leases/${id}`);
     return response.data;
   },
+
+  getLeaseBalance: async (leaseId: string) => {
+    const response = await api.get(`/leases/${leaseId}/balance`);
+    return response.data;
+  },
 };
 
 // Payments API functions
 export const paymentsApi = {
-  getAll: async () => {
-    // Use landlord-specific endpoint to ensure ownership filtering with timestamp to prevent caching
-    const response = await api.get(`/payments?_t=${Date.now()}`);
+  getAll: async (filters?: { status?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.append('status', filters.status);
+    params.append('_t', Date.now().toString());
+    const response = await api.get(`/payments?${params.toString()}`);
     return response.data;
   },
 
@@ -269,7 +281,6 @@ export const paymentsApi = {
     if (startDate) params.append('startDate', startDate);
     if (endDate) params.append('endDate', endDate);
     params.append('_t', Date.now().toString()); // Add timestamp to prevent caching
-    // Use landlord-specific endpoint for payment analytics
     const response = await api.get(`/landlords/payments/analytics?${params.toString()}`);
     return response.data;
   },

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { leasesApi, paymentScheduleApi } from '@/lib/api';
+import { leasesApi, paymentsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,10 +11,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Clock, CheckCircle, AlertCircle, Settings, RefreshCw } from 'lucide-react';
+import { CalendarDays, Home, Phone, Mail, User, MapPin, FileText, CheckCircle, AlertCircle, Settings } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { toast } from 'sonner';
 import { PaymentScheduleTab } from './PaymentScheduleTab';
@@ -34,59 +34,66 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
     enabled: !!leaseId && isOpen,
   });
 
-  const { data: paymentScheduleData, isLoading: scheduleLoading } = useQuery({
-    queryKey: ['payment-schedule', leaseId],
-    queryFn: () => paymentScheduleApi.getByLease(leaseId!),
+  const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
+    queryKey: ['lease-payments', leaseId],
+    queryFn: () => paymentsApi.getByLease(leaseId!),
     enabled: !!leaseId && isOpen,
   });
 
+  // const { data: paymentScheduleData, isLoading: scheduleLoading } = useQuery({
+  //   queryKey: ['payment-schedule', leaseId],
+  //   queryFn: () => leasesApi.getPaymentSchedule(leaseId!),
+  //   enabled: !!leaseId && isOpen,
+  // });
+
   const { data: leaseBalanceData } = useQuery({
     queryKey: ['lease-balance', leaseId],
-    queryFn: () => leasesApi.getBalance(leaseId!),
+    queryFn: () => leasesApi.getLeaseBalance(leaseId!),
     enabled: !!leaseId && isOpen,
   });
 
   const leaseDetails = leaseDetailsData?.data;
-  const paymentSchedule = paymentScheduleData?.data || [];
+  // const paymentSchedule = paymentScheduleData?.data || [];
+  const payments = paymentsData?.data || [];
   const leaseBalance = leaseBalanceData?.data;
 
   // Lease lifecycle mutations
-  const activateMutation = useMutation({
-    mutationFn: () => leasesApi.activate(leaseId!, leaseDetails?.paymentDay || 1),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      queryClient.invalidateQueries({ queryKey: ['payment-schedule', leaseId] });
-      toast.success('Lease activated successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to activate lease');
-    },
-  });
+  // const activateMutation = useMutation({
+  //   mutationFn: () => leasesApi.activate(leaseId!, leaseDetails?.paymentDay || 1),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
+  //     queryClient.invalidateQueries({ queryKey: ['leases'] });
+  //     queryClient.invalidateQueries({ queryKey: ['payment-schedule', leaseId] });
+  //     toast.success('Lease activated successfully!');
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error.response?.data?.message || 'Failed to activate lease');
+  //   },
+  // });
 
-  const approveMutation = useMutation({
-    mutationFn: () => leasesApi.approve(leaseId!),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      toast.success('Lease approved successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to approve lease');
-    },
-  });
+  // const approveMutation = useMutation({
+  //   mutationFn: () => leasesApi.approve(leaseId!),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
+  //     queryClient.invalidateQueries({ queryKey: ['leases'] });
+  //     toast.success('Lease approved successfully!');
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error.response?.data?.message || 'Failed to approve lease');
+  //   },
+  // });
 
-  const terminateMutation = useMutation({
-    mutationFn: (reason?: string) => leasesApi.terminate(leaseId!, reason),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
-      queryClient.invalidateQueries({ queryKey: ['leases'] });
-      toast.success('Lease terminated successfully!');
-    },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to terminate lease');
-    },
-  });
+  // const terminateMutation = useMutation({
+  //   mutationFn: (reason?: string) => leasesApi.terminate(leaseId!, reason),
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
+  //     queryClient.invalidateQueries({ queryKey: ['leases'] });
+  //     toast.success('Lease terminated successfully!');
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error.response?.data?.message || 'Failed to terminate lease');
+  //   },
+  // });
 
   if (!isOpen || !leaseId) return null;
 
@@ -103,16 +110,16 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
 
   const calculateDuration = (startDate: string, endDate: string) => {
     if (!startDate || !endDate) return '--';
-    
+
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     if (isNaN(start.getTime()) || isNaN(end.getTime())) return 'Invalid Date';
-    
+
     const diffTime = Math.abs(end.getTime() - start.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     const diffMonths = Math.round(diffDays / 30.44);
-    
+
     if (diffMonths >= 12) {
       const years = Math.floor(diffMonths / 12);
       const remainingMonths = diffMonths % 12;
@@ -130,15 +137,15 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
 
   const calculateRemainingTime = (endDate: string) => {
     if (!endDate) return null;
-    
+
     const end = new Date(endDate);
     const now = new Date();
-    
+
     if (isNaN(end.getTime())) return null;
-    
+
     const diffTime = end.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays < 0) {
       return { text: 'Expired', color: 'text-red-600' };
     } else if (diffDays === 0) {
@@ -191,32 +198,32 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
               </div>
               <div className="flex items-center gap-2">
                 {leaseDetails.status === 'draft' && (
-                  <Button 
-                    onClick={() => approveMutation.mutate()}
-                    disabled={approveMutation.isPending}
+                  <Button
+                    onClick={() => null}
+                    disabled={true}
                     variant="outline"
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    {approveMutation.isPending ? 'Approving...' : 'Approve'}
+                    Approve
                   </Button>
                 )}
-                {leaseDetails.status === 'approved' && (
-                  <Button 
-                    onClick={() => activateMutation.mutate()}
-                    disabled={activateMutation.isPending}
+                {leaseDetails.status === 'draft' && (
+                  <Button
+                    onClick={() => null}
+                    disabled={true}
                   >
                     <Settings className="h-4 w-4 mr-2" />
-                    {activateMutation.isPending ? 'Activating...' : 'Activate'}
+                    Activate
                   </Button>
                 )}
                 {(leaseDetails.status === 'active' || leaseDetails.status === 'expiring') && (
-                  <Button 
-                    onClick={() => terminateMutation.mutate()}
-                    disabled={terminateMutation.isPending}
+                  <Button
+                    onClick={() => null}
+                    disabled={true}
                     variant="destructive"
                   >
                     <AlertCircle className="h-4 w-4 mr-2" />
-                    {terminateMutation.isPending ? 'Terminating...' : 'Terminate'}
+                    Terminate
                   </Button>
                 )}
                 <Button onClick={onClose} variant="outline">Close</Button>
@@ -329,10 +336,9 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
               </TabsContent>
 
               <TabsContent value="payments">
-                <PaymentScheduleTab 
-                  paymentSchedule={paymentSchedule}
-                  leaseBalance={leaseBalance}
-                  isLoading={scheduleLoading}
+                <PaymentScheduleTab
+                  lease={leaseDetails}
+                  payments={payments}
                 />
               </TabsContent>
 
@@ -370,7 +376,7 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                             <Separator />
                           </>
                         )}
-                        
+
                         <div>
                           <h4 className="font-medium mb-2">Unit Information</h4>
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -17,7 +17,6 @@ import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Cl
 import { formatUGX } from '@/lib/currency';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PaymentScheduleTab } from './PaymentScheduleTab';
-import { useEffect } from 'react';
 
 interface LeaseDetailsModalProps {
   isOpen: boolean;
@@ -37,7 +36,7 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
     queryFn: () => paymentsApi.getByLease(leaseId!),
     enabled: !!leaseId && isOpen,
   });
-
+  
   const leaseDetails = leaseDetailsData?.data;
   const payments = paymentsData?.data || [];
   const isLoading = leaseLoading || paymentsLoading;

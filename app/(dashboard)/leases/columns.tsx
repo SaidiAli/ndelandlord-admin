@@ -109,6 +109,28 @@ export const getColumns = (
     },
   },
   {
+    accessorKey: "paymentDay",
+    header: () => <div className="text-center">Payment Day</div>,
+    cell: ({ row }) => {
+      const paymentDay = row.original.paymentDay;
+      return <div className="text-center">{paymentDay ? `${paymentDay}th` : '--'}</div>
+    },
+  },
+  {
+    accessorKey: "balance",
+    header: () => <div className="text-right">Balance</div>,
+    cell: ({ row }) => {
+      const balance = row.original.balance;
+      if (balance === undefined) return <div className="text-right text-gray-400">--</div>;
+      
+      return (
+        <div className={`text-right font-medium ${balance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+          {formatUGX(balance)}
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
@@ -119,6 +141,12 @@ export const getColumns = (
             return 'default';
           case 'expired':
             return 'destructive';
+          case 'terminated':
+            return 'secondary';
+          case 'draft':
+            return 'outline';
+          case 'expiring':
+            return 'secondary';
           default:
             return 'secondary';
         }

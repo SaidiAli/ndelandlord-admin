@@ -18,8 +18,12 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { TenantWithFullDetails, Unit, User } from '@/types';
 import { toast } from 'sonner';
+import { formatUGX } from '@/lib/currency';
+import { Calendar, Clock } from 'lucide-react';
 
 const createLeaseSchema = z.object({
   unitId: z.string().uuid('Please select a unit'),
@@ -28,6 +32,7 @@ const createLeaseSchema = z.object({
   endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
+  paymentDay: z.coerce.number().min(1, 'Payment day must be between 1-31').max(31, 'Payment day must be between 1-31'),
   terms: z.string().optional(),
 }).refine((data) => {
   const startDate = new Date(data.startDate);
@@ -60,16 +65,70 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
   });
   const tenants: TenantWithFullDetails[] = tenantsData?.data || [];
 
-
   const {
     register,
     handleSubmit,
     control,
+    watch,
     formState: { errors, isSubmitting },
     reset,
   } = useForm<CreateLeaseFormData>({
     resolver: zodResolver(createLeaseSchema),
+    defaultValues: {
+      paymentDay: 1, // Default to 1st of the month
+    },
   });
+
+  // Watch form values for preview
+  const watchedValues = watch();
+
+  // Calculate payment schedule preview
+  const calculatePaymentPreview = () => {
+    const { startDate, endDate, monthlyRent, paymentDay } = watchedValues;
+    
+    if (!startDate || !endDate || !monthlyRent || !paymentDay) {
+      return [];
+    }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const rent = Number(monthlyRent);
+    const payDay = Number(paymentDay);
+
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || rent <= 0 || payDay < 1 || payDay > 31) {
+      return [];
+    }
+
+    const payments = [];
+    let currentDate = new Date(start);
+    let paymentNumber = 1;
+
+    while (currentDate <= end) {
+      const dueDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), payDay);
+      
+      // If payment day has passed for this month, move to next month
+      if (dueDate < currentDate) {
+        dueDate.setMonth(dueDate.getMonth() + 1);
+      }
+
+      // Stop if due date exceeds lease end
+      if (dueDate > end) break;
+
+      payments.push({
+        number: paymentNumber,
+        dueDate: dueDate.toLocaleDateString(),
+        amount: rent,
+      });
+
+      paymentNumber++;
+      currentDate = new Date(dueDate);
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    }
+
+    return payments.slice(0, 5); // Show first 5 payments
+  };
+
+  const paymentPreview = calculatePaymentPreview();
 
   const mutation = useMutation({
     mutationFn: (newLease: CreateLeaseFormData) => leasesApi.create(newLease),
@@ -191,7 +250,7 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
             </div>
           </div>
           
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div className="space-y-2">
               <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
               <Input id="monthlyRent" type="number" {...register('monthlyRent')} />
@@ -201,6 +260,19 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               <Label htmlFor="deposit">Deposit (UGX)</Label>
               <Input id="deposit" type="number" {...register('deposit')} />
               {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="paymentDay">Payment Day of Month</Label>
+              <Input 
+                id="paymentDay" 
+                type="number" 
+                min="1" 
+                max="31" 
+                placeholder="e.g., 1, 15, 30"
+                {...register('paymentDay')} 
+              />
+              {errors.paymentDay && <p className="text-sm text-red-500">{errors.paymentDay.message}</p>}
+              <p className="text-xs text-gray-500">Day of month when rent is due (1-31)</p>
             </div>
           </div>
 
@@ -216,6 +288,44 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               Include any special conditions, restrictions, or additional terms for this lease agreement.
             </p>
           </div>
+
+          {/* Payment Schedule Preview */}
+          {paymentPreview.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Payment Schedule Preview
+                </CardTitle>
+                <CardDescription>
+                  First {paymentPreview.length} payments based on your lease terms
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  {paymentPreview.map((payment, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 border rounded-md">
+                      <div className="flex items-center gap-3">
+                        <Badge variant="outline">Payment {payment.number}</Badge>
+                        <div className="flex items-center gap-1 text-sm text-gray-600">
+                          <Clock className="h-3 w-3" />
+                          Due: {payment.dueDate}
+                        </div>
+                      </div>
+                      <div className="font-semibold text-green-600">
+                        {formatUGX(payment.amount)}
+                      </div>
+                    </div>
+                  ))}
+                  {calculatePaymentPreview().length > 5 && (
+                    <p className="text-xs text-gray-500 text-center mt-2">
+                      ... and {calculatePaymentPreview().length - 5} more payments
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
           
           <DialogFooter>
             <DialogClose asChild>

@@ -65,18 +65,23 @@ export interface Lease {
   endDate: string;
   monthlyRent: number;
   deposit: number;
-  status: 'draft' | 'active' | 'expired' | 'terminated';
+  paymentDay: number; // Day of month (1-31) when rent is due
+  status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
   terms?: string;
+  previousLeaseId?: string; // For lease renewals
+  balance?: number; // Current outstanding balance
   createdAt: string;
   updatedAt: string;
   unit?: Unit;
   tenant?: User;
   payments?: Payment[];
+  paymentSchedules?: PaymentSchedule[];
 }
 
 export interface Payment {
   id: string;
   leaseId: string;
+  scheduleId?: string; // Links to payment schedule entry
   amount: number;
   dueDate?: string;
   paidDate?: string;
@@ -89,6 +94,23 @@ export interface Payment {
   createdAt: string;
   updatedAt: string;
   lease?: Lease;
+  paymentSchedule?: PaymentSchedule;
+}
+
+export interface PaymentSchedule {
+  id: string;
+  leaseId: string;
+  paymentNumber: number; // 1, 2, 3, etc.
+  dueDate: string;
+  amount: number;
+  periodStart: string;
+  periodEnd: string;
+  isPaid: boolean;
+  paidPaymentId?: string; // Links to actual payment when paid
+  createdAt: string;
+  updatedAt: string;
+  lease?: Lease;
+  payment?: Payment;
 }
 
 export interface MaintenanceRequest {
@@ -154,8 +176,11 @@ export interface LeaseApiResponse {
     endDate: Date | string;
     monthlyRent: string; // Backend stores as decimal string
     deposit: string; // Backend stores as decimal string
-    status: 'draft' | 'active' | 'expired' | 'terminated';
+    paymentDay: number;
+    status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
     terms?: string;
+    previousLeaseId?: string;
+    balance?: number;
     createdAt: Date | string;
     updatedAt?: Date | string;
   };
@@ -209,8 +234,11 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
     endDate: typeof lease.endDate === 'string' ? lease.endDate : lease.endDate.toISOString(),
     monthlyRent: parseFloat(lease.monthlyRent),
     deposit: parseFloat(lease.deposit),
+    paymentDay: lease.paymentDay,
     status: lease.status,
     terms: lease.terms,
+    previousLeaseId: lease.previousLeaseId,
+    balance: lease.balance,
     createdAt: typeof lease.createdAt === 'string' ? lease.createdAt : lease.createdAt.toISOString(),
     updatedAt: lease.updatedAt ? 
       (typeof lease.updatedAt === 'string' ? lease.updatedAt : lease.updatedAt.toISOString()) : 
@@ -254,6 +282,64 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
       updatedAt: '',
     } : undefined,
   };
+}
+
+// Lease Management Types
+export interface LeaseBalance {
+  totalOwed: number;
+  totalPaid: number;
+  currentBalance: number;
+  overdueAmount: number;
+  nextPaymentDue?: PaymentSchedule;
+}
+
+export interface LeaseRenewalRequest {
+  leaseId: string;
+  newStartDate: string;
+  newEndDate: string;
+  newMonthlyRent: number;
+  newPaymentDay?: number;
+  terms?: string;
+}
+
+export interface LeaseActivationRequest {
+  leaseId: string;
+  paymentDay: number;
+}
+
+// Dashboard Analytics Types
+export interface LeaseAnalytics {
+  totalLeases: number;
+  activeLeases: number;
+  expiringLeases: number; // Expiring in next 30 days
+  draftLeases: number;
+  leasesByStatus: Array<{
+    status: string;
+    count: number;
+  }>;
+  avgLeaseLength: number; // In months
+  renewalRate: number; // Percentage
+}
+
+export interface PaymentAnalytics {
+  totalPayments: number;
+  totalAmount: number;
+  averagePaymentTime: number;
+  paymentsByStatus: Array<{
+    status: string;
+    count: number;
+    amount: number;
+  }>;
+  paymentsByProvider: Array<{
+    provider: string;
+    count: number;
+    amount: number;
+  }>;
+  monthlyTrends: Array<{
+    month: string;
+    amount: number;
+    count: number;
+  }>;
 }
 
 // Dashboard metrics

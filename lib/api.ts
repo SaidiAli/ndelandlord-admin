@@ -214,6 +214,43 @@ export const leasesApi = {
     const response = await api.delete(`/leases/${id}`);
     return response.data;
   },
+
+  // Lease Lifecycle Management
+  activate: async (id: string, paymentDay: number) => {
+    const response = await api.post(`/leases/${id}/activate`, { paymentDay });
+    return response.data;
+  },
+
+  approve: async (id: string) => {
+    const response = await api.post(`/leases/${id}/approve`);
+    return response.data;
+  },
+
+  terminate: async (id: string, reason?: string) => {
+    const response = await api.post(`/leases/${id}/terminate`, { reason });
+    return response.data;
+  },
+
+  renew: async (id: string, renewalData: any) => {
+    const response = await api.post(`/leases/${id}/renew`, renewalData);
+    return response.data;
+  },
+
+  // Balance and Payment Schedule
+  getBalance: async (id: string) => {
+    const response = await api.get(`/leases/${id}/balance`);
+    return response.data;
+  },
+
+  getPaymentSchedule: async (id: string) => {
+    const response = await api.get(`/leases/${id}/payment-schedule`);
+    return response.data;
+  },
+
+  generatePaymentSchedule: async (id: string) => {
+    const response = await api.post(`/leases/${id}/generate-schedule`);
+    return response.data;
+  },
 };
 
 // Payments API functions
@@ -303,9 +340,37 @@ export const maintenanceApi = {
   },
 };
 
+// Payment Schedule API functions
+export const paymentScheduleApi = {
+  getByLease: async (leaseId: string) => {
+    const response = await api.get(`/payment-schedules/lease/${leaseId}`);
+    return response.data;
+  },
+
+  markAsPaid: async (scheduleId: string, paymentId: string) => {
+    const response = await api.post(`/payment-schedules/${scheduleId}/mark-paid`, { paymentId });
+    return response.data;
+  },
+
+  getOverdue: async () => {
+    const response = await api.get('/payment-schedules/overdue');
+    return response.data;
+  },
+
+  getUpcoming: async (days: number = 30) => {
+    const response = await api.get(`/payment-schedules/upcoming?days=${days}`);
+    return response.data;
+  },
+};
+
 export const landlordApi = {
   getDashboardData: async () => {
     const response = await api.get(`/landlords/dashboard/complete?_t=${Date.now()}`);
+    return response.data;
+  },
+
+  getLeaseAnalytics: async () => {
+    const response = await api.get('/landlords/leases/analytics');
     return response.data;
   },
 };

@@ -31,7 +31,7 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
   const paymentSchedules: { month: string; amount: number; isProrated: boolean; status: string; payment?: Payment }[] = [];
   const startDate = new Date(lease.startDate);
   const endDate = new Date(lease.endDate);
-  let currentDate = new Date(startDate);
+  const currentDate = new Date(startDate);
 
   while (currentDate <= endDate) {
     const isFirstMonth =

@@ -404,11 +404,7 @@ export interface PaymentAnalytics {
     count: number;
     amount: number;
   }[];
-  monthlyTrends: {
-    month: string;
-    totalPayments: number;
-    totalAmount: number;
-  }[];
+  monthlyTrends: { month: string; amount: number; count: number; }[];
 }
 
 export interface TenantWithFullDetails {

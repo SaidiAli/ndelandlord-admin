@@ -3,9 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { paymentsApi } from '@/lib/api';
 import { Payment } from '@/types';
-import { DataTable } from '@/components/ui/data-table';
 import { useAuth } from '@/hooks/useAuth';
-import columns from '@/app/(dashboard)/payments/history/columns';
 
 export function PaymentHistoryClient() {
   const { user } = useAuth();
@@ -27,5 +25,5 @@ export function PaymentHistoryClient() {
     );
   }
 
-  return <DataTable columns={columns} data={payments} searchKey="lease.tenant" />;
+  // return <DataTable columns={columns} data={payments} searchKey="lease.tenant" />;
 }

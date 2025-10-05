@@ -24,7 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { TenantWithFullDetails, Unit } from '@/types';
+import { TenantWithFullDetails } from '@/types';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 import { formatUGX } from '@/lib/currency';
@@ -289,11 +289,11 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               <AlertTitle>Proration Preview</AlertTitle>
               <AlertDescription>
                 <p>
-                  First month's prorated rent:{' '}
+                  First month&apos;s prorated rent:{' '}
                   <strong>{formatUGX(proratedFirstMonth)}</strong>
                 </p>
                 <p>
-                  Last month's prorated rent:{' '}
+                  Last month&apos;s prorated rent:{' '}
                   <strong>{formatUGX(proratedLastMonth)}</strong>
                 </p>
               </AlertDescription>

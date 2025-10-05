@@ -20,7 +20,7 @@ export function OverduePaymentsWidget() {
     (p: Payment) => new Date(p.dueDate!) < new Date()
   );
 
-  const totalOverdue = overduePayments.reduce((acc, p) => acc + p.amount, 0);
+  const totalOverdue = overduePayments.reduce((acc: any, p: any) => acc + p.amount, 0);
 
   if (isLoading) {
     return <div>Loading...</div>;

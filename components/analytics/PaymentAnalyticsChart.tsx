@@ -41,7 +41,7 @@ export function PaymentAnalyticsChart({ analytics }: PaymentAnalyticsChartProps)
   // Prepare data for monthly trends chart
   const monthlyTrendsData = analytics.monthlyTrends.map((trend) => ({
     ...trend,
-    formattedAmount: formatCompactUGX(trend.totalAmount),
+    formattedAmount: formatCompactUGX(trend.amount),
   }));
 
   // Prepare data for provider pie chart

@@ -7,19 +7,19 @@ import { unitsApi } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  ArrowLeft, 
-  Pencil, 
-  Building, 
-  DollarSign, 
-  Users, 
-  BedDouble, 
-  Bath, 
-  MapPin, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  Home, 
+import {
+  ArrowLeft,
+  Pencil,
+  Building,
+  DollarSign,
+  Users,
+  BedDouble,
+  Bath,
+  MapPin,
+  Phone,
+  Mail,
+  Calendar,
+  Home,
   TrendingUp,
   Activity,
   CheckCircle,
@@ -167,7 +167,7 @@ export default function UnitDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">{analytics.occupancyRate.toFixed(1)}%</div>
                     <div className="text-sm text-gray-500">Occupancy Rate</div>
@@ -179,10 +179,6 @@ export default function UnitDetailsPage() {
                   <div className="text-center">
                     <div className="text-2xl font-bold text-purple-600">{analytics.averageLeaseLength}</div>
                     <div className="text-sm text-gray-500">Avg Lease (days)</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-orange-600">{analytics.daysVacant}</div>
-                    <div className="text-sm text-gray-500">Days Vacant</div>
                   </div>
                 </div>
               </CardContent>
@@ -211,6 +207,10 @@ export default function UnitDetailsPage() {
                 </div>
               )}
               <div className="grid grid-cols-1 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Property</label>
+                  <p className="text-sm font-mono">{property?.name}</p>
+                </div>
                 <div>
                   <label className="text-sm font-medium text-gray-500">Unit ID</label>
                   <p className="text-sm font-mono">{unit.id}</p>
@@ -254,7 +254,7 @@ export default function UnitDetailsPage() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium text-gray-500">Lease Period</label>
@@ -355,8 +355,8 @@ export default function UnitDetailsPage() {
                   {property?.address}, {property?.city}, {property?.state} {property?.postalCode}
                 </div>
               </div>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 onClick={() => router.push(`/properties/${property?.id}`)}
               >
                 View Property Details
@@ -365,11 +365,11 @@ export default function UnitDetailsPage() {
           </CardContent>
         </Card>
       </div>
-      
-      <EditUnitModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
-        unit={transformedUnit} 
+
+      <EditUnitModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        unit={transformedUnit}
       />
     </>
   );

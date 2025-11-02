@@ -1,7 +1,7 @@
 import { User } from '@/types';
 
-const TOKEN_KEY = 'ndi_landlord_auth_token';
-const USER_KEY = 'ndi_landlord_auth_user';
+const TOKEN_KEY = 'wakka_auth_token';
+const USER_KEY = 'wakka_auth_user';
 
 export const authStorage = {
   getToken: (): string | null => {

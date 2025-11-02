@@ -226,7 +226,6 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                     Terminate
                   </Button>
                 )}
-                <Button onClick={onClose} variant="outline">Close</Button>
               </div>
             </div>
 

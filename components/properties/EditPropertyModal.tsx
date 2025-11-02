@@ -23,11 +23,11 @@ import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
 const editPropertySchema = z.object({
-  name: z.string().min(1, 'Property name is required'),
-  address: z.string().min(1, 'Address is required'),
-  city: z.string().min(1, 'City is required'),
-  state: z.string().min(1, 'State is required'),
-  zipCode: z.string().regex(/^\d{5}(-\d{4})?$/, 'Invalid ZIP code format'),
+  name: z.string().optional(),
+  address: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  postalCode: z.string().optional(),
   description: z.string().optional(),
 });
 
@@ -115,9 +115,9 @@ export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyMod
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="zipCode">ZIP Code</Label>
-            <Input id="zipCode" {...register('zipCode')} />
-            {errors.zipCode && <p className="text-sm text-red-500">{errors.zipCode.message}</p>}
+            <Label htmlFor="postalCode">Postal Code</Label>
+            <Input id="postalCode" {...register('postalCode')} />
+            {errors.postalCode && <p className="text-sm text-red-500">{errors.postalCode.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description (Optional)</Label>

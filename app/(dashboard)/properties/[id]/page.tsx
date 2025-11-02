@@ -6,9 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { propertiesApi } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, Activity, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal';
 import { useAuth } from '@/hooks/useAuth';
@@ -71,7 +70,7 @@ export default function PropertyDetailsPage() {
         </div>
 
         {/* Statistics Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Units</CardTitle>
@@ -109,16 +108,6 @@ export default function PropertyDetailsPage() {
               <div className="text-2xl font-bold">{formatUGX(stats?.monthlyRevenue || 0)}</div>
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Recent Activity</CardTitle>
-              <Activity className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{(recentActivity?.newLeases || 0) + (recentActivity?.expiredLeases || 0)}</div>
-              <p className="text-xs text-muted-foreground">Last 30 days</p>
-            </CardContent>
-          </Card>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -143,8 +132,14 @@ export default function PropertyDetailsPage() {
                   <p className="text-sm font-mono">{property.id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Created</label>
+                  <label className="text-sm font-medium text-gray-500">Added on</label>
                   <p className="text-sm">{new Date(property.createdAt).toLocaleDateString()}</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Property address</label>
+                  <p className="text-sm font-mono">{property.address}</p>
                 </div>
               </div>
             </CardContent>
@@ -193,7 +188,9 @@ export default function PropertyDetailsPage() {
                 <div key={unitData.unit.id} className="border rounded-lg p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h3 className="text-lg font-semibold">Unit {unitData.unit.unitNumber}</h3>
+                      <a href={`/units/${unitData.unit.id}`}>
+                        <h3 className="text-lg font-semibold">Unit {unitData.unit.unitNumber}</h3>
+                      </a>
                       <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
                         <div className="flex items-center">
                           <BedDouble className="h-4 w-4 mr-1" />
@@ -284,9 +281,9 @@ export default function PropertyDetailsPage() {
           </CardContent>
         </Card>
       </div>
-      <EditPropertyModal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
+      <EditPropertyModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         property={{
           id: property.id,
           name: property.name,
@@ -319,7 +316,7 @@ export default function PropertyDetailsPage() {
               phone: unitData.tenant.phone
             } : undefined
           }))
-        }} 
+        }}
       />
     </>
   );

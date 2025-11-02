@@ -24,7 +24,7 @@ import { Separator } from '../ui/separator';
 const addTenantSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email().optional(),
+  email: z.string().optional(),
   phone: z.string().min(1, 'Phone number is required'),
   userName: z.string().min(1, 'Username is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -78,7 +78,6 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
   });
 
   const onSubmit = (data: AddTenantFormData) => {
-    // Convert dates to ISO datetime format for server validation
     const formattedData = {
       ...data,
       leaseData: {

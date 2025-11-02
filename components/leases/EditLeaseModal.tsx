@@ -56,9 +56,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
     control,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<EditLeaseFormData>({
-    resolver: zodResolver(editLeaseSchema),
-  });
+  } = useForm<EditLeaseFormData>();
 
   useEffect(() => {
     if (lease) {
@@ -88,7 +86,16 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
   });
 
   const onSubmit = (data: EditLeaseFormData) => {
-    mutation.mutate(data);
+    const formattedData = {
+      ...data,
+      startDate: new Date(data.startDate).toISOString(),
+      endDate: new Date(data.endDate).toISOString(),
+      deposit: Number(data.deposit),
+      terms: data.terms || undefined,
+    };
+
+    console.log({ formattedData });
+    mutation.mutate(formattedData);
   };
 
   const handleClose = () => {

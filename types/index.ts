@@ -12,13 +12,16 @@ export interface User {
   updatedAt: string;
 }
 
+export const propertyTypes = ['residential', 'commercial', 'industrial', 'office', 'retail', 'apartment', 'house', 'condo', 'townhouse', 'warehouse', 'mixed_use', 'land'] as const;
+
 export interface Property {
   id: string;
   name: string;
   address: string;
   city: string;
-  state: string;
   zipCode: string;
+  type: typeof propertyTypes[number];
+  numberOfUnits: number;
   description?: string;
   landlordId: string;
   createdAt: string;
@@ -209,8 +212,9 @@ export interface LeaseApiResponse {
     name: string;
     address: string;
     city: string;
-    state: string;
     postalCode?: string;
+    type: typeof propertyTypes[number];
+    numberOfUnits: number;
     description?: string;
   };
   landlord?: {
@@ -225,7 +229,7 @@ export interface LeaseApiResponse {
 // Transformation utility to convert backend response to frontend Lease type
 export function transformLeaseResponse(response: LeaseApiResponse): Lease {
   const { lease, tenant, unit, property, landlord } = response;
-  
+
   return {
     id: lease.id,
     unitId: unit?.id || '',
@@ -240,8 +244,8 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
     previousLeaseId: lease.previousLeaseId,
     balance: lease.balance,
     createdAt: typeof lease.createdAt === 'string' ? lease.createdAt : lease.createdAt.toISOString(),
-    updatedAt: lease.updatedAt ? 
-      (typeof lease.updatedAt === 'string' ? lease.updatedAt : lease.updatedAt.toISOString()) : 
+    updatedAt: lease.updatedAt ?
+      (typeof lease.updatedAt === 'string' ? lease.updatedAt : lease.updatedAt.toISOString()) :
       (typeof lease.createdAt === 'string' ? lease.createdAt : lease.createdAt.toISOString()),
     unit: unit ? {
       id: unit.id,
@@ -261,8 +265,9 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
         name: property.name,
         address: property.address,
         city: property.city,
-        state: property.state,
         zipCode: property.postalCode || '',
+        type: property.type,
+        numberOfUnits: property.numberOfUnits,
         description: property.description,
         landlordId: landlord?.id || '',
         createdAt: '',
@@ -450,7 +455,8 @@ export interface PropertyDashboardData {
     name: string;
     address: string;
     city: string;
-    state: string;
+    type: typeof propertyTypes[number];
+    numberOfUnits: number;
     postalCode?: string;
     description?: string;
     landlordId: string;

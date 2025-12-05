@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -17,18 +17,20 @@ import {
   DialogFooter,
   DialogClose,
 } from '@/components/ui/dialog';
-import { Property } from '@/types';
+import { Property, propertyTypes } from '@/types';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { capitalize } from 'lodash';
 
 const editPropertySchema = z.object({
   name: z.string().optional(),
   address: z.string().optional(),
   city: z.string().optional(),
-  state: z.string().optional(),
   postalCode: z.string().optional(),
-  description: z.string().optional(),
+  type: z.enum(propertyTypes).optional(),
+  numberOfUnits: z.number().int().positive().optional(),
 });
 
 type EditPropertyFormData = z.infer<typeof editPropertySchema>;
@@ -48,6 +50,7 @@ export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyMod
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
+    control,
   } = useForm<EditPropertyFormData>({
     resolver: zodResolver(editPropertySchema),
   });
@@ -102,26 +105,44 @@ export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyMod
             <Input id="address" {...register('address')} />
             {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid gap-4">
             <div className="space-y-2">
               <Label htmlFor="city">City</Label>
               <Input id="city" {...register('city')} />
               {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="state">State</Label>
-              <Input id="state" {...register('state')} />
-              {errors.state && <p className="text-sm text-red-500">{errors.state.message}</p>}
-            </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="postalCode">Postal Code</Label>
+            <Label htmlFor="postalCode">Postal Code <span className="text-gray-500 text-xs">(Optional)</span></Label>
             <Input id="postalCode" {...register('postalCode')} />
             {errors.postalCode && <p className="text-sm text-red-500">{errors.postalCode.message}</p>}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description (Optional)</Label>
-            <Input id="description" {...register('description')} />
+            <Label htmlFor="type">Type Of Property <span className="text-gray-500 text-xs">(Optional)</span></Label>
+            <Controller
+              name="type"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select property type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {propertyTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {capitalize(type)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
+            {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="numberOfUnits">Number of Units <span className="text-gray-500 text-xs">(Optional)</span></Label>
+            <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" />
+            {errors.numberOfUnits && <p className="text-sm text-red-500">{errors.numberOfUnits.message}</p>}
           </div>
           <DialogFooter>
             <DialogClose asChild>

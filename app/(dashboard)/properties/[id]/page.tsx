@@ -59,7 +59,7 @@ export default function PropertyDetailsPage() {
               <h1 className="text-3xl font-bold text-gray-900">{property.name}</h1>
               <div className="flex items-center text-gray-600 mt-1">
                 <MapPin className="h-4 w-4 mr-1" />
-                {property.address}, {property.city}, {property.state} {property.postalCode}
+                {property.address}, {property.city}, {property.postalCode}
               </div>
             </div>
           </div>
@@ -289,8 +289,9 @@ export default function PropertyDetailsPage() {
           name: property.name,
           address: property.address,
           city: property.city,
-          state: property.state,
           zipCode: property.postalCode || '',
+          type: property.type,
+          numberOfUnits: property.numberOfUnits,
           description: property.description,
           landlordId: property.landlordId,
           createdAt: property.createdAt,

@@ -131,6 +131,12 @@ export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="squareFeet">Square Feet (Optional)</Label>
+            <Input id="squareFeet" type="number" {...register('squareFeet')} />
+            {errors.squareFeet && <p className="text-sm text-red-500">{errors.squareFeet.message}</p>}
+          </div>
+
           <DialogFooter>
             <DialogClose asChild>
               <Button type="button" variant="outline">Cancel</Button>

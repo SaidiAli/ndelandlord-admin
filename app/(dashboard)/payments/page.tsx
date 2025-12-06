@@ -24,6 +24,7 @@ import { paymentsApi } from '@/lib/api';
 import { formatUGX, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
 import { Payment, PaymentAnalytics } from '@/types';
 import { PaymentDetailsModal } from '@/components/payments/PaymentDetailsModal';
+import { RegisterPaymentModal } from '@/components/RegisterPaymentModal';
 import { PaymentAnalyticsChart } from '@/components/analytics/PaymentAnalyticsChart';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -31,9 +32,10 @@ export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  
+
   // Real-time payment updates
   const { showNotification } = usePaymentNotifications();
   usePaymentUpdates({
@@ -78,14 +80,14 @@ export default function PaymentsPage() {
   };
 
   const filteredPayments = payments.filter(payment => {
-    const matchesSearch = 
+    const matchesSearch =
       payment.transactionId?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.lease?.tenant?.firstName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.lease?.tenant?.lastName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.lease?.unit?.unitNumber?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesStatus = statusFilter === 'all' || payment.status === statusFilter;
-    
+
     return matchesSearch && matchesStatus;
   });
 
@@ -111,13 +113,22 @@ export default function PaymentsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
           <p className="text-gray-600">Manage rent payments and view analytics</p>
         </div>
-        <Button 
-          onClick={() => refreshMutation.mutate()}
-          disabled={refreshMutation.isPending}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsRegisterModalOpen(true)}
+          >
+            <CreditCard className="h-4 w-4 mr-2" />
+            Register Payment
+          </Button>
+          <Button
+            onClick={() => refreshMutation.mutate()}
+            disabled={refreshMutation.isPending}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue="overview" className="space-y-6">
@@ -276,11 +287,11 @@ export default function PaymentsPage() {
                                 {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
                               </p>
                               {providerInfo && (
-                                <Badge 
-                                  variant="outline" 
-                                  style={{ 
+                                <Badge
+                                  variant="outline"
+                                  style={{
                                     backgroundColor: providerInfo.color,
-                                    color: providerInfo.textColor 
+                                    color: providerInfo.textColor
                                   }}
                                 >
                                   {providerInfo.name}
@@ -294,9 +305,9 @@ export default function PaymentsPage() {
                               ID: {payment.transactionId || payment.id}
                             </p>
                             {periodCovered && (
-                                <p className="text-xs text-gray-500">
-                                    Covers: {periodCovered}
-                                </p>
+                              <p className="text-xs text-gray-500">
+                                Covers: {periodCovered}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -306,8 +317,8 @@ export default function PaymentsPage() {
                             <Badge variant={getStatusBadgeVariant(payment.status)}>
                               {payment.status}
                             </Badge>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               onClick={() => setSelectedPayment(payment)}
                             >
@@ -351,7 +362,7 @@ export default function PaymentsPage() {
                     return (
                       <div key={provider.provider} className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <div 
+                          <div
                             className="w-3 h-3 rounded-full"
                             style={{ backgroundColor: providerInfo?.color || '#gray' }}
                           />
@@ -395,10 +406,19 @@ export default function PaymentsPage() {
         </TabsContent>
       </Tabs>
 
-      <PaymentDetailsModal 
+      <PaymentDetailsModal
         payment={selectedPayment}
         isOpen={!!selectedPayment}
         onClose={() => setSelectedPayment(null)}
+      />
+
+      <RegisterPaymentModal
+        isOpen={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        onSuccess={() => {
+          refreshMutation.mutate();
+          setIsRegisterModalOpen(false);
+        }}
       />
     </div>
   );

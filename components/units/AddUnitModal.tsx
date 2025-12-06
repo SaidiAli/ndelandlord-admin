@@ -5,10 +5,11 @@ import { useForm, Controller, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { propertiesApi, unitsApi } from '@/lib/api';
+import { propertiesApi, unitsApi, amenitiesApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -20,7 +21,7 @@ import {
 } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Property } from '@/types';
+import { Property, Amenity } from '@/types';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Plus, Trash2 } from 'lucide-react';
@@ -32,6 +33,7 @@ const addUnitSchema = z.object({
   bathrooms: z.coerce.number().min(0, 'Bathrooms must be non-negative'),
   squareFeet: z.coerce.number().int().positive('Square feet must be positive').optional(),
   description: z.string().optional(),
+  amenityIds: z.array(z.string()).optional(),
 });
 
 const bulkAddUnitSchema = z.object({
@@ -122,7 +124,16 @@ function SingleUnitForm({ properties, loading, onSuccess, userId }: { properties
     reset,
   } = useForm<AddUnitFormData>({
     resolver: zodResolver(addUnitSchema),
+    defaultValues: {
+      amenityIds: [],
+    }
   });
+
+  const { data: amenitiesData } = useQuery({
+    queryKey: ['amenities'],
+    queryFn: () => amenitiesApi.getAll(),
+  });
+  const amenities: Amenity[] = amenitiesData?.data || [];
 
   const mutation = useMutation({
     mutationFn: (newUnit: AddUnitFormData) => unitsApi.create(newUnit),
@@ -170,12 +181,12 @@ function SingleUnitForm({ properties, loading, onSuccess, userId }: { properties
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="bedrooms">Bedrooms</Label>
-          <Input id="bedrooms" type="number" {...register('bedrooms')} />
+          <Input id="bedrooms" type="number" min={1} {...register('bedrooms')} />
           {errors.bedrooms && <p className="text-sm text-red-500">{errors.bedrooms.message}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="bathrooms">Bathrooms</Label>
-          <Input id="bathrooms" type="number" step="0.5" {...register('bathrooms')} />
+          <Input id="bathrooms" type="number" min={0} {...register('bathrooms')} />
           {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms.message}</p>}
         </div>
       </div>
@@ -190,6 +201,43 @@ function SingleUnitForm({ properties, loading, onSuccess, userId }: { properties
         <Label htmlFor="description">Description (Optional)</Label>
         <Input id="description" {...register('description')} />
         {errors.description && <p className="text-sm text-red-500">{errors.description.message}</p>}
+      </div>
+
+      <div className="space-y-2">
+        <Label>Amenities</Label>
+        <div className="grid grid-cols-2 gap-2 border p-3 rounded-md max-h-40 overflow-y-auto">
+          {amenities.length === 0 ? (
+            <p className="text-sm text-gray-500 col-span-2">No amenities available.</p>
+          ) : (
+            <Controller
+              name="amenityIds"
+              control={control}
+              render={({ field }) => (
+                <>
+                  {amenities.map((amenity) => (
+                    <div key={amenity.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`amenity-${amenity.id}`}
+                        checked={field.value?.includes(amenity.id)}
+                        onCheckedChange={(checked) => {
+                          const current = field.value || [];
+                          if (checked) {
+                            field.onChange([...current, amenity.id]);
+                          } else {
+                            field.onChange(current.filter((id) => id !== amenity.id));
+                          }
+                        }}
+                      />
+                      <Label htmlFor={`amenity-${amenity.id}`} className="cursor-pointer">
+                        {amenity.name}
+                      </Label>
+                    </div>
+                  ))}
+                </>
+              )}
+            />
+          )}
+        </div>
       </div>
 
       <DialogFooter>
@@ -302,6 +350,7 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
                   <td className="p-2">
                     <Input
                       type="number"
+                      min={1}
                       {...register(`units.${index}.bedrooms`)}
                       className={`w-16 ${errors.units?.[index]?.bedrooms ? "border-red-500" : ""}`}
                       title={errors.units?.[index]?.bedrooms?.message}
@@ -310,7 +359,7 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
                   <td className="p-2">
                     <Input
                       type="number"
-                      step="0.5"
+                      min={0}
                       {...register(`units.${index}.bathrooms`)}
                       className={`w-16 ${errors.units?.[index]?.bathrooms ? "border-red-500" : ""}`}
                       title={errors.units?.[index]?.bathrooms?.message}

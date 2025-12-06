@@ -114,6 +114,14 @@ export const propertiesApi = {
   },
 };
 
+// Amenities API functions
+export const amenitiesApi = {
+  getAll: async () => {
+    const response = await api.get('/amenities');
+    return response.data;
+  },
+};
+
 // Units API functions
 export const unitsApi = {
   getAll: async () => {

@@ -25,7 +25,8 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  BarChart3
+  BarChart3,
+  Wifi
 } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { EditUnitModal } from '@/components/units/EditUnitModal';
@@ -52,6 +53,7 @@ export default function UnitDetailsPage() {
   const currentTenant = unitDetails?.currentTenant;
   const leaseHistory = unitDetails?.leaseHistory || [];
   const analytics = unitDetails?.analytics;
+  const amenities = unitDetails?.amenities || [];
 
   if (unitLoading) {
     return (
@@ -223,6 +225,27 @@ export default function UnitDetailsPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Amenities */}
+        {amenities.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wifi className="h-5 w-5" />
+                Amenities
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-wrap gap-2">
+                {amenities.map((amenity) => (
+                  <Badge key={amenity.id} variant="secondary">
+                    {amenity.name}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Current Lease and Tenant */}
         {currentLease && currentTenant && (

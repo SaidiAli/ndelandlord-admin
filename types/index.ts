@@ -14,6 +14,11 @@ export interface User {
 
 export const propertyTypes = ['residential', 'commercial', 'industrial', 'office', 'retail', 'apartment', 'house', 'condo', 'townhouse', 'warehouse', 'mixed_use', 'land'] as const;
 
+export interface Amenity {
+  id: string;
+  name: string;
+}
+
 export interface Property {
   id: string;
   name: string;
@@ -45,6 +50,7 @@ export interface Unit {
   updatedAt: string;
   property?: Property;
   leases?: Lease[];
+  amenities?: Amenity[];
   currentLease?: {
     id: string;
     status: string;
@@ -544,6 +550,7 @@ export interface UnitWithDetails {
     phone?: string;
     userName?: string;
   };
+  amenities?: Amenity[];
   leaseHistory: Array<{
     lease: {
       id: string;

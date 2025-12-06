@@ -143,6 +143,11 @@ export const unitsApi = {
     return response.data;
   },
 
+  createBulk: async (data: any) => {
+    const response = await api.post('/units/bulk', data);
+    return response.data;
+  },
+
   update: async (id: string, data: any) => {
     const response = await api.put(`/units/${id}`, data);
     return response.data;
@@ -170,7 +175,7 @@ export const leasesApi = {
         data: response.data.data.map(transformLeaseResponse)
       };
     }
-    
+
     return {
       success: false,
       data: [],

@@ -279,7 +279,7 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
                               <div>
                                 <p className="text-sm text-gray-500">Address</p>
                                 <p className="font-medium">
-                                  {leaseDetails.unit.property.address}, {leaseDetails.unit.property.city}, {leaseDetails.unit.property.state}
+                                  {leaseDetails.unit.property.address}, {leaseDetails.unit.property.city}
                                 </p>
                               </div>
                             </div>

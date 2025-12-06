@@ -40,7 +40,11 @@ const bulkAddUnitSchema = z.object({
     unitNumber: z.string().min(1, 'Required'),
     bedrooms: z.coerce.number().int().min(0, 'Min 0'),
     bathrooms: z.coerce.number().min(0, 'Min 0'),
-    squareFeet: z.coerce.number().int().positive('Positive').optional(),
+    squareFeet: z.union([
+      z.string().length(0),
+      z.string().min(1)
+    ]).optional().transform(e => e === "" || e === undefined ? undefined : Number(e))
+      .pipe(z.number().int().positive('Positive').optional()),
     description: z.string().optional(),
   })).min(1, 'At least one unit is required'),
 });
@@ -292,13 +296,15 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
                       {...register(`units.${index}.unitNumber`)}
                       placeholder="e.g. 101"
                       className={errors.units?.[index]?.unitNumber ? "border-red-500" : ""}
+                      title={errors.units?.[index]?.unitNumber?.message}
                     />
                   </td>
                   <td className="p-2">
                     <Input
                       type="number"
                       {...register(`units.${index}.bedrooms`)}
-                      className="w-16"
+                      className={`w-16 ${errors.units?.[index]?.bedrooms ? "border-red-500" : ""}`}
+                      title={errors.units?.[index]?.bedrooms?.message}
                     />
                   </td>
                   <td className="p-2">
@@ -306,15 +312,18 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
                       type="number"
                       step="0.5"
                       {...register(`units.${index}.bathrooms`)}
-                      className="w-16"
+                      className={`w-16 ${errors.units?.[index]?.bathrooms ? "border-red-500" : ""}`}
+                      title={errors.units?.[index]?.bathrooms?.message}
                     />
                   </td>
                   <td className="p-2">
                     <Input
                       type="number"
+                      min={0}
                       {...register(`units.${index}.squareFeet`)}
                       placeholder="Opt"
-                      className="w-20"
+                      className={`w-20 ${errors.units?.[index]?.squareFeet ? "border-red-500" : ""}`}
+                      title={errors.units?.[index]?.squareFeet?.message}
                     />
                   </td>
                   <td className="p-2">

@@ -65,7 +65,7 @@ export interface Lease {
   unitId: string;
   tenantId: string;
   startDate: string;
-  endDate: string;
+  endDate: string | null;
   monthlyRent: number;
   deposit: number;
   paymentDay: number;
@@ -176,7 +176,7 @@ export interface LeaseApiResponse {
   lease: {
     id: string;
     startDate: Date | string;
-    endDate: Date | string;
+    endDate: Date | string | null;
     monthlyRent: string;
     deposit: string;
     paymentDay: number;
@@ -235,7 +235,7 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
     unitId: unit?.id || '',
     tenantId: tenant?.id || '',
     startDate: typeof lease.startDate === 'string' ? lease.startDate : lease.startDate.toISOString(),
-    endDate: typeof lease.endDate === 'string' ? lease.endDate : lease.endDate.toISOString(),
+    endDate: lease.endDate ? (typeof lease.endDate === 'string' ? lease.endDate : lease.endDate.toISOString()) : null,
     monthlyRent: parseFloat(lease.monthlyRent),
     deposit: parseFloat(lease.deposit),
     paymentDay: lease.paymentDay,

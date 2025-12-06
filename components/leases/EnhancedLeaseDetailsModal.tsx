@@ -108,8 +108,9 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
     }
   };
 
-  const calculateDuration = (startDate: string, endDate: string) => {
-    if (!startDate || !endDate) return '--';
+  const calculateDuration = (startDate: string, endDate: string | null) => {
+    if (!startDate) return '--';
+    if (!endDate) return 'Open Contract';
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -135,8 +136,8 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
     }
   };
 
-  const calculateRemainingTime = (endDate: string) => {
-    if (!endDate) return null;
+  const calculateRemainingTime = (endDate: string | null) => {
+    if (!endDate) return { text: 'No expiry', color: 'text-green-600' };
 
     const end = new Date(endDate);
     const now = new Date();
@@ -297,12 +298,12 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">End Date</p>
-                        <p className="font-medium">{new Date(leaseDetails.endDate).toLocaleDateString('en-US', {
+                        <p className="font-medium">{leaseDetails.endDate ? new Date(leaseDetails.endDate).toLocaleDateString('en-US', {
                           weekday: 'long',
                           year: 'numeric',
                           month: 'long',
                           day: 'numeric'
-                        })}</p>
+                        }) : 'Open (Indefinite)'}</p>
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Created</p>
@@ -367,7 +368,7 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                                 <div>
                                   <p className="text-sm text-gray-500">Address</p>
                                   <p className="font-medium">
-                                    {leaseDetails.unit.property.address}, {leaseDetails.unit.property.city}, {leaseDetails.unit.property.state}
+                                    {leaseDetails.unit.property.address}, {leaseDetails.unit.property.city}, {leaseDetails.unit.property.city}
                                   </p>
                                 </div>
                               </div>

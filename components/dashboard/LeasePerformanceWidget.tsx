@@ -17,7 +17,7 @@ export function LeasePerformanceWidget() {
 
   const leases: Lease[] = leasesData?.data || [];
   const activeLeases = leases.filter(l => l.status === 'active');
-  const expiringLeases = activeLeases.filter(l => new Date(l.endDate) < new Date(new Date().setDate(new Date().getDate() + 30)));
+  const expiringLeases = activeLeases.filter(l => l.endDate && new Date(l.endDate) < new Date(new Date().setDate(new Date().getDate() + 30)));
 
   if (isLoading) {
     return <div>Loading...</div>;

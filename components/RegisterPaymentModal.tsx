@@ -85,6 +85,7 @@ export function RegisterPaymentModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        console.log({ leaseId, amount, paidDate, paymentMethod, notes })
         if (!leaseId || !amount || !paidDate || !paymentMethod) {
             // toast({
             //     title: 'Error',

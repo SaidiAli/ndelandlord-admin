@@ -49,10 +49,6 @@ export default function UnitsPage() {
         </div>
         
         <Card>
-          <CardHeader>
-            <CardTitle>All Units</CardTitle>
-            <CardDescription>A list of all rental units.</CardDescription>
-          </CardHeader>
           <CardContent>
             {unitsLoading ? (
               <div className="text-center py-8">

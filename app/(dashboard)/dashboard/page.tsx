@@ -9,15 +9,10 @@ import { formatUGX } from '@/lib/currency';
 import { Payment } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
-import { OverduePaymentsWidget } from '@/components/dashboard/OverduePaymentsWidget';
-import { RevenueForecastWidget } from '@/components/dashboard/RevenueForecastWidget';
-import { LeasePerformanceWidget } from '@/components/dashboard/LeasePerformanceWidget';
-import { CollectionRateWidget } from '@/components/dashboard/CollectionRateWidget';
-import { UpcomingPaymentsWidget } from '@/components/dashboard/UpcomingPaymentsWidget';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  
+
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
     queryKey: ['landlord-dashboard', user?.id],
     queryFn: () => landlordApi.getDashboardData(),
@@ -26,7 +21,7 @@ export default function DashboardPage() {
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
     queryKey: ['recent-payments', user?.id],
-    queryFn: () => paymentsApi.getAll(), 
+    queryFn: () => paymentsApi.getAll(),
     enabled: !!user,
   });
 
@@ -97,15 +92,6 @@ export default function DashboardPage() {
           </Card>
         </div>
       )}
-
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <OverduePaymentsWidget />
-        <RevenueForecastWidget />
-        <LeasePerformanceWidget />
-        <CollectionRateWidget />
-        <UpcomingPaymentsWidget />
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>

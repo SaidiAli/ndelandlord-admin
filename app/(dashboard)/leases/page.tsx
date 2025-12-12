@@ -150,37 +150,8 @@ export default function LeasesPage() {
         <Card>
           <CardHeader>
             <CardTitle>All Leases</CardTitle>
-            <CardDescription>Manage lease agreements and track payment schedules.</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Filters */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-6">
-              <div className="flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search by tenant name, unit, or property..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40">
-                  <Filter className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Status</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="expiring">Expiring</SelectItem>
-                  <SelectItem value="expired">Expired</SelectItem>
-                  <SelectItem value="terminated">Terminated</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             {leasesLoading ? (
               <div className="text-center py-8">
@@ -204,7 +175,7 @@ export default function LeasesPage() {
                 )}
               </div>
             ) : (
-                <DataTable columns={columns} data={filteredLeases} searchKey="tenant" />
+                <DataTable columns={columns} data={filteredLeases} searchKey="tenant" searchPlaceholder="Search by tenant name, unit, or property" />
             )}
           </CardContent>
         </Card>

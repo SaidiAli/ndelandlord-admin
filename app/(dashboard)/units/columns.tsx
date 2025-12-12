@@ -39,25 +39,17 @@ export const getColumns = (onEdit: (unit: Unit) => void): ColumnDef<Unit>[] => [
   {
     accessorKey: "property.name",
     header: "Property",
-     cell: ({ row }) => {
+    cell: ({ row }) => {
       return <span>{row.original.property?.name}</span>
     }
   },
   {
     accessorKey: "bedrooms",
-    header: "Beds",
-  },
-    {
-    accessorKey: "bathrooms",
-    header: "Baths",
+    header: "Bedrooms",
   },
   {
-    accessorKey: "monthlyRent",
-    header: () => <div className="text-right">Monthly Rent</div>,
-    cell: ({ row }) => {
-      const amount = parseFloat(row.getValue("monthlyRent"))
-      return <div className="text-right font-medium">{formatUGX(amount)}</div>
-    },
+    accessorKey: "bathrooms",
+    header: "Bathrooms",
   },
   {
     accessorKey: "isAvailable",
@@ -71,10 +63,10 @@ export const getColumns = (onEdit: (unit: Unit) => void): ColumnDef<Unit>[] => [
     id: "actions",
     cell: ({ row }) => {
       const unit = row.original
-      
+
       const ActionsCell = () => {
         const router = useRouter();
-        
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

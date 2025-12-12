@@ -41,7 +41,7 @@ export default function TenantsPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Tenants</h1>
-            <p className="text-gray-600">Manage your tenant relationships</p>
+            <p className="text-gray-600">Manage your tenants</p>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />

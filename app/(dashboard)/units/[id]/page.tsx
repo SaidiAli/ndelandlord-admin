@@ -20,7 +20,6 @@ import {
   Mail,
   Calendar,
   Home,
-  TrendingUp,
   Activity,
   CheckCircle,
   XCircle,
@@ -131,11 +130,11 @@ export default function UnitDetailsPage() {
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Security Deposit</CardTitle>
+              <CardTitle className="text-sm font-medium">Unit Size</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatUGX(parseFloat(unit.deposit))}</div>
+              <div className="text-2xl font-bold">{unit.squareFeet || 0} sqft</div>
             </CardContent>
           </Card>
           <Card>
@@ -169,11 +168,7 @@ export default function UnitDetailsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">{analytics.occupancyRate.toFixed(1)}%</div>
-                    <div className="text-sm text-gray-500">Occupancy Rate</div>
-                  </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-green-600">{formatUGX(analytics.totalRevenue)}</div>
                     <div className="text-sm text-gray-500">Total Revenue</div>

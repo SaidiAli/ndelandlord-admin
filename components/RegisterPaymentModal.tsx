@@ -19,7 +19,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import api from '@/lib/api';
+import api, { leasesApi } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -66,9 +66,9 @@ export function RegisterPaymentModal({
     const fetchLeases = async () => {
         setLoading(true);
         try {
-            const response = await api.get('/leases?status=active'); // Assuming this endpoint exists
-            if (response.data.success) {
-                setLeases(response.data.data);
+            const response = await leasesApi.getAll({ status: 'active' });
+            if (response.success && response.data) {
+                setLeases(response.data as unknown as Lease[]);
             }
         } catch (error) {
             console.error('Failed to fetch leases:', error);
@@ -159,7 +159,7 @@ export function RegisterPaymentModal({
                             <SelectContent>
                                 {leases.map((lease) => (
                                     <SelectItem key={lease.id} value={lease.id}>
-                                        {lease.property.name} - Unit {lease.unit.unitNumber} ({lease.tenant.firstName} {lease.tenant.lastName})
+                                        {lease.property?.name} - Unit {lease.unit?.unitNumber} ({lease.tenant?.firstName} {lease.tenant?.lastName})
                                     </SelectItem>
                                 ))}
                             </SelectContent>

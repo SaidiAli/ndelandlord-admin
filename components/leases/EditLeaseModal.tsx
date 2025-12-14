@@ -24,13 +24,14 @@ import { toast } from 'sonner';
 
 const editLeaseSchema = z.object({
   startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
-  endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
+  endDate: z.string().optional().refine((val) => !val || !isNaN(Date.parse(val)), { message: "Invalid end date" }),
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   paymentDay: z.coerce.number().int().min(1, 'Day must be between 1 and 31').max(31, 'Day must be between 1 and 31').default(1),
   status: z.enum(['draft', 'active', 'expiring', 'expired', 'terminated']),
   terms: z.string().optional(),
 }).refine((data) => {
+  if (!data.endDate) return true;
   const startDate = new Date(data.startDate);
   const endDate = new Date(data.endDate);
   return endDate > startDate;
@@ -63,7 +64,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
       reset({
         ...lease,
         startDate: new Date(lease.startDate).toISOString().split('T')[0],
-        endDate: new Date(lease.endDate).toISOString().split('T')[0],
+        endDate: lease.endDate ? new Date(lease.endDate).toISOString().split('T')[0] : '',
         monthlyRent: parseFloat(lease.monthlyRent as any),
         deposit: parseFloat(lease.deposit as any),
         paymentDay: (lease as any).paymentDay || 1,
@@ -89,12 +90,11 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
     const formattedData = {
       ...data,
       startDate: new Date(data.startDate).toISOString(),
-      endDate: new Date(data.endDate).toISOString(),
+      endDate: data.endDate ? new Date(data.endDate).toISOString() : undefined,
       deposit: Number(data.deposit),
       terms: data.terms || undefined,
     };
 
-    console.log({ formattedData });
     mutation.mutate(formattedData);
   };
 

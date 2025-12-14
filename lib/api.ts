@@ -341,6 +341,11 @@ export const paymentsApi = {
     const response = await api.get(`/landlords/payments/analytics?${params.toString()}`);
     return response.data;
   },
+
+  getPaymentSchedules: async (leaseId: string) => {
+    const response = await api.get(`/payment-schedules?leaseId=${leaseId}`);
+    return response.data;
+  },
 };
 
 // Maintenance API functions

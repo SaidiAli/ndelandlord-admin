@@ -1,6 +1,8 @@
 'use client';
 
-import { Lease, Payment } from '@/types';
+import { useState, useEffect } from 'react';
+import { Lease, Payment, PaymentSchedule } from '@/types';
+import { paymentsApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatUGX } from '@/lib/currency';
@@ -14,18 +16,57 @@ interface PaymentScheduleTabProps {
 }
 
 export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps) {
-  if (!lease) {
+  const [schedules, setSchedules] = useState<PaymentSchedule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSchedules = async () => {
+      if (!lease?.id) return;
+      try {
+        setLoading(true);
+        const response = await paymentsApi.getPaymentSchedules(lease.id);
+        if (response.success) {
+          setSchedules(response.data);
+        } else {
+          setError('Failed to load payment schedule');
+        }
+      } catch (err) {
+        console.error('Error fetching schedules:', err);
+        setError('Error loading schedules');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSchedules();
+  }, [lease?.id]);
+
+  if (loading) {
     return <div>Loading schedule...</div>;
   }
 
-  const paymentSchedules: { month: string; amount: number; isProrated: boolean; status: string; payment?: Payment }[] = [];
+  if (error) {
+    return <div className="text-red-500">{error}</div>;
+  }
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="h-5 w-5 text-green-600" />;
-      case 'pending': return <Clock className="h-5 w-5 text-gray-600" />;
-      case 'failed': return <XCircle className="h-5 w-5 text-red-600" />;
-      default: return <Clock className="h-5 w-5 text-yellow-600" />;
+      case 'paid': return <CheckCircle className="h-5 w-5 text-green-600" />;
+      case 'pending': return <Clock className="h-5 w-5 text-yellow-600" />;
+      case 'overdue': return <XCircle className="h-5 w-5 text-red-600" />;
+      case 'upcoming': return <Clock className="h-5 w-5 text-gray-400" />;
+      case 'partial': return <Info className="h-5 w-5 text-blue-500" />;
+      default: return <Clock className="h-5 w-5 text-gray-400" />;
+    }
+  }
+
+  const getStatusBadgeVariant = (status: string) => {
+    switch (status) {
+      case 'paid': return 'default'; // default is typically primary/greenish depending on theme, or we can use specific classes if needed. strictly default is primary.
+      case 'overdue': return 'destructive';
+      case 'pending': return 'secondary'; // often yellow/gray
+      default: return 'outline';
     }
   }
 
@@ -38,44 +79,46 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Month</TableHead>
+              <TableHead>#</TableHead>
+              <TableHead>Due Date</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Payment Date</TableHead>
+              <TableHead>Period</TableHead>
               <TableHead className="text-right">Amount</TableHead>
+              <TableHead className="text-right">Paid</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paymentSchedules.map((schedule) => (
-              <TableRow key={schedule.month}>
+            {schedules.map((schedule) => (
+              <TableRow key={schedule.id}>
+                <TableCell>{schedule.paymentNumber}</TableCell>
                 <TableCell>
-                  {schedule.month}
-                  {schedule.isProrated && (
-                    <TooltipProvider>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Info className="inline-block w-4 h-4 ml-2 text-gray-500" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>This amount is prorated.</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  )}
+                  {new Date(schedule.dueDate).toLocaleDateString()}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
-                    {getStatusIcon(schedule.status)}
-                    <Badge variant={schedule.status === 'completed' ? 'default' : 'secondary'}>
-                      {schedule.status}
+                    {getStatusIcon(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}
+                    {/* The backend returns a calculated 'status' field now */}
+                    <Badge variant={getStatusBadgeVariant(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}>
+                      {schedule.status ? schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1) : (schedule.isPaid ? 'Paid' : 'Pending')}
                     </Badge>
                   </div>
                 </TableCell>
                 <TableCell>
-                  {schedule.payment?.paidDate ? new Date(schedule.payment.paidDate).toLocaleDateString() : '-'}
+                  {new Date(schedule.periodStart).toLocaleDateString()} - {new Date(schedule.periodEnd).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="text-right">{formatUGX(schedule.amount)}</TableCell>
+                <TableCell className="text-right font-medium">{formatUGX(schedule.amount)}</TableCell>
+                <TableCell className="text-right text-muted-foreground">
+                  {schedule.isPaid ? formatUGX(schedule.amount) : (schedule.paidAmount ? formatUGX(schedule.paidAmount) : '-')}
+                </TableCell>
               </TableRow>
             ))}
+            {schedules.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                  No payment schedule generated yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

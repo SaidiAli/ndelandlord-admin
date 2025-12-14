@@ -120,6 +120,8 @@ export interface PaymentSchedule {
   updatedAt: string;
   lease?: Lease;
   payment?: Payment;
+  status?: 'paid' | 'pending' | 'overdue' | 'upcoming' | 'partial';
+  paidAmount?: number;
 }
 
 export interface MaintenanceRequest {

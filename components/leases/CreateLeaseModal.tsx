@@ -38,9 +38,9 @@ const createLeaseSchema = z
     startDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
       message: 'Invalid start date',
     }),
-    endDate: z.string().refine((val) => !isNaN(Date.parse(val)), {
+    endDate: z.string().optional().refine((val) => !val || !isNaN(Date.parse(val)), {
       message: 'Invalid end date',
-    }),
+    }).transform(val => val === '' ? undefined : val),
     monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
     deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
     paymentDay: z.coerce.number().int().min(1, 'Day must be between 1 and 31').max(31, 'Day must be between 1 and 31').default(1),
@@ -48,6 +48,7 @@ const createLeaseSchema = z
   })
   .refine(
     (data) => {
+      if (!data.endDate) return true;
       const startDate = new Date(data.startDate);
       const endDate = new Date(data.endDate);
       return endDate > startDate;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePaymentUpdates, usePaymentNotifications } from '@/hooks/usePaymentUpdates';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,16 +16,12 @@ import {
   Eye,
   RefreshCw,
   CreditCard,
-  TrendingUp,
-  Clock,
-  CheckCircle
 } from 'lucide-react';
 import { paymentsApi } from '@/lib/api';
 import { formatUGX, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
-import { Payment, PaymentAnalytics } from '@/types';
+import { Payment } from '@/types';
 import { PaymentDetailsModal } from '@/components/payments/PaymentDetailsModal';
 import { RegisterPaymentModal } from '@/components/RegisterPaymentModal';
-import { PaymentAnalyticsChart } from '@/components/analytics/PaymentAnalyticsChart';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function PaymentsPage() {
@@ -55,29 +51,14 @@ export default function PaymentsPage() {
     enabled: !!user, // Only fetch when user is available
   });
 
-  const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['payment-analytics', user?.id], // Include user ID to prevent cache sharing between users
-    queryFn: () => paymentsApi.getAnalytics(),
-    enabled: !!user, // Only fetch when user is available
-  });
-
   const refreshMutation = useMutation({
     mutationFn: () => paymentsApi.getAll(),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['payments', user?.id] });
-      queryClient.invalidateQueries({ queryKey: ['payment-analytics', user?.id] });
     },
   });
 
   const payments: Payment[] = paymentsData?.data || [];
-  const analytics: PaymentAnalytics = analyticsData?.data || {
-    totalPayments: 0,
-    totalAmount: 0,
-    averagePaymentTime: 0,
-    paymentsByStatus: [],
-    paymentsByProvider: [],
-    monthlyTrends: [],
-  };
 
   const filteredPayments = payments.filter(payment => {
     const matchesSearch =
@@ -139,64 +120,6 @@ export default function PaymentsPage() {
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Payments</CardTitle>
-                <CreditCard className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{analytics.totalPayments}</div>
-                <p className="text-xs text-muted-foreground">
-                  {formatUGX(analytics.totalAmount)} total value
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Completed</CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analytics.paymentsByStatus.find(s => s.status === 'completed')?.count || 0}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatUGX(analytics.paymentsByStatus.find(s => s.status === 'completed')?.amount || 0)}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Processing</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {analytics.paymentsByStatus.find(s => s.status === 'processing')?.count || 0}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Avg. {Math.round(analytics.averagePaymentTime)} mins
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Monthly Growth</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">0%</div>
-                <p className="text-xs text-muted-foreground">
-                  vs last month
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
           <Card>
             <CardHeader>
               <CardTitle>Recent Payments</CardTitle>
@@ -233,10 +156,6 @@ export default function PaymentsPage() {
 
         <TabsContent value="payments" className="space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle>All Payments</CardTitle>
-              <CardDescription>Complete payment transaction history</CardDescription>
-            </CardHeader>
             <CardContent>
               <div className="flex flex-col sm:flex-row gap-4 mb-6">
                 <div className="flex-1">
@@ -339,70 +258,7 @@ export default function PaymentsPage() {
         </TabsContent>
 
         <TabsContent value="analytics" className="space-y-6">
-          {analyticsLoading ? (
-            <div className="text-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-              <p className="text-sm text-gray-500 mt-2">Loading analytics...</p>
-            </div>
-          ) : (
-            <PaymentAnalyticsChart analytics={analytics} />
-          )}
 
-          {/* Summary Cards */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Payments by Provider</CardTitle>
-                <CardDescription>Mobile money provider distribution</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {analytics.paymentsByProvider.map((provider) => {
-                    const providerInfo = getProviderInfo(provider.provider);
-                    return (
-                      <div key={provider.provider} className="flex items-center justify-between">
-                        <div className="flex items-center space-x-2">
-                          <div
-                            className="w-3 h-3 rounded-full"
-                            style={{ backgroundColor: providerInfo?.color || '#gray' }}
-                          />
-                          <span>{providerInfo?.name || provider.provider}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-medium">{provider.count} payments</div>
-                          <div className="text-sm text-gray-500">{formatUGX(provider.amount)}</div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Status Distribution</CardTitle>
-                <CardDescription>Current status of all payments</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {analytics.paymentsByStatus.map((status) => (
-                    <div key={status.status} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <Badge variant={getStatusBadgeVariant(status.status)}>
-                          {status.status}
-                        </Badge>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-medium">{status.count} payments</div>
-                        <div className="text-sm text-gray-500">{formatUGX(status.amount)}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </TabsContent>
       </Tabs>
 

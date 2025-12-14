@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { authStorage } from './auth';
-import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse } from '@/types';
+import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse, Payment } from '@/types';
 
 // Create axios instance
 const api = axios.create({
@@ -9,6 +9,26 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Helper to transform payment response
+const transformPaymentResponse = (item: any): Payment => {
+  // If the item doesn't have the nested structure { payment, lease, ... }, return as is
+  if (!item.payment) return item;
+
+  const leaseData: any = {
+    lease: item.lease,
+    tenant: item.tenant,
+    unit: item.unit,
+    property: item.property,
+    landlord: item.landlord
+  };
+
+  return {
+    ...item.payment,
+    amount: typeof item.payment.amount === 'string' ? parseFloat(item.payment.amount) : item.payment.amount,
+    lease: item.lease ? transformLeaseResponse(leaseData) : undefined
+  };
+};
 
 // Request interceptor to add auth token
 api.interceptors.request.use(
@@ -246,11 +266,27 @@ export const paymentsApi = {
     if (filters?.status) params.append('status', filters.status);
     params.append('_t', Date.now().toString());
     const response = await api.get(`/payments?${params.toString()}`);
+
+    if (response.data?.data && Array.isArray(response.data.data)) {
+      return {
+        ...response.data,
+        data: response.data.data.map(transformPaymentResponse)
+      };
+    }
+
     return response.data;
   },
 
   getById: async (id: string) => {
     const response = await api.get(`/payments/${id}`);
+
+    if (response.data?.data) {
+      return {
+        ...response.data,
+        data: transformPaymentResponse(response.data.data)
+      };
+    }
+
     return response.data;
   },
 
@@ -286,6 +322,14 @@ export const paymentsApi = {
 
   getByLease: async (leaseId: string) => {
     const response = await api.get(`/payments?leaseId=${leaseId}`);
+
+    if (response.data?.data && Array.isArray(response.data.data)) {
+      return {
+        ...response.data,
+        data: response.data.data.map(transformPaymentResponse)
+      };
+    }
+
     return response.data;
   },
 

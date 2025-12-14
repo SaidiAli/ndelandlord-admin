@@ -29,6 +29,9 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
   }
 
   const paymentSchedules: { month: string; amount: number; isProrated: boolean; status: string; payment?: Payment }[] = [];
+  if (!lease.endDate) {
+    return <div className="p-4">Lease end date is not set.</div>;
+  }
   const startDate = new Date(lease.startDate);
   const endDate = new Date(lease.endDate);
   const currentDate = new Date(startDate);

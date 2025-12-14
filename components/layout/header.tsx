@@ -22,16 +22,9 @@ export function Header() {
         </div>
       </div>
 
-      <div className="flex items-center space-x-4">
-        Sign Out
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={handleLogout}
-          title="Logout"
-        >
-          <LogOut className="w-4 h-4" />
-        </Button>
+      <div className="flex flex-row items-center space-x-4 hover:cursor-pointer" onClick={handleLogout}>
+        <p className='hover:underline'>Sign Out</p>
+        <LogOut className="w-4 h-4" />
       </div>
     </header>
   );

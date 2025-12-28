@@ -393,7 +393,7 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
           </table>
         </div>
         <div className="text-xs text-muted-foreground mt-2">
-          Click "Add Row" to add another unit. Duplicate unit numbers for the same property will be skipped.
+          Click &quot;Add Row&quot; to add another unit. Duplicate unit numbers for the same property will be skipped.
         </div>
       </div>
 

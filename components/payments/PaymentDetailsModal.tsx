@@ -57,7 +57,7 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
   if (!payment) return null;
 
   const receipt: PaymentReceipt | null = receiptData?.data || null;
-  const providerInfo = payment.mobileMoneyProvider 
+  const providerInfo = payment.mobileMoneyProvider
     ? MOBILE_MONEY_PROVIDERS[payment.mobileMoneyProvider]
     : null;
 
@@ -88,7 +88,7 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
 
   const handleDownloadReceipt = async () => {
     if (!receipt) return;
-    
+
     setIsDownloadingReceipt(true);
     try {
       // In a real implementation, you'd generate and download a PDF receipt
@@ -107,7 +107,7 @@ Payment Method: ${receipt.paymentMethod}
 Transaction ID: ${receipt.transactionId}
 
 Thank you for your payment!
-NDI Landlord Property Management
+Verit Property Management
       `.trim();
 
       const blob = new Blob([receiptContent], { type: 'text/plain' });
@@ -188,9 +188,9 @@ NDI Landlord Property Management
                   </div>
                 )}
                 {periodCovered && (
-                    <div className="text-sm text-gray-500 mt-1">
-                        Covers period: {periodCovered}
-                    </div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Covers period: {periodCovered}
+                  </div>
                 )}
               </div>
             </CardContent>
@@ -224,11 +224,11 @@ NDI Landlord Property Management
                 <div>
                   <label className="text-sm font-medium text-gray-500">Payment Provider</label>
                   <div className="flex items-center space-x-2 mt-1">
-                    <Badge 
+                    <Badge
                       variant="outline"
-                      style={{ 
+                      style={{
                         backgroundColor: providerInfo.color,
-                        color: providerInfo.textColor 
+                        color: providerInfo.textColor
                       }}
                     >
                       {providerInfo.name}
@@ -361,7 +361,7 @@ NDI Landlord Property Management
                       <span>{new Date(receipt.paidDate).toLocaleString()}</span>
                     </div>
                     <Separator />
-                    <Button 
+                    <Button
                       onClick={handleDownloadReceipt}
                       disabled={isDownloadingReceipt}
                       className="w-full"

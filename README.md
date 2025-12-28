@@ -1,4 +1,4 @@
-# NDI Landlord Admin Dashboard
+# Verit Admin Dashboard
 
 A modern property management dashboard built with Next.js 14, TypeScript, and Tailwind CSS.
 
@@ -112,7 +112,7 @@ The dashboard integrates with the backend API server running on port 4000. Make 
 
 The dashboard follows a consistent design system based on the provided mockup:
 
-- **Primary Color**: #2D5A4A (Dark Green)
+- **Primary Color**: #739BA4 (Dark Green)
 - **Success**: #10B981 (Green)
 - **Warning**: #F59E0B (Amber)
 - **Error**: #EF4444 (Red)

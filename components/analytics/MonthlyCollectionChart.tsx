@@ -52,7 +52,7 @@ export function MonthlyCollectionChart({ payments }: MonthlyCollectionChartProps
               <XAxis dataKey="month" />
               <YAxis tickFormatter={(value) => formatUGX(value as number)} />
               <Tooltip formatter={(value) => formatUGX(value as number)} />
-              <Bar dataKey="collected" fill="#2D5A4A" name="Collected" />
+              <Bar dataKey="collected" fill="#739BA4" name="Collected" />
               <Bar dataKey="pending" fill="#F59E0B" name="Pending" />
             </BarChart>
           </ResponsiveContainer>

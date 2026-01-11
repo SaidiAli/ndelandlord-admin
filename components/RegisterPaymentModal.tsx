@@ -220,7 +220,7 @@ export function RegisterPaymentModal({
                     </div>
 
                     <DialogFooter>
-                        <Button type="button" variant="outline" onClick={onClose} disabled={submitting}>
+                        <Button type="button" onClick={onClose} disabled={submitting}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={submitting || loading}>

@@ -197,7 +197,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">Cancel</Button>
+              <Button type="button">Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting || mutation.isPending}>
               {isSubmitting || mutation.isPending ? 'Saving...' : 'Create Tenant & Lease'}

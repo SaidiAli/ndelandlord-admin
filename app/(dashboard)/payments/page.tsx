@@ -96,7 +96,6 @@ export default function PaymentsPage() {
         </div>
         <div className="flex gap-2">
           <Button
-            variant="outline"
             onClick={() => setIsRegisterModalOpen(true)}
           >
             <CreditCard className="h-4 w-4 mr-2" />
@@ -182,7 +181,7 @@ export default function PaymentsPage() {
                     <SelectItem value="failed">Failed</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button variant="outline">
+                <Button>
                   <Download className="h-4 w-4 mr-2" />
                   Export
                 </Button>
@@ -237,8 +236,6 @@ export default function PaymentsPage() {
                               {payment.status}
                             </Badge>
                             <Button
-                              variant="ghost"
-                              size="sm"
                               onClick={() => setSelectedPayment(payment)}
                             >
                               <Eye className="h-4 w-4" />

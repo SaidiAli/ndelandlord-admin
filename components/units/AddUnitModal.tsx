@@ -242,7 +242,7 @@ function SingleUnitForm({ properties, loading, onSuccess, userId }: { properties
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button" variant="outline">Cancel</Button>
+          <Button type="button">Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add Unit'}
@@ -317,8 +317,6 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
           <Label>Units List</Label>
           <Button
             type="button"
-            variant="outline"
-            size="sm"
             onClick={() => append({ unitNumber: '', bedrooms: 1, bathrooms: 1 })}
           >
             <Plus className="h-4 w-4 mr-2" /> Add Row
@@ -378,8 +376,6 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
                   <td className="p-2">
                     <Button
                       type="button"
-                      variant="ghost"
-                      size="icon"
                       onClick={() => remove(index)}
                       disabled={fields.length === 1}
                       className="text-red-500 hover:text-red-700"
@@ -399,7 +395,7 @@ function BulkUnitForm({ properties, loading, onSuccess, userId }: { properties: 
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button" variant="outline">Cancel</Button>
+          <Button type="button">Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add All Units'}

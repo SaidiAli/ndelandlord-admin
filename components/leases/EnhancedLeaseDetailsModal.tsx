@@ -202,7 +202,6 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                   <Button
                     onClick={() => null}
                     disabled={true}
-                    variant="outline"
                   >
                     <CheckCircle className="h-4 w-4 mr-2" />
                     Approve
@@ -221,7 +220,6 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                   <Button
                     onClick={() => null}
                     disabled={true}
-                    variant="destructive"
                   >
                     <AlertCircle className="h-4 w-4 mr-2" />
                     Terminate

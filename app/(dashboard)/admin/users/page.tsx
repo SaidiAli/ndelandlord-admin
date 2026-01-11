@@ -63,7 +63,7 @@ export default function ManageUsersPage() {
                                         <Badge variant={user.isActive ? 'default' : 'secondary'}>
                                             {user.isActive ? 'Active' : 'Inactive'}
                                         </Badge>
-                                        <Button variant="ghost" size="icon">
+                                        <Button>
                                             <MoreHorizontal className="h-4 w-4" />
                                         </Button>
                                     </div>

@@ -154,8 +154,6 @@ Verit Property Management
                 </div>
                 <div className="flex space-x-2">
                   <Button
-                    variant="outline"
-                    size="sm"
                     onClick={() => refreshMutation.mutate()}
                     disabled={refreshMutation.isPending}
                   >
@@ -164,8 +162,6 @@ Verit Property Management
                   </Button>
                   {payment.status === 'completed' && receipt && (
                     <Button
-                      variant="outline"
-                      size="sm"
                       onClick={handleDownloadReceipt}
                       disabled={isDownloadingReceipt}
                     >
@@ -225,7 +221,6 @@ Verit Property Management
                   <label className="text-sm font-medium text-gray-500">Payment Provider</label>
                   <div className="flex items-center space-x-2 mt-1">
                     <Badge
-                      variant="outline"
                       style={{
                         backgroundColor: providerInfo.color,
                         color: providerInfo.textColor

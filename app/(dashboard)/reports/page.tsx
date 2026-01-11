@@ -45,7 +45,7 @@ export default function ReportsPage() {
           <h1 className="text-3xl font-bold text-gray-900">Reports & Analytics</h1>
           <p className="text-gray-600">Visualize and analyze your property management data</p>
         </div>
-        <Button variant="outline">
+        <Button>
           <Download className="h-4 w-4 mr-2" />
           Export Reports
         </Button>

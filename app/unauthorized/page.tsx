@@ -27,12 +27,12 @@ export default function UnauthorizedPage() {
               This page is restricted to administrators and landlords only.
             </p>
             <div className="flex flex-col space-y-2">
-              <Button onClick={handleLogout} variant="outline" className="w-full">
+              <Button onClick={handleLogout} className="w-full">
                 <LogOut className="w-4 h-4 mr-2" />
                 Logout and Login with Different Account
               </Button>
               <Link href="/dashboard">
-                <Button variant="ghost" className="w-full">
+                <Button className="w-full">
                   Go Back to Dashboard
                 </Button>
               </Link>

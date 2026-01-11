@@ -88,7 +88,7 @@ export default function UnitDetailsPage() {
         {/* Header with breadcrumb */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="sm" onClick={() => router.back()}>
+            <Button onClick={() => router.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
             </Button>
@@ -374,7 +374,6 @@ export default function UnitDetailsPage() {
                 </div>
               </div>
               <Button
-                variant="outline"
                 onClick={() => router.push(`/properties/${property?.id}`)}
               >
                 View Property Details

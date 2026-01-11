@@ -47,18 +47,20 @@ export default function DashboardPage() {
       {/* Metrics Cards */}
       {summary && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summary.totalProperties}</div>
-              <p className="text-xs text-muted-foreground">{summary.totalUnits} total units</p>
-            </CardContent>
-          </Card>
+          <Link href="/properties">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
+                <Building className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{summary.totalProperties}</div>
+                <p className="text-xs text-muted-foreground">{summary.totalUnits} total units</p>
+              </CardContent>
+            </Card>
+          </Link>
 
-          <Card>
+          <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Tenants</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
@@ -67,29 +69,34 @@ export default function DashboardPage() {
               <div className="text-2xl font-bold">{summary.totalTenants}</div>
               <p className="text-xs text-muted-foreground">{summary.occupancyRate}% occupancy</p>
             </CardContent>
-          </Card>
+          </Card></Link>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenue)}</div>
-              <p className="text-xs text-muted-foreground">from active leases</p>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{summary.overduePayments}</div>
-              <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
-            </CardContent>
-          </Card>
+          <Link href="/payments">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+                <DollarSign className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenue)}</div>
+                <p className="text-xs text-muted-foreground">from active leases</p>
+              </CardContent>
+            </Card>
+          </Link>
+
+          <Link href="/leases">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
+                <AlertTriangle className="h-4 w-4 text-red-500" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{summary.overduePayments}</div>
+                <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       )}
 
@@ -101,7 +108,7 @@ export default function DashboardPage() {
               <CardDescription>Latest rent payments received</CardDescription>
             </div>
             <Link href="/payments">
-              <Button variant="outline" size="sm">
+              <Button>
                 <Eye className="h-4 w-4 mr-2" />
                 View All
               </Button>

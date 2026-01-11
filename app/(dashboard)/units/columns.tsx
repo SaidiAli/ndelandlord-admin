@@ -1,24 +1,19 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { ArrowUpDown, Eye, Edit } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Unit } from "@/types"
 import { formatUGX } from "@/lib/currency"
 
-// Add onEdit to the component props
-export const getColumns = (onEdit: (unit: Unit) => void): ColumnDef<Unit>[] => [
+interface ColumnsProps {
+  onViewDetails: (unitId: string) => void;
+  onEdit: (unit: Unit) => void;
+}
+
+export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<Unit>[] => [
   {
     accessorKey: "unitNumber",
     header: ({ column }) => {
@@ -55,43 +50,37 @@ export const getColumns = (onEdit: (unit: Unit) => void): ColumnDef<Unit>[] => [
     header: "Status",
     cell: ({ row }) => {
       const isAvailable = row.getValue("isAvailable")
-      return <Badge variant={isAvailable ? "default" : "secondary"}>{isAvailable ? "Available" : "Occupied"}</Badge>
+      return <Badge className={isAvailable ? "" : "bg-secondary text-white"}>{isAvailable ? "Available" : "Occupied"}</Badge>
     }
   },
   {
-    id: "actions",
+    id: "viewDetails",
+    header: "Details",
     cell: ({ row }) => {
       const unit = row.original
-
-      const ActionsCell = () => {
-        const router = useRouter();
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(unit.id)}
-              >
-                Copy unit ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => router.push(`/units/${unit.id}`)}>
-                View details
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(unit)}>Edit unit</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      };
-
-      return <ActionsCell />;
+      return (
+        <Button
+          onClick={() => onViewDetails(unit.id)}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View
+        </Button>
+      )
+    },
+  },
+  {
+    id: "edit",
+    header: "Edit",
+    cell: ({ row }) => {
+      const unit = row.original
+      return (
+        <Button
+          onClick={() => onEdit(unit)}
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
+      )
     },
   },
 ]

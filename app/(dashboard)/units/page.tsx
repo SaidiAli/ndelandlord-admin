@@ -26,13 +26,18 @@ export default function UnitsPage() {
   });
 
   const units: Unit[] = unitsData?.data || [];
-  
+
+  const handleViewDetails = (unitId: string) => {
+    // Navigate to unit details page
+    window.location.href = `/units/${unitId}`;
+  };
+
   const handleEdit = (unit: Unit) => {
     setSelectedUnit(unit);
     setIsEditModalOpen(true);
   };
 
-  const columns = getColumns(handleEdit);
+  const columns = getColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
 
   return (
     <>

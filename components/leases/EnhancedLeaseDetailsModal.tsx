@@ -97,14 +97,14 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
 
   if (!isOpen || !leaseId) return null;
 
-  const getStatusVariant = (status: string) => {
+  const getStatusClassName = (status: string) => {
     switch (status) {
-      case 'active': return 'default';
-      case 'expired': return 'destructive';
-      case 'terminated': return 'secondary';
-      case 'draft': return 'outline';
-      case 'expiring': return 'secondary';
-      default: return 'secondary';
+      case 'active': return '';
+      case 'expired': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
+      case 'terminated': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      case 'draft': return 'bg-transparent border-input text-foreground';
+      case 'expiring': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      default: return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
     }
   };
 
@@ -180,7 +180,7 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
               <div className="flex items-center gap-6">
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                  <Badge variant={getStatusVariant(leaseDetails.status)} className="mt-1">
+                  <Badge className={`${getStatusClassName(leaseDetails.status)} mt-1`}>
                     {leaseDetails.status}
                   </Badge>
                 </div>
@@ -445,7 +445,7 @@ export function EnhancedLeaseDetailsModal({ isOpen, onClose, leaseId }: Enhanced
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Account Status</p>
-                          <Badge variant={leaseDetails.tenant.isActive ? 'default' : 'secondary'}>
+                          <Badge className={leaseDetails.tenant.isActive ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                             {leaseDetails.tenant.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>

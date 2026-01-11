@@ -61,12 +61,12 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
     }
   }
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeClassName = (status: string) => {
     switch (status) {
-      case 'paid': return 'default'; // default is typically primary/greenish depending on theme, or we can use specific classes if needed. strictly default is primary.
-      case 'overdue': return 'destructive';
-      case 'pending': return 'secondary'; // often yellow/gray
-      default: return 'outline';
+      case 'paid': return ''; // default primary style
+      case 'overdue': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
+      case 'pending': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      default: return 'bg-transparent border-input text-foreground';
     }
   }
 
@@ -98,7 +98,7 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}
                     {/* The backend returns a calculated 'status' field now */}
-                    <Badge variant={getStatusBadgeVariant(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}>
+                    <Badge className={getStatusBadgeClassName(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}>
                       {schedule.status ? schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1) : (schedule.isPaid ? 'Paid' : 'Pending')}
                     </Badge>
                   </div>

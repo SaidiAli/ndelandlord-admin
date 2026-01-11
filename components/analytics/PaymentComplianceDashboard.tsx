@@ -75,7 +75,7 @@ export function PaymentComplianceDashboard() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={status === "on-track" ? "default" : status === "at-risk" ? "secondary" : "destructive"}>
+                    <Badge className={status === "on-track" ? "" : status === "at-risk" ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" : "bg-destructive text-destructive-foreground hover:bg-destructive/80"}>
                       {status}
                     </Badge>
                   </TableCell>

@@ -57,10 +57,10 @@ export default function ManageUsersPage() {
                                         <p className="text-sm text-gray-500">{user.email}</p>
                                     </div>
                                     <div className="text-sm">
-                                        <Badge variant={user.role === 'admin' ? 'destructive' : 'default'}>{user.role}</Badge>
+                                        <Badge className={user.role === 'admin' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/80' : ''}>{user.role}</Badge>
                                     </div>
                                     <div className="flex items-center justify-end space-x-2">
-                                        <Badge variant={user.isActive ? 'default' : 'secondary'}>
+                                        <Badge className={user.isActive ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                                             {user.isActive ? 'Active' : 'Inactive'}
                                         </Badge>
                                         <Button>

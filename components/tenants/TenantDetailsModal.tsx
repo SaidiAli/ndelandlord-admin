@@ -83,7 +83,7 @@ export function TenantDetailsModal({ isOpen, onClose, tenantId }: TenantDetailsM
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Account Status</p>
-                    <Badge variant={tenantDetails.tenant.isActive ? 'default' : 'secondary'}>
+                    <Badge className={tenantDetails.tenant.isActive ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                       {tenantDetails.tenant.isActive ? 'Active' : 'Inactive'}
                     </Badge>
                   </div>
@@ -109,7 +109,7 @@ export function TenantDetailsModal({ isOpen, onClose, tenantId }: TenantDetailsM
                     <div key={index} className={index > 0 ? 'mt-6 pt-6 border-t' : ''}>
                       <div className="flex items-center justify-between mb-4">
                         <h4 className="font-medium">Lease #{index + 1}</h4>
-                        <Badge variant={leaseInfo.lease.status === 'active' ? 'default' : 'secondary'}>
+                        <Badge className={leaseInfo.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                           {leaseInfo.lease.status}
                         </Badge>
                       </div>
@@ -136,7 +136,7 @@ export function TenantDetailsModal({ isOpen, onClose, tenantId }: TenantDetailsM
                         </div>
                         <div>
                           <p className="text-sm text-gray-500">Status</p>
-                          <Badge variant={leaseInfo.lease.status === 'active' ? 'default' : 'secondary'}>
+                          <Badge className={leaseInfo.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                             {leaseInfo.lease.status}
                           </Badge>
                         </div>

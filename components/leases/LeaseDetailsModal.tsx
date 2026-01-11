@@ -43,13 +43,13 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
 
   if (!isOpen || !leaseId) return null;
 
-  const getStatusVariant = (status: string) => {
+  const getStatusClassName = (status: string) => {
     switch (status) {
-      case 'active': return 'default';
-      case 'expired': return 'destructive';
-      case 'terminated': return 'secondary';
-      case 'draft': return 'outline';
-      default: return 'secondary';
+      case 'active': return '';
+      case 'expired': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
+      case 'terminated': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      case 'draft': return 'bg-transparent border-input text-foreground';
+      default: return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
     }
   };
 
@@ -141,7 +141,7 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Status</p>
-                      <Badge variant={getStatusVariant(leaseDetails.status)}>
+                      <Badge className={getStatusClassName(leaseDetails.status)}>
                         {leaseDetails.status}
                       </Badge>
                     </div>
@@ -244,7 +244,7 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
                       </div>
                       <div>
                         <p className="text-sm text-gray-500">Account Status</p>
-                        <Badge variant={leaseDetails.tenant.isActive ? 'default' : 'secondary'}>
+                        <Badge className={leaseDetails.tenant.isActive ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                           {leaseDetails.tenant.isActive ? 'Active' : 'Inactive'}
                         </Badge>
                       </div>

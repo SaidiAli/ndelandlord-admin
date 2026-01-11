@@ -103,7 +103,7 @@ export default function UnitDetailsPage() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant={unit.isAvailable ? "secondary" : "default"}>
+            <Badge className={unit.isAvailable ? "bg-secondary text-secondary-foreground" : ""}>
               {unit.isAvailable ? (
                 <><CheckCircle className="h-3 w-3 mr-1" />Available</>
               ) : (
@@ -233,7 +233,7 @@ export default function UnitDetailsPage() {
             <CardContent>
               <div className="flex flex-wrap gap-2">
                 {amenities.map((amenity) => (
-                  <Badge key={amenity.id} variant="secondary">
+                  <Badge key={amenity.id}>
                     {amenity.name}
                   </Badge>
                 ))}
@@ -340,7 +340,7 @@ export default function UnitDetailsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <Badge variant={leaseData.lease.status === 'active' ? 'default' : 'secondary'}>
+                        <Badge className={leaseData.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground'}>
                           {leaseData.lease.status}
                         </Badge>
                         <p className="text-sm font-semibold mt-1">{formatUGX(parseFloat(leaseData.lease.monthlyRent))}</p>

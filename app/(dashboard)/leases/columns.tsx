@@ -1,18 +1,10 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, Eye, Edit } from "lucide-react"
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { Lease } from "@/types"
 import { formatUGX } from "@/lib/currency"
@@ -147,50 +139,54 @@ export const getColumns = (
       header: "Status",
       cell: ({ row }) => {
         const lease = row.original;
-        const getStatusVariant = (status: string) => {
+        const getStatusClassName = (status: string) => {
           switch (status) {
             case 'active':
-              return 'default';
+              return '';
             case 'expired':
-              return 'destructive';
+              return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
             case 'terminated':
-              return 'secondary';
+              return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
             case 'draft':
-              return 'outline';
+              return 'bg-transparent border-input text-foreground';
             case 'expiring':
-              return 'secondary';
+              return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
             default:
-              return 'secondary';
+              return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
           }
         };
-        return <Badge variant={getStatusVariant(lease.status)}>{lease.status}</Badge>
+        return <Badge className={getStatusClassName(lease.status)}>{lease.status}</Badge>
       }
     },
     {
-      id: "actions",
+      id: "viewDetails",
+      header: "Details",
       cell: ({ row }) => {
         const lease = row.original
-
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(lease.id)}
-              >
-                Copy lease ID
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => onViewDetails?.(lease.id)}>View details</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => onEdit(lease)}>Edit lease</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <Button
+            size="sm"
+            onClick={() => onViewDetails?.(lease.id)}
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            View
+          </Button>
+        )
+      },
+    },
+    {
+      id: "edit",
+      header: "Edit",
+      cell: ({ row }) => {
+        const lease = row.original
+        return (
+          <Button
+            size="sm"
+            onClick={() => onEdit(lease)}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
         )
       },
     },

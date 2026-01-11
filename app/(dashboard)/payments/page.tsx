@@ -72,13 +72,13 @@ export default function PaymentsPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const getStatusBadgeVariant = (status: string) => {
+  const getStatusBadgeClassName = (status: string) => {
     switch (status) {
-      case 'completed': return 'default';
-      case 'processing': return 'secondary';
-      case 'pending': return 'outline';
-      case 'failed': return 'destructive';
-      default: return 'outline';
+      case 'completed': return '';
+      case 'processing': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      case 'pending': return 'bg-transparent border-input text-foreground';
+      case 'failed': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
+      default: return 'bg-transparent border-input text-foreground';
     }
   };
 
@@ -141,7 +141,7 @@ export default function PaymentsPage() {
                     <div className="text-right">
                       <p className="font-medium">{formatUGX(payment.amount)}</p>
                       <div className="flex items-center space-x-2">
-                        <Badge variant={getStatusBadgeVariant(payment.status)}>
+                        <Badge className={getStatusBadgeClassName(payment.status)}>
                           {payment.status}
                         </Badge>
                       </div>
@@ -206,7 +206,6 @@ export default function PaymentsPage() {
                               </p>
                               {providerInfo && (
                                 <Badge
-                                  variant="outline"
                                   style={{
                                     backgroundColor: providerInfo.color,
                                     color: providerInfo.textColor
@@ -232,7 +231,7 @@ export default function PaymentsPage() {
                         <div className="text-right">
                           <p className="font-medium">{formatUGX(payment.amount)}</p>
                           <div className="flex items-center space-x-2">
-                            <Badge variant={getStatusBadgeVariant(payment.status)}>
+                            <Badge className={getStatusBadgeClassName(payment.status)}>
                               {payment.status}
                             </Badge>
                             <Button

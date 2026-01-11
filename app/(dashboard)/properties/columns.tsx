@@ -1,21 +1,16 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
-import { useRouter } from "next/navigation"
-
+import { ArrowUpDown, Eye, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Property } from "@/types"
 
-export const getColumns = (): ColumnDef<Property>[] => [
+interface ColumnsProps {
+  onViewDetails: (propertyId: string) => void;
+  onEdit: (propertyId: string) => void;
+}
+
+export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<Property>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -37,50 +32,36 @@ export const getColumns = (): ColumnDef<Property>[] => [
     accessorKey: "city",
     header: "City",
   },
-  // {
-  //   accessorKey: "units",
-  //   header: "Units",
-  //   cell: ({ row }) => {
-  //       const units = row.original.units || [];
-  //       return <span>{units.length}</span>
-  //   }
-  // },
   {
-    id: "actions",
+    id: "viewDetails",
+    header: "Details",
     cell: ({ row }) => {
       const property = row.original
- 
       return (
-        <ActionsCell property={property} />
+        <Button
+          size="sm"
+          onClick={() => onViewDetails(property.id)}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View
+        </Button>
+      )
+    },
+  },
+  {
+    id: "edit",
+    header: "Edit",
+    cell: ({ row }) => {
+      const property = row.original
+      return (
+        <Button
+          size="sm"
+          onClick={() => onEdit(property.id)}
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
       )
     },
   },
 ]
-
-function ActionsCell({ property }: { property: Property }) {
-  const router = useRouter();
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button className="h-8 w-8 p-0">
-          <span className="sr-only">Open menu</span>
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-        <DropdownMenuItem
-          onClick={() => navigator.clipboard.writeText(property.id)}
-        >
-          Copy property ID
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push(`/properties/${property.id}`)}>
-          View details
-        </DropdownMenuItem>
-        {/* <DropdownMenuItem>Edit property</DropdownMenuItem> */}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
-}

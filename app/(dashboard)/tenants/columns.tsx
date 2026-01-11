@@ -1,25 +1,18 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, Eye, Edit } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Badge } from "@/components/ui/badge"
 import { TenantWithFullDetails } from "@/types"
 
 interface ColumnsProps {
   onViewDetails: (tenantId: string) => void;
+  onEdit: (tenantId: string) => void;
 }
 
-export const createColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<TenantWithFullDetails>[] => [
+export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<TenantWithFullDetails>[] => [
   {
     accessorKey: "tenant",
     header: ({ column }) => {
@@ -69,7 +62,7 @@ export const createColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Tenant
     cell: ({ row }) => {
       const { leases } = row.original;
       if (leases.length === 0) {
-        return <Badge variant="outline">No leases</Badge>;
+        return <Badge>No leases</Badge>;
       }
       
       // Show status of most recent lease (first in array since backend orders by createdAt desc)
@@ -78,7 +71,7 @@ export const createColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Tenant
       
       return (
         <div className="space-y-1">
-          <Badge variant={mostRecentLease.lease.status === 'active' ? 'default' : 'secondary'}>
+          <Badge className={mostRecentLease.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
             {mostRecentLease.lease.status}
           </Badge>
           {hasMultiple && (
@@ -93,46 +86,48 @@ export const createColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Tenant
     header: "Payment Status",
     cell: ({ row }) => {
       const { paymentSummary } = row.original;
-      const getStatusVariant = (status: string) => {
+      const getStatusClassName = (status: string) => {
         switch (status) {
-          case 'current': return 'default';
-          case 'overdue': return 'destructive';
-          case 'advance': return 'secondary';
-          default: return 'outline';
+          case 'current': return '';
+          case 'overdue': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
+          case 'advance': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+          default: return 'bg-transparent border-input text-foreground';
         }
       };
-      return <Badge variant={getStatusVariant(paymentSummary.paymentStatus)}>{paymentSummary.paymentStatus}</Badge>
+      return <Badge className={getStatusClassName(paymentSummary.paymentStatus)}>{paymentSummary.paymentStatus}</Badge>
     }
   },
   {
-    id: "actions",
+    id: "viewDetails",
+    header: "Details",
     cell: ({ row }) => {
       const { tenant } = row.original
- 
       return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="h-8 w-8 p-0">
-              <span className="sr-only">Open menu</span>
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => navigator.clipboard.writeText(tenant.id)}
-            >
-              Copy tenant ID
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => onViewDetails(tenant.id)}>View details</DropdownMenuItem>
-            <DropdownMenuItem>Edit tenant</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <Button
+          onClick={() => onViewDetails(tenant.id)}
+        >
+          <Eye className="h-4 w-4 mr-2" />
+          View
+        </Button>
+      )
+    },
+  },
+  {
+    id: "edit",
+    header: "Edit",
+    cell: ({ row }) => {
+      const { tenant } = row.original
+      return (
+        <Button
+          onClick={() => onEdit(tenant.id)}
+        >
+          <Edit className="h-4 w-4 mr-2" />
+          Edit
+        </Button>
       )
     },
   },
 ];
 
 // For backward compatibility, export a default columns function
-export const columns = createColumns({ onViewDetails: () => {} });
+export const columns = createColumns({ onViewDetails: () => {}, onEdit: () => {} });

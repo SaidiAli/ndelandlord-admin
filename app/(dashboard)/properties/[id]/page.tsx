@@ -157,15 +157,15 @@ export default function PropertyDetailsPage() {
             <CardContent className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="text-sm">New Leases</span>
-                <Badge variant="default">{recentActivity?.newLeases || 0}</Badge>
+                <Badge>{recentActivity?.newLeases || 0}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Expired Leases</span>
-                <Badge variant="secondary">{recentActivity?.expiredLeases || 0}</Badge>
+                <Badge>{recentActivity?.expiredLeases || 0}</Badge>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm">Maintenance Requests</span>
-                <Badge variant="outline">{recentActivity?.maintenanceRequests || 0}</Badge>
+                <Badge>{recentActivity?.maintenanceRequests || 0}</Badge>
               </div>
             </CardContent>
           </Card>
@@ -205,7 +205,7 @@ export default function PropertyDetailsPage() {
                         )}
                       </div>
                     </div>
-                    <Badge variant={unitData.unit.isAvailable ? "secondary" : "default"}>
+                    <Badge className={unitData.unit.isAvailable ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" : ""}>
                       {unitData.unit.isAvailable ? (
                         <><CheckCircle className="h-3 w-3 mr-1" />Available</>
                       ) : (

@@ -33,7 +33,12 @@ export default function TenantsPage() {
     setSelectedTenantId(null);
   };
 
-  const columns = createColumns({ onViewDetails: handleViewDetails });
+  const handleEdit = (tenantId: string) => {
+    // TODO: Implement edit functionality
+    console.log('Edit tenant:', tenantId);
+  };
+
+  const columns = createColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
 
   return (
     <>

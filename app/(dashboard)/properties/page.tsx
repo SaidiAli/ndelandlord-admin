@@ -16,7 +16,7 @@ import { useAuth } from '@/hooks/useAuth';
 export default function PropertiesPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const { user } = useAuth();
-  
+
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
     queryKey: ['properties', user?.id], // Include user ID to prevent cache sharing between users
     queryFn: () => propertiesApi.getAll(),
@@ -24,7 +24,18 @@ export default function PropertiesPage() {
   });
 
   const properties: Property[] = propertiesData?.data || [];
-  const columns = getColumns();
+
+  const handleViewDetails = (propertyId: string) => {
+    // Navigate to property details page
+    window.location.href = `/properties/${propertyId}`;
+  };
+
+  const handleEdit = (propertyId: string) => {
+    // TODO: Implement edit functionality
+    console.log('Edit property:', propertyId);
+  };
+
+  const columns = getColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
 
   return (
     <>

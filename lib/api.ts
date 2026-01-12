@@ -70,7 +70,7 @@ export const usersApi = {
   },
 };
 
-// Tenants API functions  
+// Tenants API functions
 export const tenantsApi = {
   getAll: async () => {
     const response = await api.get('/users/tenants/my-tenants');
@@ -78,6 +78,10 @@ export const tenantsApi = {
   },
   getTenantDetails: async (tenantId: string) => {
     const response = await api.get(`/users/tenants/${tenantId}/details`);
+    return response.data;
+  },
+  update: async (tenantId: string, data: any) => {
+    const response = await api.put(`/users/${tenantId}`, data);
     return response.data;
   },
 };

@@ -8,12 +8,14 @@ import { PlusCircle, Users } from 'lucide-react';
 import { tenantsApi } from '@/lib/api';
 import { AddTenantModal } from '@/components/tenants/AddTenantModal';
 import { TenantDetailsModal } from '@/components/tenants/TenantDetailsModal';
+import { EditTenantModal } from '@/components/tenants/EditTenantModal';
 import { createColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
 
 export default function TenantsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
   
   const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
@@ -34,8 +36,13 @@ export default function TenantsPage() {
   };
 
   const handleEdit = (tenantId: string) => {
-    // TODO: Implement edit functionality
-    console.log('Edit tenant:', tenantId);
+    setSelectedTenantId(tenantId);
+    setIsEditModalOpen(true);
+  };
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false);
+    setSelectedTenantId(null);
   };
 
   const columns = createColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
@@ -78,10 +85,15 @@ export default function TenantsPage() {
         </Card>
       </div>
       <AddTenantModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-      <TenantDetailsModal 
-        isOpen={isDetailsModalOpen} 
-        onClose={handleCloseDetailsModal} 
-        tenantId={selectedTenantId} 
+      <TenantDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        tenantId={selectedTenantId}
+      />
+      <EditTenantModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        tenantId={selectedTenantId}
       />
     </>
   );

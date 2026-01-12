@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { tenantsApi, unitsApi, usersApi } from '@/lib/api';
+import { unitsApi, usersApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,9 @@ import { Separator } from '../ui/separator';
 const addTenantSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().optional(),
+  email: z.string()
+    .transform(val => val === '' ? undefined : val)
+    .pipe(z.string().email('Invalid email address').optional()),
   phone: z.string().min(1, 'Phone number is required'),
   userName: z.string().min(1, 'Username is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -104,7 +106,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          
+
           <h4 className="font-semibold text-lg">Tenant Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -117,12 +119,12 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
               <Input id="lastName" {...register('lastName')} />
               {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
               <Input id="phone" {...register('phone')} />
               {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="email">Email (Optional)</Label>
               <Input id="email" type="email" {...register('email')} />
               {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
@@ -130,25 +132,25 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
           </div>
 
           <h4 className="font-semibold text-lg mt-4">Account Credentials</h4>
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input id="username" {...register('userName')} />
-                {errors.userName && <p className="text-sm text-red-500">{errors.userName.message}</p>}
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" {...register('password')} />
-                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" {...register('userName')} />
+              {errors.userName && <p className="text-sm text-red-500">{errors.userName.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" type="password" {...register('password')} />
+              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
+            </div>
           </div>
-          
+
           <Separator className="my-6" />
 
           <h4 className="font-semibold text-lg">Lease & Unit Assignment</h4>
-           <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="unitId">Assign to Unit</Label>
-             <Controller
+            <Controller
               name="unitId"
               control={control}
               render={({ field }) => (
@@ -169,26 +171,26 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
             {errors.unitId && <p className="text-sm text-red-500">{errors.unitId.message}</p>}
           </div>
 
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="space-y-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label htmlFor="startDate">Lease Start Date</Label>
               <Input id="startDate" type="date" {...register('leaseData.startDate')} />
               {errors.leaseData?.startDate && <p className="text-sm text-red-500">{errors.leaseData.startDate.message}</p>}
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="endDate">Lease End Date</Label>
               <Input id="endDate" type="date" {...register('leaseData.endDate')} />
               {errors.leaseData?.endDate && <p className="text-sm text-red-500">{errors.leaseData.endDate.message}</p>}
             </div>
           </div>
-          
-           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-             <div className="space-y-2">
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
               <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
               <Input id="monthlyRent" type="number" {...register('leaseData.monthlyRent')} />
               {errors.leaseData?.monthlyRent && <p className="text-sm text-red-500">{errors.leaseData.monthlyRent.message}</p>}
             </div>
-             <div className="space-y-2">
+            <div className="space-y-2">
               <Label htmlFor="deposit">Deposit (UGX)</Label>
               <Input id="deposit" type="number" {...register('leaseData.deposit')} />
               {errors.leaseData?.deposit && <p className="text-sm text-red-500">{errors.leaseData.deposit.message}</p>}

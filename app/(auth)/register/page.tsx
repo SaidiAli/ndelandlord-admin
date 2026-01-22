@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { toast } from 'sonner';
 import { authApi } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
 
 const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -34,15 +35,20 @@ export default function RegisterPage() {
     resolver: zodResolver(registerSchema),
   });
 
+  const registerMutation = useMutation({
+    mutationFn: authApi.register,
+    onSuccess: (response) => {
+      toast.success("Successful! You can go to login page.")
+    }
+  });
+
   const onSubmit = async (data: RegisterFormData) => {
     try {
 
-      const response = authApi.register({
+      registerMutation.mutate({
         ...data,
         role: 'landlord'
-      });
-
-      router.push('/login');
+      })
 
     } catch (err: any) {
       toast.error(err.response?.data?.error || 'Registration failed');
@@ -59,6 +65,11 @@ export default function RegisterPage() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          {registerMutation.isError && (
+            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-md">
+              {(registerMutation.error as any)?.message || 'Registration failed. Please try again.'}
+            </div>
+          )}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name</Label>
@@ -71,7 +82,7 @@ export default function RegisterPage() {
               {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
             </div>
           </div>
-           <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="username">Username</Label>
             <Input id="username" {...register('username')} />
             {errors.username && <p className="text-sm text-red-500">{errors.username.message}</p>}
@@ -81,7 +92,7 @@ export default function RegisterPage() {
             <Input id="email" type="email" {...register('email')} />
             {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
           </div>
-           <div className="space-y-2">
+          <div className="space-y-2">
             <Label htmlFor="phone">Phone Number</Label>
             <Input id="phone" {...register('phone')} />
             {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
@@ -95,7 +106,7 @@ export default function RegisterPage() {
             {isSubmitting ? 'Creating Account...' : 'Create Account'}
           </Button>
         </form>
-         <div className="mt-4 text-center text-sm">
+        <div className="mt-4 text-center text-sm">
           Already have an account?{" "}
           <Link href="/login" className="underline">
             Sign in

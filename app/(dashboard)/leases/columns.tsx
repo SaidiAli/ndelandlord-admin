@@ -38,12 +38,13 @@ export const getColumns = (
       accessorKey: "startDate",
       header: ({ column }) => {
         return (
-          <Button
+          <div
+            className="flex flex-row"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
             Duration
             <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          </div>
         )
       },
       cell: ({ row }) => {
@@ -165,7 +166,6 @@ export const getColumns = (
         const lease = row.original
         return (
           <Button
-            size="sm"
             onClick={() => onViewDetails?.(lease.id)}
           >
             <Eye className="h-4 w-4 mr-2" />
@@ -181,7 +181,6 @@ export const getColumns = (
         const lease = row.original
         return (
           <Button
-            size="sm"
             onClick={() => onEdit(lease)}
           >
             <Edit className="h-4 w-4 mr-2" />

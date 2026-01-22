@@ -90,9 +90,7 @@ export interface Lease {
 export interface Payment {
   id: string;
   leaseId: string;
-  scheduleId?: string; // Links to payment schedule entry
   amount: number;
-  dueDate?: string;
   paidDate?: string;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   paymentMethod?: string;
@@ -103,7 +101,15 @@ export interface Payment {
   createdAt: string;
   updatedAt: string;
   lease?: Lease;
-  paymentSchedule?: PaymentSchedule;
+  appliedSchedules?: Array<{
+    scheduleId: string;
+    paymentNumber: number;
+    amountApplied: number;
+    scheduledAmount: number;
+    period: string;
+  }>;
+  paymentNumber?: number | null;
+  periodCovered?: string | null;
 }
 
 export interface PaymentSchedule {
@@ -115,13 +121,13 @@ export interface PaymentSchedule {
   periodStart: string;
   periodEnd: string;
   isPaid: boolean;
-  paidPaymentId?: string;
   createdAt: string;
   updatedAt: string;
   lease?: Lease;
-  payment?: Payment;
+  // Many-to-many: schedule can have multiple payments
+  payments?: Payment[];
   status?: 'paid' | 'pending' | 'overdue' | 'upcoming' | 'partial';
-  paidAmount?: number;
+  paidAmount?: number; // Calculated from junction table
 }
 
 export interface MaintenanceRequest {

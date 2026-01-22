@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePaymentUpdates, usePaymentNotifications } from '@/hooks/usePaymentUpdates';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -111,47 +111,11 @@ export default function PaymentsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="overview" className="space-y-6">
+      <Tabs defaultValue="payments" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="payments">All Payments</TabsTrigger>
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Payments</CardTitle>
-              <CardDescription>Latest payment transactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {payments.slice(0, 5).map((payment) => (
-                  <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div>
-                        <p className="font-medium">
-                          {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">{formatUGX(payment.amount)}</p>
-                      <div className="flex items-center space-x-2">
-                        <Badge className={getStatusBadgeClassName(payment.status)}>
-                          {payment.status}
-                        </Badge>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="payments" className="space-y-6">
           <Card>
@@ -199,7 +163,7 @@ export default function PaymentsPage() {
                     return (
                       <div key={payment.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50">
                         <div className="flex items-center space-x-4">
-                          <div className="flex-1">
+                          <div className="flex-1 space-y-2">
                             <div className="flex items-center space-x-2">
                               <p className="font-medium">
                                 {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
@@ -228,9 +192,9 @@ export default function PaymentsPage() {
                             )}
                           </div>
                         </div>
-                        <div className="text-right">
+                        <div className="text-right space-y-2">
                           <p className="font-medium">{formatUGX(payment.amount)}</p>
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-center gap-2">
                             <Badge className={getStatusBadgeClassName(payment.status)}>
                               {payment.status}
                             </Badge>

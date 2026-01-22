@@ -40,6 +40,8 @@ interface PaymentDetailsModalProps {
 export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetailsModalProps) {
   const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
 
+  console.log({ payment })
+
   const { data: receiptData, isLoading: receiptLoading } = useQuery({
     queryKey: ['payment-receipt', payment?.id],
     queryFn: () => paymentsApi.getReceipt(payment!.id),
@@ -183,9 +185,14 @@ Verit Property Management
                     {new Date(payment.paidDate).toLocaleTimeString()}
                   </div>
                 )}
-                {periodCovered && (
+                {payment.periodCovered && (
                   <div className="text-sm text-gray-500 mt-1">
-                    Covers period: {periodCovered}
+                    Covers period: {payment.periodCovered}
+                  </div>
+                )}
+                {payment.appliedSchedules && payment.appliedSchedules.length > 0 && (
+                  <div className="text-sm text-gray-500 mt-1">
+                    Applied to {payment.appliedSchedules.length} schedule{payment.appliedSchedules.length > 1 ? 's' : ''}
                   </div>
                 )}
               </div>
@@ -370,6 +377,36 @@ Verit Property Management
                     <p className="text-gray-500">Receipt not available</p>
                   </div>
                 )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Applied Schedules (Partial/Bulk Payments) */}
+          {payment.appliedSchedules && payment.appliedSchedules.length > 0 && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Distribution</CardTitle>
+                <CardDescription>
+                  This payment was applied to the following schedule(s)
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {payment.appliedSchedules.map((schedule, index) => (
+                    <div key={index} className="flex justify-between items-center p-3 border rounded-lg">
+                      <div>
+                        <div className="font-medium">Payment #{schedule.paymentNumber}</div>
+                        <div className="text-sm text-gray-500">{schedule.period}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-medium">{formatUGX(schedule.amountApplied)}</div>
+                        <div className="text-sm text-gray-500">
+                          of {formatUGX(schedule.scheduledAmount)}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           )}

@@ -2,7 +2,6 @@
 
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Edit } from "lucide-react"
-
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { TenantWithFullDetails } from "@/types"
@@ -17,12 +16,13 @@ export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDe
     accessorKey: "tenant",
     header: ({ column }) => {
       return (
-        <Button
+        <div
+        className="flex flex-row"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </div>
       )
     },
     cell: ({ row }) => {
@@ -71,7 +71,7 @@ export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDe
       
       return (
         <div className="space-y-1">
-          <Badge className={mostRecentLease.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
+          <Badge className={mostRecentLease.lease.status === 'active' ? '' : 'bg-secondary text-white'}>
             {mostRecentLease.lease.status}
           </Badge>
           {hasMultiple && (
@@ -79,22 +79,6 @@ export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDe
           )}
         </div>
       );
-    }
-  },
-  {
-    accessorKey: "paymentStatus",
-    header: "Payment Status",
-    cell: ({ row }) => {
-      const { paymentSummary } = row.original;
-      const getStatusClassName = (status: string) => {
-        switch (status) {
-          case 'current': return '';
-          case 'overdue': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
-          case 'advance': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-          default: return 'bg-transparent border-input text-foreground';
-        }
-      };
-      return <Badge className={getStatusClassName(paymentSummary.paymentStatus)}>{paymentSummary.paymentStatus}</Badge>
     }
   },
   {

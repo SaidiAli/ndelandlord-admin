@@ -25,6 +25,7 @@ const transformPaymentResponse = (item: any): Payment => {
 
   return {
     ...item.payment,
+    appliedSchedules: item.appliedSchedules,
     amount: typeof item.payment.amount === 'string' ? parseFloat(item.payment.amount) : item.payment.amount,
     lease: item.lease ? transformLeaseResponse(leaseData) : undefined
   };
@@ -58,7 +59,8 @@ api.interceptors.response.use(
         window.location.href = '/login';
       }
     }
-    return Promise.reject(error);
+
+    return Promise.reject(new Error(error.message));
   }
 );
 

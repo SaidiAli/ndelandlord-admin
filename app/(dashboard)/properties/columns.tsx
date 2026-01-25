@@ -15,12 +15,13 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<P
     accessorKey: "name",
     header: ({ column }) => {
       return (
-        <Button
+        <div
+        className="flex flex-row"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
+        </div>
       )
     },
   },
@@ -39,7 +40,6 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<P
       const property = row.original
       return (
         <Button
-          size="sm"
           onClick={() => onViewDetails(property.id)}
         >
           <Eye className="h-4 w-4 mr-2" />
@@ -55,7 +55,6 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<P
       const property = row.original
       return (
         <Button
-          size="sm"
           onClick={() => onEdit(property.id)}
         >
           <Edit className="h-4 w-4 mr-2" />

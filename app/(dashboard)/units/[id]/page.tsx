@@ -437,24 +437,24 @@ export default function UnitDetailsPage() {
             ) : (
               <div className="space-y-4">
                 {leaseHistory.map((leaseData, index) => (
-                  <div key={leaseData.lease.id} className="border rounded-lg p-4">
+                  <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h4 className="font-semibold">{leaseData.tenant.firstName} {leaseData.tenant.lastName}</h4>
+                        <h4 className="font-semibold">John doe</h4>
                         <div className="flex items-center text-sm text-gray-600 mt-1">
                           <Calendar className="h-4 w-4 mr-1" />
-                          {new Date(leaseData.lease.startDate).toLocaleDateString()} - {new Date(leaseData.lease.endDate).toLocaleDateString()}
+                          {new Date().toLocaleDateString()} - {new Date().toLocaleDateString()}
                         </div>
                       </div>
-                      <div className="text-right">
+                      {/* <div className="text-right">
                         <Badge className={leaseData.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground'}>
                           {leaseData.lease.status}
                         </Badge>
-                        <p className="text-sm font-semibold mt-1">{formatUGX(parseFloat(leaseData.lease.monthlyRent))}</p>
-                      </div>
+                        <p className="text-sm font-semibold mt-1">{formatUGX(500000)}</p>
+                      </div> */}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Lease ID: {leaseData.lease.id}
+                      Lease ID: {}
                     </div>
                   </div>
                 ))}

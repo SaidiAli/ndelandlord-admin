@@ -327,7 +327,7 @@ function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
       </div>
 
       <div className="flex items-center space-x-6">
-        <div className="flex items-center space-x-2">
+        {/* <div className="flex items-center space-x-2">
           <Controller
             name="isAvailable"
             control={control}
@@ -340,7 +340,7 @@ function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
             )}
           />
           <Label htmlFor="isAvailable">Available for Rent</Label>
-        </div>
+        </div> */}
         <div className="flex items-center space-x-2">
           <Controller
             name="isFurnished"
@@ -575,7 +575,7 @@ function EditCommercialForm({ unit, unitDetails, onClose }: FormProps) {
         </div>
       </div>
 
-      <div className="flex items-center space-x-3">
+      {/* <div className="flex items-center space-x-3">
         <Controller
           name="isAvailable"
           control={control}
@@ -588,7 +588,7 @@ function EditCommercialForm({ unit, unitDetails, onClose }: FormProps) {
           )}
         />
         <Label htmlFor="isAvailable">Available for Rent</Label>
-      </div>
+      </div> */}
 
       <div className="space-y-2">
         <Label htmlFor="description">Description (Optional)</Label>

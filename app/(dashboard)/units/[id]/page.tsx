@@ -7,30 +7,12 @@ import { unitsApi } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  ArrowLeft,
-  Pencil,
-  Building,
-  DollarSign,
-  Users,
-  BedDouble,
-  Bath,
-  MapPin,
-  Phone,
-  Mail,
-  Calendar,
-  Home,
-  Activity,
-  CheckCircle,
-  XCircle,
-  Clock,
-  BarChart3,
-  Wifi
-} from 'lucide-react';
+import { ArrowLeft, Pencil, Building, DollarSign, Users, BedDouble, Bath, MapPin, Phone, Mail, Calendar, Home, Activity, CheckCircle, XCircle, Clock, BarChart3, Wifi, Layers, Maximize, Building2, Armchair, UsersRound } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { EditUnitModal } from '@/components/units/EditUnitModal';
 import { useAuth } from '@/hooks/useAuth';
-import { UnitWithDetails } from '@/types';
+import { UnitWithDetails, ResidentialUnitDetails, CommercialUnitDetails, PropertyType } from '@/types';
+import { isResidentialDetails, isCommercialDetails, capitalize } from '@/lib/unit-utils';
 
 export default function UnitDetailsPage() {
   const params = useParams();
@@ -54,6 +36,9 @@ export default function UnitDetailsPage() {
   const analytics = unitDetails?.analytics;
   const amenities = unitDetails?.amenities || [];
 
+  const propertyType: PropertyType = property?.type || unit?.propertyType || 'residential';
+  const details = unit?.details;
+
   if (unitLoading) {
     return (
       <div className="text-center py-16">
@@ -71,16 +56,135 @@ export default function UnitDetailsPage() {
     id: unit.id,
     propertyId: property?.id || '',
     unitNumber: unit.unitNumber,
-    bedrooms: unit.bedrooms,
-    bathrooms: parseFloat(unit.bathrooms),
+    propertyType: propertyType,
     squareFeet: unit.squareFeet,
     monthlyRent: parseFloat(unit.monthlyRent),
     deposit: parseFloat(unit.deposit),
     isAvailable: unit.isAvailable,
     description: unit.description,
+    details: unit.details,
     createdAt: unit.createdAt,
     updatedAt: unit.updatedAt,
   };
+
+  // Render residential-specific metrics
+  const renderResidentialMetrics = (details: ResidentialUnitDetails) => (
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Bedrooms</CardTitle>
+          <BedDouble className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.bedrooms}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Bathrooms</CardTitle>
+          <Bath className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.bathrooms}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Furnished</CardTitle>
+          <Armchair className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.isFurnished ? 'Yes' : 'No'}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Balcony</CardTitle>
+          <Layers className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.hasBalcony ? 'Yes' : 'No'}</div>
+        </CardContent>
+      </Card>
+    </>
+  );
+
+  // Render commercial-specific metrics
+  const renderCommercialMetrics = (details: CommercialUnitDetails) => (
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Unit Type</CardTitle>
+          <Building2 className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{capitalize(details.unitType)}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Max Occupancy</CardTitle>
+          <UsersRound className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.maxOccupancy || 'N/A'}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Ceiling Height</CardTitle>
+          <Maximize className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.ceilingHeight ? `${details.ceilingHeight} ft` : 'N/A'}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Suite Number</CardTitle>
+          <Layers className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{details.suiteNumber || 'N/A'}</div>
+        </CardContent>
+      </Card>
+    </>
+  );
+
+  // Default metrics when no details available
+  const renderDefaultMetrics = () => (
+    <>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Monthly Rent</CardTitle>
+          <DollarSign className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{formatUGX(parseFloat(unit.monthlyRent))}</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Unit Size</CardTitle>
+          <Maximize className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{unit.squareFeet || 0} sqft</div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+          <CardTitle className="text-sm font-medium">Floor Number</CardTitle>
+          <Layers className="h-4 w-4 text-muted-foreground" />
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">
+            {(details && 'floorNumber' in details && details.floorNumber) || 'N/A'}
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
 
   return (
     <>
@@ -88,12 +192,17 @@ export default function UnitDetailsPage() {
         {/* Header with breadcrumb */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button onClick={() => router.back()}>
+            <div className="flex items-center cursor-pointer" onClick={() => router.back()}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
-            </Button>
+            </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Unit {unit.unitNumber}</h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-3xl font-bold text-gray-900">Unit {unit.unitNumber}</h1>
+                <Badge className={propertyType === 'commercial' ? 'bg-blue-500' : 'bg-green-500'}>
+                  {capitalize(propertyType)}
+                </Badge>
+              </div>
               <div className="flex items-center text-gray-600 mt-1">
                 <Building className="h-4 w-4 mr-1" />
                 <span className="mr-2">{property?.name}</span>
@@ -103,7 +212,7 @@ export default function UnitDetailsPage() {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge className={unit.isAvailable ? "bg-secondary text-secondary-foreground" : ""}>
+            <Badge className={unit.isAvailable ? "bg-secondary text-white" : ""}>
               {unit.isAvailable ? (
                 <><CheckCircle className="h-3 w-3 mr-1" />Available</>
               ) : (
@@ -117,8 +226,18 @@ export default function UnitDetailsPage() {
           </div>
         </div>
 
-        {/* Key Metrics Dashboard */}
+        {/* Key Metrics Dashboard - Type-specific */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {isResidentialDetails(details)
+            ? renderResidentialMetrics(details)
+            : isCommercialDetails(details)
+              ? renderCommercialMetrics(details)
+              : renderDefaultMetrics()
+          }
+        </div>
+
+        {/* Financial Info */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Monthly Rent</CardTitle>
@@ -131,28 +250,10 @@ export default function UnitDetailsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Unit Size</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <Maximize className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{unit.squareFeet || 0} sqft</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bedrooms</CardTitle>
-              <BedDouble className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{unit.bedrooms}</div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Bathrooms</CardTitle>
-              <Bath className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{unit.bathrooms}</div>
+              <div className="text-2xl font-bold">{unit.squareFeet || 'N/A'} sqft</div>
             </CardContent>
           </Card>
         </div>
@@ -195,6 +296,12 @@ export default function UnitDetailsPage() {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Square Feet</label>
                   <p className="text-gray-900">{unit.squareFeet} sq ft</p>
+                </div>
+              )}
+              {details && 'floorNumber' in details && details.floorNumber && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Floor Number</label>
+                  <p className="text-gray-900">{details.floorNumber}</p>
                 </div>
               )}
               {unit.description && (

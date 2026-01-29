@@ -15,7 +15,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import {
   Download,
-  RefreshCw,
   CreditCard,
   User,
   Building,
@@ -46,14 +45,6 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
     queryKey: ['payment-receipt', payment?.id],
     queryFn: () => paymentsApi.getReceipt(payment!.id),
     enabled: !!payment && payment.status === 'completed',
-  });
-
-  const refreshMutation = useMutation({
-    mutationFn: () => paymentsApi.getStatus(payment!.id),
-    onSuccess: () => {
-      // In a real app, you'd update the parent component's data
-      // For now, we'll just show success feedback
-    },
   });
 
   if (!payment) return null;
@@ -154,24 +145,6 @@ Verit Property Management
                     {payment.status.charAt(0).toUpperCase() + payment.status.slice(1)}
                   </span>
                 </div>
-                <div className="flex space-x-2">
-                  <Button
-                    onClick={() => refreshMutation.mutate()}
-                    disabled={refreshMutation.isPending}
-                  >
-                    <RefreshCw className={`h-4 w-4 mr-1 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
-                    Refresh
-                  </Button>
-                  {payment.status === 'completed' && receipt && (
-                    <Button
-                      onClick={handleDownloadReceipt}
-                      disabled={isDownloadingReceipt}
-                    >
-                      <Download className="h-4 w-4 mr-1" />
-                      Receipt
-                    </Button>
-                  )}
-                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -213,12 +186,6 @@ Verit Property Management
                   <label className="text-sm font-medium text-gray-500">Transaction ID</label>
                   <p className="font-mono text-sm bg-gray-100 p-2 rounded">
                     {payment.transactionId || payment.id}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Payment ID</label>
-                  <p className="font-mono text-sm bg-gray-100 p-2 rounded">
-                    {payment.id}
                   </p>
                 </div>
               </div>

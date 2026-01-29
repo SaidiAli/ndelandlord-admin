@@ -13,10 +13,12 @@ import {
 } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Clock } from 'lucide-react';
+import { CalendarDays, Home, Phone, Mail, User, CreditCard, MapPin, FileText, Clock, Building2 } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PaymentScheduleTab } from './PaymentScheduleTab';
+import { ResidentialUnitDetails, CommercialUnitDetails } from '@/types';
+import { isResidentialDetails, isCommercialDetails, capitalize } from '@/lib/unit-utils';
 
 interface LeaseDetailsModalProps {
   isOpen: boolean;
@@ -295,14 +297,36 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
                             <p className="text-sm text-gray-500">Unit Number</p>
                             <p className="font-medium">Unit {leaseDetails.unit.unitNumber}</p>
                           </div>
-                          <div>
-                            <p className="text-sm text-gray-500">Bedrooms</p>
-                            <p className="font-medium">{leaseDetails.unit.bedrooms}</p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">Bathrooms</p>
-                            <p className="font-medium">{leaseDetails.unit.bathrooms}</p>
-                          </div>
+                          {isResidentialDetails(leaseDetails.unit.details) ? (
+                            <>
+                              <div>
+                                <p className="text-sm text-gray-500">Bedrooms</p>
+                                <p className="font-medium">{(leaseDetails.unit.details as ResidentialUnitDetails).bedrooms}</p>
+                              </div>
+                              <div>
+                                <p className="text-sm text-gray-500">Bathrooms</p>
+                                <p className="font-medium">{(leaseDetails.unit.details as ResidentialUnitDetails).bathrooms}</p>
+                              </div>
+                            </>
+                          ) : isCommercialDetails(leaseDetails.unit.details) ? (
+                            <>
+                              <div>
+                                <p className="text-sm text-gray-500">Unit Type</p>
+                                <p className="font-medium">{capitalize((leaseDetails.unit.details as CommercialUnitDetails).unitType)}</p>
+                              </div>
+                              {(leaseDetails.unit.details as CommercialUnitDetails).suiteNumber && (
+                                <div>
+                                  <p className="text-sm text-gray-500">Suite Number</p>
+                                  <p className="font-medium">{(leaseDetails.unit.details as CommercialUnitDetails).suiteNumber}</p>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div>
+                              <p className="text-sm text-gray-500">Property Type</p>
+                              <p className="font-medium">{capitalize(leaseDetails.unit.propertyType || 'residential')}</p>
+                            </div>
+                          )}
                           {leaseDetails.unit.squareFeet && (
                             <div>
                               <p className="text-sm text-gray-500">Square Feet</p>

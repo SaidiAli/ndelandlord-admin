@@ -12,11 +12,46 @@ export interface User {
   updatedAt: string;
 }
 
-export const propertyTypes = ['residential', 'commercial', 'industrial', 'office', 'retail', 'apartment', 'house', 'condo', 'townhouse', 'warehouse', 'mixed_use', 'land'] as const;
+// Simplified property types - just residential or commercial
+export const propertyTypes = ['residential', 'commercial'] as const;
+export type PropertyType = typeof propertyTypes[number];
+
+// Unit type enums for residential and commercial
+export const residentialUnitTypes = ['apartment', 'studio', 'house', 'condo', 'townhouse', 'duplex', 'room', 'other'] as const;
+export type ResidentialUnitType = typeof residentialUnitTypes[number];
+
+export const commercialUnitTypes = ['office', 'retail', 'warehouse', 'restaurant', 'medical', 'industrial', 'flex_space', 'coworking', 'other'] as const;
+export type CommercialUnitType = typeof commercialUnitTypes[number];
+
+// Amenity types
+export type AmenityType = 'residential' | 'commercial' | 'common';
 
 export interface Amenity {
   id: string;
   name: string;
+  type?: AmenityType;
+}
+
+// Unit detail interfaces
+export interface ResidentialUnitDetails {
+  id: string;
+  unitId: string;
+  unitType: ResidentialUnitType;
+  bedrooms: number;
+  bathrooms: number;
+  hasBalcony?: boolean;
+  floorNumber?: number;
+  isFurnished?: boolean;
+}
+
+export interface CommercialUnitDetails {
+  id: string;
+  unitId: string;
+  unitType: CommercialUnitType;
+  floorNumber?: number;
+  suiteNumber?: string;
+  ceilingHeight?: number;
+  maxOccupancy?: number;
 }
 
 export interface Property {
@@ -39,8 +74,7 @@ export interface Unit {
   id: string;
   propertyId: string;
   unitNumber: string;
-  bedrooms: number;
-  bathrooms: number;
+  propertyType?: PropertyType;
   squareFeet?: number;
   monthlyRent: number;
   deposit: number;
@@ -51,6 +85,7 @@ export interface Unit {
   property?: Property;
   leases?: Lease[];
   amenities?: Amenity[];
+  details?: ResidentialUnitDetails | CommercialUnitDetails;
   currentLease?: {
     id: string;
     status: string;
@@ -213,13 +248,13 @@ export interface LeaseApiResponse {
   unit?: {
     id: string;
     unitNumber: string;
-    bedrooms: number;
-    bathrooms: number;
+    propertyType?: PropertyType;
     squareFeet?: number;
     monthlyRent?: string;
     deposit?: string;
     isAvailable?: boolean;
     description?: string;
+    details?: ResidentialUnitDetails | CommercialUnitDetails;
   };
   property?: {
     id: string;
@@ -265,13 +300,13 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
       id: unit.id,
       propertyId: property?.id || '',
       unitNumber: unit.unitNumber,
-      bedrooms: unit.bedrooms,
-      bathrooms: unit.bathrooms,
+      propertyType: unit.propertyType,
       squareFeet: unit.squareFeet,
       monthlyRent: unit.monthlyRent ? parseFloat(unit.monthlyRent) : 0,
       deposit: unit.deposit ? parseFloat(unit.deposit) : 0,
       isAvailable: unit.isAvailable || false,
       description: unit.description,
+      details: unit.details,
       createdAt: '',
       updatedAt: '',
       property: property ? {
@@ -480,13 +515,13 @@ export interface PropertyDashboardData {
       unit: {
         id: string;
         unitNumber: string;
-        bedrooms: number;
-        bathrooms: number;
+        propertyType?: PropertyType;
         squareFeet?: number;
         monthlyRent: string;
         deposit: string;
         isAvailable: boolean;
         description?: string;
+        details?: ResidentialUnitDetails | CommercialUnitDetails;
       };
       lease?: {
         id: string;
@@ -523,8 +558,7 @@ export interface UnitWithDetails {
   unit: {
     id: string;
     unitNumber: string;
-    bedrooms: number;
-    bathrooms: string;
+    propertyType?: PropertyType;
     squareFeet?: number;
     monthlyRent: string;
     deposit: string;
@@ -532,6 +566,7 @@ export interface UnitWithDetails {
     description?: string;
     createdAt: string;
     updatedAt: string;
+    details?: ResidentialUnitDetails | CommercialUnitDetails;
   };
   property: {
     id: string;
@@ -540,6 +575,7 @@ export interface UnitWithDetails {
     city: string;
     state: string;
     postalCode?: string;
+    type?: PropertyType;
   };
   currentLease?: {
     id: string;
@@ -580,4 +616,88 @@ export interface UnitWithDetails {
     averageLeaseLength: number;
     daysVacant: number;
   };
+}
+
+// Request types for type-specific unit API calls
+export interface CreateResidentialUnitRequest {
+  propertyId: string;
+  unitNumber: string;
+  squareFeet?: number;
+  description?: string;
+  amenityIds?: string[];
+  unitType: ResidentialUnitType;
+  bedrooms: number;
+  bathrooms: number;
+  hasBalcony?: boolean;
+  floorNumber?: number;
+  isFurnished?: boolean;
+}
+
+export interface CreateCommercialUnitRequest {
+  propertyId: string;
+  unitNumber: string;
+  squareFeet?: number;
+  description?: string;
+  amenityIds?: string[];
+  unitType: CommercialUnitType;
+  floorNumber?: number;
+  suiteNumber?: string;
+  ceilingHeight?: number;
+  maxOccupancy?: number;
+}
+
+export interface UpdateResidentialUnitRequest {
+  unitNumber?: string;
+  squareFeet?: number;
+  isAvailable?: boolean;
+  description?: string;
+  amenityIds?: string[];
+  unitType?: ResidentialUnitType;
+  bedrooms?: number;
+  bathrooms?: number;
+  hasBalcony?: boolean;
+  floorNumber?: number;
+  isFurnished?: boolean;
+}
+
+export interface UpdateCommercialUnitRequest {
+  unitNumber?: string;
+  squareFeet?: number;
+  isAvailable?: boolean;
+  description?: string;
+  amenityIds?: string[];
+  unitType?: CommercialUnitType;
+  floorNumber?: number;
+  suiteNumber?: string;
+  ceilingHeight?: number;
+  maxOccupancy?: number;
+}
+
+export interface BulkCreateResidentialUnitsRequest {
+  propertyId: string;
+  units: Array<{
+    unitNumber: string;
+    squareFeet?: number;
+    description?: string;
+    unitType: ResidentialUnitType;
+    bedrooms: number;
+    bathrooms: number;
+    hasBalcony?: boolean;
+    floorNumber?: number;
+    isFurnished?: boolean;
+  }>;
+}
+
+export interface BulkCreateCommercialUnitsRequest {
+  propertyId: string;
+  units: Array<{
+    unitNumber: string;
+    squareFeet?: number;
+    description?: string;
+    unitType: CommercialUnitType;
+    floorNumber?: number;
+    suiteNumber?: string;
+    ceilingHeight?: number;
+    maxOccupancy?: number;
+  }>;
 }

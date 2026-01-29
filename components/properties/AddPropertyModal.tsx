@@ -21,8 +21,7 @@ import {
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-
-const propertyTypes = ['residential', 'commercial', 'industrial', 'office', 'retail', 'apartment', 'house', 'condo', 'townhouse', 'warehouse', 'mixed_use', 'land'] as const;
+import { propertyTypes } from '@/types';
 
 const addPropertySchema = z.object({
   name: z.string().min(1, 'Property name is required'),

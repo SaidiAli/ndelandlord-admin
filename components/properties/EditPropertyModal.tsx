@@ -22,8 +22,6 @@ import { toast } from 'sonner';
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { capitalize } from 'lodash';
-
 const editPropertySchema = z.object({
   name: z.string().optional(),
   address: z.string().optional(),
@@ -130,7 +128,7 @@ export function EditPropertyModal({ isOpen, onClose, property }: EditPropertyMod
                   <SelectContent>
                     {propertyTypes.map((type) => (
                       <SelectItem key={type} value={type}>
-                        {capitalize(type)}
+                        {type.charAt(0).toUpperCase() + type.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectContent>

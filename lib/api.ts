@@ -142,8 +142,26 @@ export const propertiesApi = {
 
 // Amenities API functions
 export const amenitiesApi = {
-  getAll: async () => {
-    const response = await api.get('/amenities');
+  getAll: async (type?: 'residential' | 'commercial' | 'common') => {
+    const params = new URLSearchParams();
+    if (type) params.append('type', type);
+    const queryString = params.toString();
+    const response = await api.get(`/amenities${queryString ? `?${queryString}` : ''}`);
+    return response.data;
+  },
+
+  getResidential: async () => {
+    const response = await api.get('/amenities?type=residential');
+    return response.data;
+  },
+
+  getCommercial: async () => {
+    const response = await api.get('/amenities?type=commercial');
+    return response.data;
+  },
+
+  getCommon: async () => {
+    const response = await api.get('/amenities?type=common');
     return response.data;
   },
 };
@@ -172,18 +190,54 @@ export const unitsApi = {
     return response.data;
   },
 
+  // Legacy create (auto-detect property type)
   create: async (data: any) => {
     const response = await api.post('/units', data);
     return response.data;
   },
 
+  // Type-specific unit creation
+  createResidential: async (data: any) => {
+    const response = await api.post('/units/residential', data);
+    return response.data;
+  },
+
+  createCommercial: async (data: any) => {
+    const response = await api.post('/units/commercial', data);
+    return response.data;
+  },
+
+  // Legacy bulk create
   createBulk: async (data: any) => {
     const response = await api.post('/units/bulk', data);
     return response.data;
   },
 
+  // Type-specific bulk creation
+  createBulkResidential: async (data: any) => {
+    const response = await api.post('/units/bulk/residential', data);
+    return response.data;
+  },
+
+  createBulkCommercial: async (data: any) => {
+    const response = await api.post('/units/bulk/commercial', data);
+    return response.data;
+  },
+
+  // Legacy update
   update: async (id: string, data: any) => {
     const response = await api.put(`/units/${id}`, data);
+    return response.data;
+  },
+
+  // Type-specific updates
+  updateResidential: async (id: string, data: any) => {
+    const response = await api.put(`/units/${id}/residential`, data);
+    return response.data;
+  },
+
+  updateCommercial: async (id: string, data: any) => {
+    const response = await api.put(`/units/${id}/commercial`, data);
     return response.data;
   },
 

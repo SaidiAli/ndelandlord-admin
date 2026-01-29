@@ -6,18 +6,21 @@ import { useParams, useRouter } from 'next/navigation';
 import { propertiesApi } from '@/lib/api';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle } from 'lucide-react';
+import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle, Building2, Plus } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal';
+import { AddUnitModal } from '@/components/units/AddUnitModal';
 import { useAuth } from '@/hooks/useAuth';
-import { PropertyDashboardData } from '@/types';
+import { PropertyDashboardData, ResidentialUnitDetails, CommercialUnitDetails } from '@/types';
+import { isResidentialDetails, isCommercialDetails, capitalize } from '@/lib/unit-utils';
 
 export default function PropertyDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const propertyId = params.id as string;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isAddUnitModalOpen, setIsAddUnitModalOpen] = useState(false);
   const { user } = useAuth();
 
   const { data: propertyData, isLoading: propertyLoading } = useQuery({
@@ -51,10 +54,10 @@ export default function PropertyDetailsPage() {
         {/* Header with breadcrumb */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <Button onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <div className="cursor-pointer flex items-center gap-2" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4" />
               Back
-            </Button>
+            </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{property.name}</h1>
               <div className="flex items-center text-gray-600 mt-1">
@@ -63,10 +66,16 @@ export default function PropertyDetailsPage() {
               </div>
             </div>
           </div>
-          <Button onClick={() => setIsEditModalOpen(true)}>
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit Property
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button onClick={() => setIsAddUnitModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Unit
+            </Button>
+            <Button onClick={() => setIsEditModalOpen(true)}>
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit Property
+            </Button>
+          </div>
         </div>
 
         {/* Statistics Dashboard */}
@@ -192,20 +201,35 @@ export default function PropertyDetailsPage() {
                         <h3 className="text-lg font-semibold">Unit {unitData.unit.unitNumber}</h3>
                       </a>
                       <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
-                        <div className="flex items-center">
-                          <BedDouble className="h-4 w-4 mr-1" />
-                          {unitData.unit.bedrooms} beds
-                        </div>
-                        <div className="flex items-center">
-                          <Bath className="h-4 w-4 mr-1" />
-                          {unitData.unit.bathrooms} baths
-                        </div>
+                        {isResidentialDetails(unitData.unit.details) ? (
+                          <>
+                            <div className="flex items-center">
+                              <BedDouble className="h-4 w-4 mr-1" />
+                              {(unitData.unit.details as ResidentialUnitDetails).bedrooms} beds
+                            </div>
+                            <div className="flex items-center">
+                              <Bath className="h-4 w-4 mr-1" />
+                              {(unitData.unit.details as ResidentialUnitDetails).bathrooms} baths
+                            </div>
+                          </>
+                        ) : isCommercialDetails(unitData.unit.details) ? (
+                          <div className="flex items-center">
+                            <Building2 className="h-4 w-4 mr-1" />
+                            {capitalize((unitData.unit.details as CommercialUnitDetails).unitType)}
+                            {(unitData.unit.details as CommercialUnitDetails).suiteNumber && ` - Suite ${(unitData.unit.details as CommercialUnitDetails).suiteNumber}`}
+                          </div>
+                        ) : (
+                          <div className="flex items-center">
+                            <Home className="h-4 w-4 mr-1" />
+                            {capitalize(unitData.unit.propertyType || property.type || 'residential')} Unit
+                          </div>
+                        )}
                         {unitData.unit.squareFeet && (
                           <div>{unitData.unit.squareFeet} sq ft</div>
                         )}
                       </div>
                     </div>
-                    <Badge className={unitData.unit.isAvailable ? "bg-secondary text-secondary-foreground hover:bg-secondary/80" : ""}>
+                    <Badge className={unitData.unit.isAvailable ? "text-secondary-foreground bg-secondary/80" : ""}>
                       {unitData.unit.isAvailable ? (
                         <><CheckCircle className="h-3 w-3 mr-1" />Available</>
                       ) : (
@@ -300,13 +324,13 @@ export default function PropertyDetailsPage() {
             id: unitData.unit.id,
             propertyId: property.id,
             unitNumber: unitData.unit.unitNumber,
-            bedrooms: unitData.unit.bedrooms,
-            bathrooms: unitData.unit.bathrooms,
+            propertyType: unitData.unit.propertyType,
             squareFeet: unitData.unit.squareFeet,
             monthlyRent: parseFloat(unitData.unit.monthlyRent),
             deposit: parseFloat(unitData.unit.deposit),
             isAvailable: unitData.unit.isAvailable,
             description: unitData.unit.description,
+            details: unitData.unit.details,
             createdAt: property.createdAt,
             updatedAt: property.updatedAt,
             currentTenant: unitData.tenant ? {
@@ -318,6 +342,10 @@ export default function PropertyDetailsPage() {
             } : undefined
           }))
         }}
+      />
+      <AddUnitModal
+        isOpen={isAddUnitModalOpen}
+        onClose={() => setIsAddUnitModalOpen(false)}
       />
     </>
   );

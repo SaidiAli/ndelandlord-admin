@@ -37,9 +37,6 @@ export function TenantDetailsModal({ isOpen, onClose, tenantId }: TenantDetailsM
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Tenant Details</DialogTitle>
-          <DialogDescription>
-            Comprehensive information about the tenant, their lease, and payment status.
-          </DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
@@ -210,11 +207,11 @@ export function TenantDetailsModal({ isOpen, onClose, tenantId }: TenantDetailsM
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Payment Status</p>
-                      <Badge 
-                        variant={
-                          tenantDetails.paymentSummary.paymentStatus === 'current' ? 'default' :
-                          tenantDetails.paymentSummary.paymentStatus === 'overdue' ? 'destructive' :
-                          'secondary'
+                      <Badge
+                        className={
+                          tenantDetails.paymentSummary.paymentStatus === 'current' ? '' :
+                          tenantDetails.paymentSummary.paymentStatus === 'overdue' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/80' :
+                          'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                         }
                       >
                         {tenantDetails.paymentSummary.paymentStatus}

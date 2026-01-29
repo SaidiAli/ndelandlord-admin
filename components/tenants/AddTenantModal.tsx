@@ -33,7 +33,7 @@ const addTenantSchema = z.object({
   unitId: z.string().uuid('Please select a unit'),
   leaseData: z.object({
     startDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid start date" }),
-    endDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid end date" }),
+    endDate: z.string().optional(),
     monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
     deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
   }),
@@ -85,7 +85,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
       leaseData: {
         ...data.leaseData,
         startDate: new Date(data.leaseData.startDate).toISOString(),
-        endDate: new Date(data.leaseData.endDate).toISOString(),
+        endDate: data.leaseData.endDate ? new Date(data.leaseData.endDate).toISOString() : undefined,
       }
     };
     mutation.mutate(formattedData);

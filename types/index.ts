@@ -701,3 +701,59 @@ export interface BulkCreateCommercialUnitsRequest {
     maxOccupancy?: number;
   }>;
 }
+
+// Wallet Types
+export type WalletTransactionType = 'deposit' | 'withdrawal' | 'adjustment';
+export type WalletTransactionStatus = 'pending' | 'completed' | 'failed';
+export type MobileMoneyProvider = 'mtn' | 'airtel';
+export type WithdrawalDestinationType = 'mobile_money' | 'bank_account';
+
+export interface WalletTransaction {
+  id: string;
+  type: WalletTransactionType;
+  amount: number;
+  balanceAfter: number;
+  status: WalletTransactionStatus;
+  description: string | null;
+  createdAt: string;
+  paymentId?: string | null;
+  destinationType?: string | null;
+  gatewayReference?: string | null;
+}
+
+export interface WalletSummary {
+  walletId: string;
+  balance: number;
+  totalDeposited: number;
+  totalWithdrawn: number;
+  pendingWithdrawals: number;
+  recentTransactions: WalletTransaction[];
+}
+
+export interface WalletBalance {
+  balance: number;
+}
+
+export interface WithdrawalRequest {
+  amount: number;
+  destinationType: WithdrawalDestinationType;
+  provider?: MobileMoneyProvider;
+  phoneNumber?: string;
+  bankId?: string;
+  accountNumber?: string;
+  accountName?: string;
+}
+
+export interface WithdrawalResponse {
+  transactionId: string;
+  gatewayReference?: string;
+  status: 'pending' | 'completed' | 'failed';
+  message: string;
+}
+
+export interface WalletTransactionFilters {
+  type?: WalletTransactionType;
+  status?: WalletTransactionStatus;
+  limit?: number;
+  offset?: number;
+}

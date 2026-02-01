@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { authStorage } from './auth';
-import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse, Payment } from '@/types';
+import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse, Payment, WalletSummary, WalletBalance, WalletTransaction, WalletTransactionFilters, WithdrawalRequest, WithdrawalResponse, PaginatedResponse } from '@/types';
 
 // Create axios instance
 const api = axios.create({
@@ -439,6 +439,36 @@ export const maintenanceApi = {
 export const landlordApi = {
   getDashboardData: async () => {
     const response = await api.get(`/landlords/dashboard/complete?_t=${Date.now()}`);
+    return response.data;
+  },
+};
+
+// Wallet API functions
+export const walletApi = {
+  getSummary: async (): Promise<ApiResponse<WalletSummary>> => {
+    const response = await api.get<ApiResponse<WalletSummary>>('/wallet');
+    return response.data;
+  },
+
+  getBalance: async (): Promise<ApiResponse<WalletBalance>> => {
+    const response = await api.get<ApiResponse<WalletBalance>>('/wallet/balance');
+    return response.data;
+  },
+
+  getTransactions: async (filters?: WalletTransactionFilters): Promise<PaginatedResponse<WalletTransaction>> => {
+    const params = new URLSearchParams();
+    if (filters?.type) params.append('type', filters.type);
+    if (filters?.status) params.append('status', filters.status);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.offset) params.append('offset', filters.offset.toString());
+    params.append('_t', Date.now().toString());
+
+    const response = await api.get<PaginatedResponse<WalletTransaction>>(`/wallet/transactions?${params.toString()}`);
+    return response.data;
+  },
+
+  withdraw: async (data: WithdrawalRequest): Promise<ApiResponse<WithdrawalResponse>> => {
+    const response = await api.post<ApiResponse<WithdrawalResponse>>('/wallet/withdraw', data);
     return response.data;
   },
 };

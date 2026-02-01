@@ -3,12 +3,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building, Users, DollarSign, Eye, AlertTriangle } from 'lucide-react';
+import { Building, Users, DollarSign, Eye, AlertTriangle, Wallet } from 'lucide-react';
 import { landlordApi, paymentsApi } from '@/lib/api';
 import { formatUGX } from '@/lib/currency';
 import { Payment } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { WalletCard } from '@/components/wallet/WalletCard';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -99,6 +100,11 @@ export default function DashboardPage() {
           </Link>
         </div>
       )}
+
+      {/* Wallet Card */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <WalletCard />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>

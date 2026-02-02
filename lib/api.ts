@@ -249,11 +249,12 @@ export const unitsApi = {
 
 // Leases API functions
 export const leasesApi = {
-  getAll: async (filters?: { status?: string; propertyId?: string; unitId?: string }) => {
+  getAll: async (filters?: { status?: string; propertyId?: string; unitId?: string; tenantId?: string }) => {
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
     if (filters?.propertyId) params.append('propertyId', filters.propertyId);
     if (filters?.unitId) params.append('unitId', filters.unitId);
+    if (filters?.tenantId) params.append('tenantId', filters.tenantId);
     params.append('_t', Date.now().toString());
 
     const response = await api.get<ApiResponse<LeaseApiResponse[]>>(`/leases?${params.toString()}`);

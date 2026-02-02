@@ -98,7 +98,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Tenant & Create Lease</DialogTitle>
           <DialogDescription>

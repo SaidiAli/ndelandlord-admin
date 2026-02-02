@@ -21,7 +21,6 @@ const navigation = [
   { name: 'Properties', href: '/properties', icon: Building },
   { name: 'Units', href: '/units', icon: Home },
   { name: 'Tenants', href: '/tenants', icon: Users },
-  { name: 'Leases', href: '/leases', icon: FileText },
   { name: 'Payments', href: '/payments', icon: CreditCard },
   { name: 'Wallet', href: '/wallet', icon: Wallet },
   // { name: 'Payment History', href: '/payments/history', icon: History },

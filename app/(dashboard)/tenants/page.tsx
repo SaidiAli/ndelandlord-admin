@@ -2,38 +2,48 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Users } from 'lucide-react';
-import { tenantsApi } from '@/lib/api';
+import { AlertCircle, CheckCircle, FileText, PlusCircle, Users } from 'lucide-react';
+import { leasesApi, tenantsApi } from '@/lib/api';
 import { AddTenantModal } from '@/components/tenants/AddTenantModal';
-import { TenantDetailsModal } from '@/components/tenants/TenantDetailsModal';
 import { EditTenantModal } from '@/components/tenants/EditTenantModal';
 import { createColumns } from './columns';
 import { DataTable } from '@/components/ui/data-table';
+import { Lease } from '@/types';
+import { formatUGX } from '@/lib/currency';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function TenantsPage() {
+  const { user } = useAuth();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTenantId, setSelectedTenantId] = useState<string | null>(null);
-  
+
   const { data: tenantsData, isLoading: tenantsLoading } = useQuery({
-    queryKey: ['tenants'],
+    queryKey: ['tenants', user?.id],
     queryFn: () => tenantsApi.getAll(),
   });
 
+  const { data: leasesData, isLoading: leasesLoading } = useQuery({
+    queryKey: ['leases', user?.id],
+    queryFn: () => leasesApi.getAll()
+  });
+
+  const leases: Lease[] = leasesData?.data || [];
+
+  // Calculate lease statistics
+  const leaseStats = {
+    total: leases.length,
+    active: leases.filter(l => l.status === 'active').length,
+    draft: leases.filter(l => l.status === 'draft').length,
+    expiring: leases.filter(l => l.status === 'expiring').length,
+    expired: leases.filter(l => l.status === 'expired').length,
+    totalBalance: leases.reduce((sum, l) => sum + (l.balance || 0), 0),
+    totalRent: leases.filter(l => l.status === 'active').reduce((sum, l) => sum + l.monthlyRent, 0)
+  };
+
   const tenants = tenantsData?.data || [];
-
-  const handleViewDetails = (tenantId: string) => {
-    setSelectedTenantId(tenantId);
-    setIsDetailsModalOpen(true);
-  };
-
-  const handleCloseDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedTenantId(null);
-  };
 
   const handleEdit = (tenantId: string) => {
     setSelectedTenantId(tenantId);
@@ -45,7 +55,7 @@ export default function TenantsPage() {
     setSelectedTenantId(null);
   };
 
-  const columns = createColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
+  const columns = createColumns({ onEdit: handleEdit });
 
   return (
     <>
@@ -60,7 +70,64 @@ export default function TenantsPage() {
             Add Tenant
           </Button>
         </div>
-        
+
+        {/* Lease Statistics */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Leases</CardTitle>
+              <FileText className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{leaseStats.total}</div>
+              <p className="text-xs text-muted-foreground">
+                {leaseStats.active} active, {leaseStats.draft} draft
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Active Leases</CardTitle>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{leaseStats.active}</div>
+              <p className="text-xs text-muted-foreground">
+                {formatUGX(leaseStats.totalRent)} monthly revenue
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Expiring Soon</CardTitle>
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-orange-600">{leaseStats.expiring}</div>
+              <p className="text-xs text-muted-foreground">
+                Require attention
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Outstanding Balance</CardTitle>
+              <AlertCircle className={`h-4 w-4 ${leaseStats.totalBalance > 0 ? 'text-red-600' : 'text-green-600'}`} />
+            </CardHeader>
+            <CardContent>
+              <div className={`text-2xl font-bold ${leaseStats.totalBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                {formatUGX(leaseStats.totalBalance)}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Total owed across all leases
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+
         <Card>
           <CardContent>
             {tenantsLoading ? (
@@ -79,17 +146,12 @@ export default function TenantsPage() {
                 </Button>
               </div>
             ) : (
-              <DataTable columns={columns} data={tenants} searchKey="tenant" />
+              <DataTable columns={columns} data={tenants} searchKey="tenant name" />
             )}
           </CardContent>
         </Card>
       </div>
       <AddTenantModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-      <TenantDetailsModal
-        isOpen={isDetailsModalOpen}
-        onClose={handleCloseDetailsModal}
-        tenantId={selectedTenantId}
-      />
       <EditTenantModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

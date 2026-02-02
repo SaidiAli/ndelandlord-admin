@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -7,11 +8,10 @@ import { Badge } from "@/components/ui/badge"
 import { TenantWithFullDetails } from "@/types"
 
 interface ColumnsProps {
-  onViewDetails: (tenantId: string) => void;
   onEdit: (tenantId: string) => void;
 }
 
-export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<TenantWithFullDetails>[] => [
+export const createColumns = ({ onEdit }: ColumnsProps): ColumnDef<TenantWithFullDetails>[] => [
   {
     accessorKey: "tenant",
     header: ({ column }) => {
@@ -85,14 +85,20 @@ export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDe
     id: "viewDetails",
     header: "Details",
     cell: ({ row }) => {
-      const { tenant } = row.original
+      const { leases } = row.original;
+      if (leases.length === 0) {
+        return <Badge>No leases</Badge>;
+      }
+
+      // Show status of most recent lease (first in array since backend orders by createdAt desc)
+      const leaseData = leases[0];
       return (
-        <Button
-          onClick={() => onViewDetails(tenant.id)}
-        >
-          <Eye className="h-4 w-4 mr-2" />
-          View
-        </Button>
+        <Link href={`/tenants/${leaseData.lease.id}`}>
+          <Button>
+            <Eye className="h-4 w-4 mr-2" />
+            View
+          </Button>
+        </Link>
       )
     },
   },
@@ -114,4 +120,4 @@ export const createColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDe
 ];
 
 // For backward compatibility, export a default columns function
-export const columns = createColumns({ onViewDetails: () => {}, onEdit: () => {} });
+export const columns = createColumns({ onEdit: () => {} });

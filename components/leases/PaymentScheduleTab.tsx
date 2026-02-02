@@ -85,10 +85,15 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
               <TableHead>Period</TableHead>
               <TableHead className="text-right">Amount</TableHead>
               <TableHead className="text-right">Paid</TableHead>
+              <TableHead className="text-right">Balance</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {schedules.map((schedule) => (
+            {schedules.map((schedule, index) => {
+              // Calculate running balance up to and including this row
+              const runningBalance = schedule.amount - (schedule.paidAmount || 0);
+
+              return (
               <TableRow key={schedule.id}>
                 <TableCell>{schedule.paymentNumber}</TableCell>
                 <TableCell>
@@ -110,11 +115,15 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
                 <TableCell className="text-right text-muted-foreground">
                   {schedule.isPaid ? formatUGX(schedule.amount) : (schedule.paidAmount ? formatUGX(schedule.paidAmount) : '-')}
                 </TableCell>
+                <TableCell className={`text-right font-medium ${runningBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                  {formatUGX(runningBalance)}
+                </TableCell>
               </TableRow>
-            ))}
+            );
+            })}
             {schedules.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center py-4 text-muted-foreground">
+                <TableCell colSpan={7} className="text-center py-4 text-muted-foreground">
                   No payment schedule generated yet.
                 </TableCell>
               </TableRow>

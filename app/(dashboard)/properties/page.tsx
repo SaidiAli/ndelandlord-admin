@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PlusCircle, Building } from 'lucide-react';
 import { propertiesApi } from '@/lib/api';
@@ -50,12 +50,8 @@ export default function PropertiesPage() {
             Add Property
           </Button>
         </div>
-        
+
         <Card>
-          <CardHeader>
-            <CardTitle>Your Properties</CardTitle>
-            <CardDescription>A list of all your properties.</CardDescription>
-          </CardHeader>
           <CardContent>
             {propertiesLoading ? (
               <div className="text-center py-8">
@@ -73,7 +69,7 @@ export default function PropertiesPage() {
                 </Button>
               </div>
             ) : (
-                <DataTable columns={columns} data={properties} searchKey="name" />
+              <DataTable columns={columns} data={properties} searchKey="name" />
             )}
           </CardContent>
         </Card>

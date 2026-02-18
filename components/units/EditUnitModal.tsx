@@ -12,25 +12,9 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose, } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import {
-  Unit,
-  Amenity,
-  PropertyType,
-  residentialUnitTypes,
-  commercialUnitTypes,
-  ResidentialUnitDetails,
-  CommercialUnitDetails,
-} from '@/types';
+import { Unit, Amenity, PropertyType, residentialUnitTypes, commercialUnitTypes, ResidentialUnitDetails, CommercialUnitDetails, } from '@/types';
 import { toast } from 'sonner';
 import { capitalize } from '@/lib/unit-utils';
 
@@ -116,37 +100,11 @@ interface EditUnitModalProps {
 }
 
 export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
-  const queryClient = useQueryClient();
-
-  // Fetch full unit details to get assigned amenities and property type
-  const { data: unitDetailsResponse, isLoading: detailsLoading } = useQuery({
-    queryKey: ['unit-details', unit?.id],
-    queryFn: () => unitsApi.getDetails(unit!.id),
-    enabled: !!unit?.id && isOpen,
-  });
-
-  const unitDetails = unitDetailsResponse?.data;
-  const propertyType: PropertyType = unitDetails?.property?.type || unitDetails?.unit?.propertyType;
+  const propertyType: PropertyType = unit?.propertyType!;
 
   const handleClose = () => {
     onClose();
   };
-
-  if (detailsLoading) {
-    return (
-      <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Edit Unit {unit?.unitNumber}</DialogTitle>
-            <DialogDescription>Loading unit details...</DialogDescription>
-          </DialogHeader>
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -161,13 +119,15 @@ export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
         {propertyType === 'commercial' ? (
           <EditCommercialForm
             unit={unit}
-            unitDetails={unitDetails}
+            unitDetails={unit?.details}
+            unitAmenities={unit?.amenities || []}
             onClose={handleClose}
           />
         ) : (
           <EditResidentialForm
             unit={unit}
-            unitDetails={unitDetails}
+            unitDetails={unit?.details}
+            unitAmenities={unit?.amenities || []}
             onClose={handleClose}
           />
         )}
@@ -179,10 +139,11 @@ export function EditUnitModal({ isOpen, onClose, unit }: EditUnitModalProps) {
 interface FormProps {
   unit: Unit | null;
   unitDetails: any;
+  unitAmenities: Amenity[];
   onClose: () => void;
 }
 
-function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
+function EditResidentialForm({ unit, unitDetails, unitAmenities, onClose }: FormProps) {
   const queryClient = useQueryClient();
 
   const {
@@ -197,6 +158,7 @@ function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
       amenityIds: [],
       hasBalcony: false,
       isFurnished: false,
+      unitType: 'apartment'
     }
   });
 
@@ -204,12 +166,9 @@ function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
   const { data: amenitiesData } = useQuery({
     queryKey: ['amenities', 'residential'],
     queryFn: async () => {
-      const [residential, common] = await Promise.all([
-        amenitiesApi.getResidential(),
-        amenitiesApi.getCommon(),
-      ]);
+      const residential = await amenitiesApi.getResidential();
       return {
-        data: [...(residential?.data || []), ...(common?.data || [])],
+        data: [...(residential?.data || [])],
       };
     },
   });
@@ -217,21 +176,19 @@ function EditResidentialForm({ unit, unitDetails, onClose }: FormProps) {
 
   useEffect(() => {
     if (unitDetails && unit) {
-      const u = unitDetails.unit;
-      const details = u.details as ResidentialUnitDetails | undefined;
 
       reset({
-        unitNumber: u.unitNumber,
-        unitType: details?.unitType || 'apartment',
-        bedrooms: details?.bedrooms?.toString() || '0',
-        bathrooms: details?.bathrooms?.toString() || '0',
-        squareFeet: u.squareFeet ? u.squareFeet.toString() : '',
-        isAvailable: u.isAvailable,
-        description: u.description || '',
-        amenityIds: unitDetails.amenities?.map((a: Amenity) => a.id) || [],
-        hasBalcony: details?.hasBalcony || false,
-        floorNumber: details?.floorNumber?.toString() || '',
-        isFurnished: details?.isFurnished || false,
+        unitNumber: unit.unitNumber,
+        unitType: unitDetails.unitType,
+        bedrooms: unitDetails.bedrooms?.toString() || '0',
+        bathrooms: unitDetails.bathrooms?.toString() || '0',
+        squareFeet: unit.squareFeet ? unit.squareFeet.toString() : '',
+        isAvailable: unit.isAvailable,
+        description: unit.description || '',
+        amenityIds: unitAmenities.map((a: Amenity) => a.id) || [],
+        hasBalcony: unitDetails.hasBalcony || false,
+        floorNumber: unitDetails.floorNumber?.toString() || '',
+        isFurnished: unitDetails.isFurnished || false,
       });
     }
   }, [unit, unitDetails, reset]);
@@ -450,12 +407,9 @@ function EditCommercialForm({ unit, unitDetails, onClose }: FormProps) {
   const { data: amenitiesData } = useQuery({
     queryKey: ['amenities', 'commercial'],
     queryFn: async () => {
-      const [commercial, common] = await Promise.all([
-        amenitiesApi.getCommercial(),
-        amenitiesApi.getCommon(),
-      ]);
+      const commercial = await amenitiesApi.getCommercial();
       return {
-        data: [...(commercial?.data || []), ...(common?.data || [])],
+        data: [...(commercial?.data || [])],
       };
     },
   });

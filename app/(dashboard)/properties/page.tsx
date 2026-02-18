@@ -30,12 +30,7 @@ export default function PropertiesPage() {
     window.location.href = `/properties/${propertyId}`;
   };
 
-  const handleEdit = (propertyId: string) => {
-    // TODO: Implement edit functionality
-    console.log('Edit property:', propertyId);
-  };
-
-  const columns = getColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
+  const columns = getColumns({ onViewDetails: handleViewDetails });
 
   return (
     <>

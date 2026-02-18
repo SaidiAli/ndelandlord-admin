@@ -1,26 +1,23 @@
 "use client"
 
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown, Eye, Edit } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
+import { ArrowUpDown, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Unit, ResidentialUnitDetails, CommercialUnitDetails } from "@/types"
-import { formatUGX } from "@/lib/currency"
-import { isResidentialDetails, isCommercialDetails, capitalize, getUnitDisplaySummary } from "@/lib/unit-utils"
+import { Unit } from "@/types"
+import { capitalize } from "@/lib/unit-utils"
+import Link from "next/link"
 
 interface ColumnsProps {
   onViewDetails: (unitId: string) => void;
-  onEdit: (unit: Unit) => void;
 }
 
-export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<Unit>[] => [
+export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Unit>[] => [
   {
     accessorKey: "unitNumber",
     header: ({ column }) => {
       return (
         <div
-        className="flex"
+          className="flex"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
           Unit No.
@@ -29,7 +26,7 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<U
       )
     },
     cell: ({ row }) => {
-      return <div className="font-medium">{row.original.unitNumber}</div>
+      return <Link href={`/units/${row.original.id}`} className="font-medium">{row.original.unitNumber}</Link>
     }
   },
   {
@@ -40,38 +37,19 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<U
     }
   },
   {
-    id: "unitDetails",
-    header: "Details",
-    cell: ({ row }) => {
-      const unit = row.original;
-      const details = unit.details;
-      const propertyType = unit.propertyType || unit.property?.type;
-
-      // Display type-specific info
-      if (isResidentialDetails(details)) {
-        return (
-          <span className="text-sm">
-            {details.bedrooms} bed / {details.bathrooms} bath
-          </span>
-        );
-      }
-
-      if (isCommercialDetails(details)) {
-        return (
-          <span className="text-sm">
-            {capitalize(details.unitType)}
-            {details.suiteNumber && ` - Suite ${details.suiteNumber}`}
-          </span>
-        );
-      }
-
-      // Fallback for legacy data or missing details
-      return (
-        <span className="text-sm text-muted-foreground">
-          {propertyType === 'commercial' ? 'Commercial' : 'Residential'}
-        </span>
-      );
-    }
+    id: "tenant",
+    header: "Tenant",
+    cell: ({ row }) => { }
+  },
+  {
+    id: "rent",
+    header: "Rent",
+    cell: ({ row }) => { }
+  },
+  {
+    id: "outstanding",
+    header: "Outstanding Balance",
+    cell: ({ row }) => { }
   },
   {
     accessorKey: "propertyType",
@@ -99,28 +77,13 @@ export const getColumns = ({ onViewDetails, onEdit }: ColumnsProps): ColumnDef<U
     cell: ({ row }) => {
       const unit = row.original
       return (
-        <Button
+        <div
+          className="cursor-pointer"
           onClick={() => onViewDetails(unit.id)}
         >
           <Eye className="h-4 w-4 mr-2" />
-          View
-        </Button>
+        </div>
       )
     },
-  },
-  {
-    id: "edit",
-    header: "Edit",
-    cell: ({ row }) => {
-      const unit = row.original
-      return (
-        <Button
-          onClick={() => onEdit(unit)}
-        >
-          <Edit className="h-4 w-4 mr-2" />
-          Edit
-        </Button>
-      )
-    },
-  },
+  }
 ]

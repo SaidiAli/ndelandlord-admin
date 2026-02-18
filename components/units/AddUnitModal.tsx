@@ -44,7 +44,7 @@ const residentialUnitSchema = z.object({
   description: z.string().optional(),
   amenityIds: z.array(z.string()).optional(),
   hasBalcony: z.boolean().optional(),
-  floorNumber: z.coerce.number().int().optional().or(z.literal('')),
+  floorNumber: z.string().optional(),
   isFurnished: z.boolean().optional(),
 });
 
@@ -56,7 +56,7 @@ const commercialUnitSchema = z.object({
   squareFeet: z.coerce.number().int().positive('Square feet must be positive').optional().or(z.literal('')),
   description: z.string().optional(),
   amenityIds: z.array(z.string()).optional(),
-  floorNumber: z.coerce.number().int().optional().or(z.literal('')),
+  floorNumber: z.string().optional(),
   suiteNumber: z.string().optional(),
   ceilingHeight: z.coerce.number().positive('Ceiling height must be positive').optional().or(z.literal('')),
   maxOccupancy: z.coerce.number().int().positive('Max occupancy must be positive').optional().or(z.literal('')),
@@ -249,12 +249,9 @@ function ResidentialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProp
   const { data: amenitiesData } = useQuery({
     queryKey: ['amenities', 'residential'],
     queryFn: async () => {
-      const [residential, common] = await Promise.all([
-        amenitiesApi.getResidential(),
-        amenitiesApi.getCommon(),
-      ]);
+      const [residential] = await amenitiesApi.getResidential();
       return {
-        data: [...(residential?.data || []), ...(common?.data || [])],
+        data: [...(residential?.data || [])],
       };
     },
   });
@@ -330,7 +327,7 @@ function ResidentialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProp
         </div>
         <div className="space-y-2">
           <Label htmlFor="bathrooms">Bathrooms</Label>
-          <Input id="bathrooms" type="number" min={0} step="0.5" {...register('bathrooms')} />
+          <Input id="bathrooms" type="number" min={0} {...register('bathrooms')} />
           {errors.bathrooms && <p className="text-sm text-red-500">{errors.bathrooms.message}</p>}
         </div>
       </div>
@@ -338,12 +335,12 @@ function ResidentialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProp
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="squareFeet">Square Feet (Optional)</Label>
-          <Input id="squareFeet" type="number" {...register('squareFeet')} />
+          <Input id="squareFeet" type="number" min={0} {...register('squareFeet')} />
           {errors.squareFeet && <p className="text-sm text-red-500">{errors.squareFeet.message}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="floorNumber">Floor Number (Optional)</Label>
-          <Input id="floorNumber" type="number" {...register('floorNumber')} />
+          <Input id="floorNumber" {...register('floorNumber')} />
           {errors.floorNumber && <p className="text-sm text-red-500">{errors.floorNumber.message}</p>}
         </div>
       </div>
@@ -455,12 +452,9 @@ function CommercialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProps
   const { data: amenitiesData } = useQuery({
     queryKey: ['amenities', 'commercial'],
     queryFn: async () => {
-      const [commercial, common] = await Promise.all([
-        amenitiesApi.getCommercial(),
-        amenitiesApi.getCommon(),
-      ]);
+      const commercial = await amenitiesApi.getCommercial();
       return {
-        data: [...(commercial?.data || []), ...(common?.data || [])],
+        data: [...(commercial?.data || [])],
       };
     },
   });
@@ -535,7 +529,7 @@ function CommercialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProps
         </div>
         <div className="space-y-2">
           <Label htmlFor="floorNumber">Floor Number (Optional)</Label>
-          <Input id="floorNumber" type="number" {...register('floorNumber')} />
+          <Input id="floorNumber" {...register('floorNumber')} />
           {errors.floorNumber && <p className="text-sm text-red-500">{errors.floorNumber.message}</p>}
         </div>
       </div>
@@ -543,17 +537,17 @@ function CommercialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProps
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
           <Label htmlFor="squareFeet">Square Feet (Optional)</Label>
-          <Input id="squareFeet" type="number" {...register('squareFeet')} />
+          <Input id="squareFeet" type="number" min={0} {...register('squareFeet')} />
           {errors.squareFeet && <p className="text-sm text-red-500">{errors.squareFeet.message}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="ceilingHeight">Ceiling Height (ft) (Optional)</Label>
-          <Input id="ceilingHeight" type="number" step="0.1" {...register('ceilingHeight')} />
+          <Input id="ceilingHeight" type="number" step="0.1" min={0} {...register('ceilingHeight')} />
           {errors.ceilingHeight && <p className="text-sm text-red-500">{errors.ceilingHeight.message}</p>}
         </div>
         <div className="space-y-2">
           <Label htmlFor="maxOccupancy">Max Occupancy (Optional)</Label>
-          <Input id="maxOccupancy" type="number" {...register('maxOccupancy')} />
+          <Input id="maxOccupancy" type="number" min={0} {...register('maxOccupancy')} />
           {errors.maxOccupancy && <p className="text-sm text-red-500">{errors.maxOccupancy.message}</p>}
         </div>
       </div>

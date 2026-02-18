@@ -1,24 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-    DialogFooter,
-} from '@/components/ui/dialog';
+import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogFooter} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
 import api, { leasesApi } from '@/lib/api';
 import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
@@ -72,11 +60,6 @@ export function RegisterPaymentModal({
             }
         } catch (error) {
             console.error('Failed to fetch leases:', error);
-            // toast({
-            //     title: 'Error',
-            //     description: 'Failed to load leases',
-            //     variant: 'destructive',
-            // });
             alert('Failed to load leases');
         } finally {
             setLoading(false);
@@ -85,13 +68,8 @@ export function RegisterPaymentModal({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log({ leaseId, amount, paidDate, paymentMethod, notes })
+  
         if (!leaseId || !amount || !paidDate || !paymentMethod) {
-            // toast({
-            //     title: 'Error',
-            //     description: 'Please fill in all required fields',
-            //     variant: 'destructive',
-            // });
             alert("Please fill in all required fields");
             return;
         }
@@ -107,10 +85,6 @@ export function RegisterPaymentModal({
             });
 
             if (response.data.success) {
-                // toast({
-                //     title: 'Success',
-                //     description: 'Payment registered successfully',
-                // });
                 alert("Payment registered successfully");
                 onSuccess();
                 onClose();
@@ -118,11 +92,6 @@ export function RegisterPaymentModal({
             }
         } catch (error: any) {
             console.error('Failed to register payment:', error);
-            // toast({
-            //     title: 'Error',
-            //     description: error.response?.data?.error || 'Failed to register payment',
-            //     variant: 'destructive',
-            // });
             alert(error.response?.data?.error || 'Failed to register payment');
         } finally {
             setSubmitting(false);

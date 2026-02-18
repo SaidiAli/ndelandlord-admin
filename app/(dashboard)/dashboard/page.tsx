@@ -56,19 +56,17 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{summary.totalProperties}</div>
-                <p className="text-xs text-muted-foreground">{summary.totalUnits} total units</p>
               </CardContent>
             </Card>
           </Link>
 
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Tenants</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Units</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary.totalTenants}</div>
-              <p className="text-xs text-muted-foreground">{summary.occupancyRate}% occupancy</p>
+              <div className="text-2xl font-bold">{summary.totalUnits}</div>
             </CardContent>
           </Card></Link>
 
@@ -76,32 +74,30 @@ export default function DashboardPage() {
           <Link href="/payments">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
+                <CardTitle className="text-sm font-medium">Received payments <span className='text-[10px]'>(This Month)</span></CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenue)}</div>
-                <p className="text-xs text-muted-foreground">from active leases</p>
               </CardContent>
             </Card>
           </Link>
 
-          <Link href="/leases">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{summary.overduePayments}</div>
-                <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
-              </CardContent>
-            </Card>
-          </Link>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.overduePayments}</div>
+              <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
+            </CardContent>
+          </Card>
         </div>
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div></div>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
@@ -150,8 +146,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Placeholder for other activity */}
-        <Card>
+        {/* <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Latest leases, maintenance, etc.</CardDescription>
@@ -161,7 +156,7 @@ export default function DashboardPage() {
               Activity feed coming soon.
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );

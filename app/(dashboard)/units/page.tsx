@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PlusCircle, DoorOpen } from 'lucide-react';
-import { unitsApi } from '@/lib/api';
-import { Unit } from '@/types';
+import { unitsApi, propertiesApi } from '@/lib/api';
+import { Unit, Property } from '@/types';
 import { AddUnitModal } from '@/components/units/AddUnitModal';
 import { EditUnitModal } from '@/components/units/EditUnitModal';
 import { getColumns } from './columns';
@@ -17,6 +18,7 @@ export default function UnitsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
   const { user } = useAuth();
 
   const { data: unitsData, isLoading: unitsLoading } = useQuery({
@@ -25,19 +27,31 @@ export default function UnitsPage() {
     enabled: !!user,
   });
 
-  const units: Unit[] = unitsData?.data || [];
+  const { data: propertiesData } = useQuery({
+    queryKey: ['properties', user?.id],
+    queryFn: () => propertiesApi.getAll(),
+    enabled: !!user,
+  });
+
+  const properties: Property[] = propertiesData?.data || [];
+
+  useEffect(() => {
+    if (properties.length > 0 && !selectedPropertyId) {
+      setSelectedPropertyId(properties[0].id);
+    }
+  }, [properties, selectedPropertyId]);
+
+  const allUnits: Unit[] = unitsData?.data || [];
+  const units = selectedPropertyId
+    ? allUnits.filter((u) => u.propertyId === selectedPropertyId)
+    : allUnits;
 
   const handleViewDetails = (unitId: string) => {
     // Navigate to unit details page
     window.location.href = `/units/${unitId}`;
   };
 
-  const handleEdit = (unit: Unit) => {
-    setSelectedUnit(unit);
-    setIsEditModalOpen(true);
-  };
-
-  const columns = getColumns({ onViewDetails: handleViewDetails, onEdit: handleEdit });
+  const columns = getColumns({ onViewDetails: handleViewDetails });
 
   return (
     <>
@@ -52,7 +66,25 @@ export default function UnitsPage() {
             Add Unit
           </Button>
         </div>
-        
+
+        {properties.length > 0 && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-600 font-medium">Property</span>
+            <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
+              <SelectTrigger className="w-64">
+                <SelectValue placeholder="Select a property" />
+              </SelectTrigger>
+              <SelectContent>
+                {properties.map((property) => (
+                  <SelectItem key={property.id} value={property.id}>
+                    {property.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
         <Card>
           <CardContent>
             {unitsLoading ? (

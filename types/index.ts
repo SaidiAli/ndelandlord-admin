@@ -566,8 +566,8 @@ export interface UnitWithDetails {
     description?: string;
     createdAt: string;
     updatedAt: string;
-    details?: ResidentialUnitDetails | CommercialUnitDetails;
   };
+  details?: ResidentialUnitDetails | CommercialUnitDetails;
   property: {
     id: string;
     name: string;

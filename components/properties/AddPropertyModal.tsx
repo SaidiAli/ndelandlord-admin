@@ -9,15 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { capitalize } from 'lodash';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
@@ -29,7 +21,7 @@ const addPropertySchema = z.object({
   city: z.string().min(1, 'City is required'),
   postalCode: z.string().optional(),
   type: z.enum(propertyTypes).optional(),
-  numberOfUnits: z.number().int().positive().optional(),
+  numberOfUnits: z.number().int().optional(),
 });
 
 
@@ -132,7 +124,7 @@ export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
           </div>
           <div className="space-y-2">
             <Label htmlFor="numberOfUnits">Number of Units <span className="text-gray-500 text-xs">(Optional)</span></Label>
-            <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" />
+            <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" min={0} />
             {errors.numberOfUnits && <p className="text-sm text-red-500">{errors.numberOfUnits.message}</p>}
           </div>
           <DialogFooter>

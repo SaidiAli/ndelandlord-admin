@@ -14,6 +14,7 @@ import { AddUnitModal } from '@/components/units/AddUnitModal';
 import { useAuth } from '@/hooks/useAuth';
 import { PropertyDashboardData, ResidentialUnitDetails, CommercialUnitDetails } from '@/types';
 import { isResidentialDetails, isCommercialDetails, capitalize } from '@/lib/unit-utils';
+import { formatDateShort } from '@/lib/utils';
 
 export default function PropertyDetailsPage() {
   const params = useParams();
@@ -96,7 +97,6 @@ export default function PropertyDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.occupiedUnits || 0}</div>
-              <p className="text-xs text-muted-foreground">{stats?.occupancyRate || 0}% occupancy</p>
             </CardContent>
           </Card>
           <Card>
@@ -137,18 +137,19 @@ export default function PropertyDetailsPage() {
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Property ID</label>
-                  <p className="text-sm font-mono">{property.id}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Added on</label>
-                  <p className="text-sm">{new Date(property.createdAt).toLocaleDateString()}</p>
+                  <label className="text-sm font-medium text-gray-500">Property address</label>
+                  <p className="text-sm font-mono">{property.address}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
+
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Property address</label>
-                  <p className="text-sm font-mono">{property.address}</p>
+                  <label className="text-sm font-medium text-gray-500">Added on</label>
+                  <p className="text-sm">{formatDateShort(property.createdAt)}</p>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Managed by:</label>
+                  <p className="text-sm font-mono"></p>
                 </div>
               </div>
             </CardContent>
@@ -188,7 +189,7 @@ export default function PropertyDetailsPage() {
               Units in {property.name} ({units.length})
             </CardTitle>
             <CardDescription>
-              Comprehensive overview of all units, tenants, and lease information
+              Comprehensive overview of all units in this property.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -246,10 +247,6 @@ export default function PropertyDetailsPage() {
                     <div>
                       <label className="text-xs font-medium text-gray-500">Monthly Rent</label>
                       <p className="font-semibold">{formatUGX(parseFloat(unitData.unit.monthlyRent))}</p>
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-gray-500">Deposit</label>
-                      <p className="font-semibold">{formatUGX(parseFloat(unitData.unit.deposit))}</p>
                     </div>
                     {unitData.lease && (
                       <>

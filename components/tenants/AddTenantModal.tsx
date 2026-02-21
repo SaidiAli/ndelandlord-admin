@@ -8,15 +8,7 @@ import { unitsApi, usersApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Separator } from '../ui/separator';
@@ -24,9 +16,7 @@ import { Separator } from '../ui/separator';
 const addTenantSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
-  email: z.string()
-    .transform(val => val === '' ? undefined : val)
-    .pipe(z.string().email('Invalid email address').optional()),
+  email: z.string().transform(val => val === '' ? undefined : val).pipe(z.string().email('Invalid email address').optional()),
   phone: z.string().min(1, 'Phone number is required'),
   userName: z.string().min(1, 'Username is required'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
@@ -68,6 +58,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
     mutationFn: (newTenantWithLease: AddTenantFormData) => usersApi.createWithLease(newTenantWithLease),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leases'] });
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
       queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['available-units'] });
       toast.success('Tenant and lease created successfully!');
@@ -100,7 +91,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Add New Tenant & Create Lease</DialogTitle>
+          <DialogTitle>Add New Tenant</DialogTitle>
           <DialogDescription>
             Create a new tenant account and assign them to an available unit with a new lease.
           </DialogDescription>
@@ -147,7 +138,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
 
           <Separator className="my-6" />
 
-          <h4 className="font-semibold text-lg">Lease & Unit Assignment</h4>
+          <h4 className="font-semibold text-lg">Unit Assignment</h4>
           <div className="space-y-2">
             <Label htmlFor="unitId">Assign to Unit</Label>
             <Controller
@@ -173,12 +164,12 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate">Lease Start Date</Label>
+              <Label htmlFor="startDate">Start Date</Label>
               <Input id="startDate" type="date" {...register('leaseData.startDate')} />
               {errors.leaseData?.startDate && <p className="text-sm text-red-500">{errors.leaseData.startDate.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate">Lease End Date</Label>
+              <Label htmlFor="endDate">End Date <span className="text-muted-foreground text-[10px]">(Optional)</span></Label>
               <Input id="endDate" type="date" {...register('leaseData.endDate')} />
               {errors.leaseData?.endDate && <p className="text-sm text-red-500">{errors.leaseData.endDate.message}</p>}
             </div>
@@ -187,22 +178,22 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
-              <Input id="monthlyRent" type="number" {...register('leaseData.monthlyRent')} />
+              <Input id="monthlyRent" type="number" min={0} {...register('leaseData.monthlyRent')} />
               {errors.leaseData?.monthlyRent && <p className="text-sm text-red-500">{errors.leaseData.monthlyRent.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="deposit">Deposit (UGX)</Label>
-              <Input id="deposit" type="number" {...register('leaseData.deposit')} />
+              <Input id="deposit" type="number" min={0} {...register('leaseData.deposit')} />
               {errors.leaseData?.deposit && <p className="text-sm text-red-500">{errors.leaseData.deposit.message}</p>}
             </div>
           </div>
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button">Cancel</Button>
+              <Button className='bg-red-500' type="button" >Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting || mutation.isPending}>
-              {isSubmitting || mutation.isPending ? 'Saving...' : 'Create Tenant & Lease'}
+              {isSubmitting || mutation.isPending ? 'Saving...' : 'Create Tenant'}
             </Button>
           </DialogFooter>
         </form>

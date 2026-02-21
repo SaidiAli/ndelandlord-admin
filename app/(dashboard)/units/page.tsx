@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export default function UnitsPage() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState<Unit | null>(null);
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('all');
   const { user } = useAuth();
 
   const { data: unitsData, isLoading: unitsLoading } = useQuery({
@@ -35,23 +35,12 @@ export default function UnitsPage() {
 
   const properties: Property[] = propertiesData?.data || [];
 
-  useEffect(() => {
-    if (properties.length > 0 && !selectedPropertyId) {
-      setSelectedPropertyId(properties[0].id);
-    }
-  }, [properties, selectedPropertyId]);
-
   const allUnits: Unit[] = unitsData?.data || [];
-  const units = selectedPropertyId
+  const units = selectedPropertyId !== 'all'
     ? allUnits.filter((u) => u.propertyId === selectedPropertyId)
     : allUnits;
 
-  const handleViewDetails = (unitId: string) => {
-    // Navigate to unit details page
-    window.location.href = `/units/${unitId}`;
-  };
-
-  const columns = getColumns({ onViewDetails: handleViewDetails });
+  const columns = getColumns();
 
   return (
     <>
@@ -75,6 +64,7 @@ export default function UnitsPage() {
                 <SelectValue placeholder="Select a property" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">All Properties</SelectItem>
                 {properties.map((property) => (
                   <SelectItem key={property.id} value={property.id}>
                     {property.name}

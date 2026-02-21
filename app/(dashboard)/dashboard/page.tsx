@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Building, Users, DollarSign, Eye, AlertTriangle } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { landlordApi, paymentsApi } from '@/lib/api';
 import { formatUGX } from '@/lib/currency';
 import { Payment } from '@/types';
@@ -52,7 +52,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-                <Building className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:buildings-bold-duotone" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{summary.totalProperties}</div>
@@ -60,22 +60,22 @@ export default function DashboardPage() {
             </Card>
           </Link>
 
-          <Link href="/tenants"><Card>
+          <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Units</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Total Expected Income</CardTitle>
+              <Icon icon="solar:money-bag-bold-duotone" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary.totalUnits}</div>
+              <div className="text-2xl font-bold">{"n/a"}</div>
             </CardContent>
-          </Card></Link>
+          </Card>
 
 
           <Link href="/payments">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Received payments <span className='text-[10px]'>(This Month)</span></CardTitle>
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <Icon icon="solar:hand-money-line-duotone" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenue)}</div>
@@ -86,13 +86,57 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-red-500" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.overduePayments}</div>
               <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
             </CardContent>
           </Card>
+
+          <Link href="/tenants"><Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{summary.totalUnits}</div>
+            </CardContent>
+          </Card>
+          </Link>
+
+          <Link href="/tenants"><Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Occupied</CardTitle>
+              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{"n/a"}</div>
+            </CardContent>
+          </Card>
+          </Link>
+
+          <Link href="/tenants"><Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Empty</CardTitle>
+              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{"n/a"}</div>
+            </CardContent>
+          </Card>
+          </Link>
+
+          <Link href="/tenants"><Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">% Occupancy</CardTitle>
+              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{"n/a"}</div>
+            </CardContent>
+          </Card>
+          </Link>
         </div>
       )}
 
@@ -106,7 +150,7 @@ export default function DashboardPage() {
             </div>
             <Link href="/payments">
               <Button>
-                <Eye className="h-4 w-4 mr-2" />
+                <Icon icon="solar:eye-broken" className="h-4 w-4 mr-2" />
                 View All
               </Button>
             </Link>

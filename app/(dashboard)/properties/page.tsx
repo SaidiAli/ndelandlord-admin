@@ -25,12 +25,7 @@ export default function PropertiesPage() {
 
   const properties: Property[] = propertiesData?.data || [];
 
-  const handleViewDetails = (propertyId: string) => {
-    // Navigate to property details page
-    window.location.href = `/properties/${propertyId}`;
-  };
-
-  const columns = getColumns({ onViewDetails: handleViewDetails });
+  const columns = getColumns();
 
   return (
     <>

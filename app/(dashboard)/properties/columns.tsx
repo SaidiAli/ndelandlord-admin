@@ -3,14 +3,11 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Property } from "@/types"
 import Link from "next/link"
 
-interface ColumnsProps {
-  onViewDetails: (propertyId: string) => void;
-}
-
-export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Property>[] => [
+export const getColumns = (): ColumnDef<Property>[] => [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -42,6 +39,18 @@ export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Property>
     header: "City",
   },
   {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      const type = row.original.type;
+      return (
+        <Badge className={type === 'commercial' ? 'bg-blue-500' : 'bg-green-500'}>
+          {type ? type.charAt(0).toUpperCase() + type.slice(1) : 'Residential'}
+        </Badge>
+      );
+    },
+  },
+  {
     accessorKey: "units",
     header: "Units",
   },
@@ -63,12 +72,12 @@ export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Property>
     cell: ({ row }) => {
       const property = row.original
       return (
-        <div
-          className="cursor-pointer"
-          onClick={() => onViewDetails(property.id)}
-        >
-          <Eye className="h-4 w-4 mr-2" />
-        </div>
+        <Link href={`/properties/${property.id}`}>
+          <div className="flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            View
+          </div>
+        </Link>
       )
     },
   },

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, CalendarDays, Home, Phone, Mail, User, MapPin, FileText, CheckCircle, AlertCircle, Settings, PlusCircle, Edit, CreditCard, Receipt, History, ExternalLink } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Payment, Lease } from '@/types';
 import { formatUGX } from '@/lib/currency';
@@ -18,6 +18,7 @@ import { isResidentialDetails, isCommercialDetails, capitalize } from '@/lib/uni
 import { CreateLeaseModal } from '@/components/leases/CreateLeaseModal';
 import { useState } from 'react';
 import { EditLeaseModal } from '@/components/leases/EditLeaseModal';
+import { formatDateShort, getOrdinalSuffix } from '@/lib/utils';
 
 export default function TenantDetailsPage() {
   const params = useParams();
@@ -61,12 +62,18 @@ export default function TenantDetailsPage() {
 
   const getStatusClassName = (status: string) => {
     switch (status) {
-      case 'active': return '';
-      case 'expired': return 'bg-destructive text-destructive-foreground hover:bg-destructive/80';
-      case 'terminated': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-      case 'draft': return 'bg-transparent border-input text-foreground';
-      case 'expiring': return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
-      default: return 'bg-secondary text-secondary-foreground hover:bg-secondary/80';
+      case 'active':
+        return 'bg-emerald-600 text-white hover:bg-emerald-600/90';
+      case 'expired':
+        return 'bg-destructive text-destructive-foreground hover:bg-destructive/90';
+      case 'terminated':
+        return 'bg-slate-500 text-white hover:bg-slate-500/90';
+      case 'draft':
+        return 'border border-input bg-background text-foreground hover:bg-accent hover:text-accent-foreground';
+      case 'expiring':
+        return 'bg-amber-500 text-white hover:bg-amber-500/90';
+      default:
+        return 'bg-secondary text-secondary-foreground hover:bg-secondary/90';
     }
   };
 
@@ -125,7 +132,7 @@ export default function TenantDetailsPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button className="bg-transparent text-foreground hover:bg-accent" onClick={() => router.push('/tenants')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <Icon icon="solar:arrow-left-bold-duotone" className="h-4 w-4 mr-2" />
             Back
           </Button>
         </div>
@@ -142,7 +149,7 @@ export default function TenantDetailsPage() {
       <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button className="bg-transparent text-foreground hover:bg-accent" onClick={() => router.push('/tenants')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <Icon icon="solar:arrow-left-bold-duotone" className="h-4 w-4 mr-2" />
             Back
           </Button>
         </div>
@@ -162,7 +169,7 @@ export default function TenantDetailsPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button className="bg-transparent text-foreground hover:bg-accent" onClick={() => router.push('/tenants')}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <Icon icon="solar:arrow-left-bold-duotone" className="h-4 w-4 mr-2" />
             Back
           </Button>
           <div>
@@ -183,25 +190,25 @@ export default function TenantDetailsPage() {
           {leaseBalance && (
             <div>
               <h3 className="text-sm font-medium text-gray-500">Current Balance</h3>
-              <p className={`text-lg font-bold ${leaseBalance.currentBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
-                {formatUGX(leaseBalance.currentBalance)}
+              <p className={`text-lg font-bold ${leaseBalance.outstandingBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                {formatUGX(leaseBalance.outstandingBalance)}
               </p>
             </div>
           )}
           <div>
             <h3 className="text-sm font-medium text-gray-500">Payment Day</h3>
-            <p className="text-lg font-bold">{leaseDetails.paymentDay}th of each month</p>
+            <p className="text-lg font-bold">{getOrdinalSuffix(leaseDetails.paymentDay)} of each month</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => setIsEditModalOpen(true)}
           >
-            <Edit className="h-4 w-4 mr-2" />
+            <Icon icon="solar:pen-broken" className="h-4 w-4 mr-2" />
             Edit
           </Button>
           <Button onClick={() => setIsCreateModalOpen(true)}>
-            <PlusCircle className="h-4 w-4 mr-2" />
+            <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
             Create Lease
           </Button>
           {leaseDetails.status === 'draft' && (
@@ -209,7 +216,7 @@ export default function TenantDetailsPage() {
               onClick={() => null}
               disabled={true}
             >
-              <CheckCircle className="h-4 w-4 mr-2" />
+              <Icon icon="solar:verified-check-broken" className="h-4 w-4 mr-2" />
               Approve
             </Button>
           )}
@@ -218,7 +225,7 @@ export default function TenantDetailsPage() {
               onClick={() => null}
               disabled={true}
             >
-              <Settings className="h-4 w-4 mr-2" />
+              <Icon icon="solar:settings-broken" className="h-4 w-4 mr-2" />
               Activate
             </Button>
           )}
@@ -227,7 +234,7 @@ export default function TenantDetailsPage() {
               onClick={() => null}
               disabled={true}
             >
-              <AlertCircle className="h-4 w-4 mr-2" />
+              <Icon icon="solar:danger-circle-broken" className="h-4 w-4 mr-2" />
               Terminate
             </Button>
           )}
@@ -248,7 +255,7 @@ export default function TenantDetailsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <User className="h-5 w-5" />
+                  <Icon icon="solar:user-broken" className="h-5 w-5" />
                   Tenant Information
                 </CardTitle>
               </CardHeader>
@@ -263,14 +270,12 @@ export default function TenantDetailsPage() {
                     <p className="font-medium">{leaseDetails.tenant.userName}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-500" />
                     <div>
                       <p className="text-sm text-gray-500">Email</p>
                       <p className="font-medium">{leaseDetails.tenant.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-gray-500" />
                     <div>
                       <p className="text-sm text-gray-500">Phone</p>
                       <p className="font-medium">{leaseDetails.tenant.phone || 'Not provided'}</p>
@@ -290,16 +295,12 @@ export default function TenantDetailsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5" />
+                <Icon icon="solar:document-text-broken" className="h-5 w-5" />
                 Lease Summary
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">Lease ID</p>
-                  <p className="font-medium font-mono text-sm">{leaseDetails.id}</p>
-                </div>
                 <div>
                   <p className="text-sm text-gray-500">Monthly Rent</p>
                   <p className="font-medium text-lg">{formatUGX(leaseDetails.monthlyRent)}</p>
@@ -307,6 +308,10 @@ export default function TenantDetailsPage() {
                 <div>
                   <p className="text-sm text-gray-500">Security Deposit</p>
                   <p className="font-medium">{formatUGX(leaseDetails.deposit)}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-500">Move in Date</p>
+                  <p className="font-medium font-mono text-sm">{formatDateShort(leaseDetails.startDate)}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Lease Duration</p>
@@ -328,7 +333,7 @@ export default function TenantDetailsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="h-5 w-5" />
+                <Icon icon="solar:calendar-broken" className="h-5 w-5" />
                 Lease Period
               </CardTitle>
             </CardHeader>
@@ -369,7 +374,7 @@ export default function TenantDetailsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <FileText className="h-5 w-5" />
+                  <Icon icon="solar:document-text-broken" className="h-5 w-5" />
                   Lease Terms & Conditions
                 </CardTitle>
               </CardHeader>
@@ -386,7 +391,7 @@ export default function TenantDetailsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5" />
+                  <Icon icon="solar:history-broken" className="h-5 w-5" />
                   Other Leases
                 </CardTitle>
               </CardHeader>
@@ -420,7 +425,7 @@ export default function TenantDetailsPage() {
                           className="h-8 px-2 bg-transparent text-foreground hover:bg-accent"
                           onClick={() => router.push(`/tenants/${lease.id}`)}
                         >
-                          <ExternalLink className="h-4 w-4" />
+                          <Icon icon="solar:arrow-right-up-broken" className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -443,7 +448,7 @@ export default function TenantDetailsPage() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Home className="h-5 w-5" />
+                  <Icon icon="solar:home-broken" className="h-5 w-5" />
                   Property & Unit Details
                 </CardTitle>
               </CardHeader>
@@ -455,7 +460,7 @@ export default function TenantDetailsPage() {
                         <h4 className="font-medium mb-2">Property Information</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex items-center gap-2">
-                            <MapPin className="h-4 w-4 text-gray-500" />
+                            <Icon icon="solar:map-point-broken" className="h-4 w-4 text-gray-500" />
                             <div>
                               <p className="text-sm text-gray-500">Property Name</p>
                               <p className="font-medium">{leaseDetails.unit.property.name}</p>
@@ -546,14 +551,14 @@ export default function TenantDetailsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Receipt className="h-5 w-5" />
+                <Icon icon="solar:receipt-broken" className="h-5 w-5" />
                 Payment History
               </CardTitle>
             </CardHeader>
             <CardContent>
               {payments.length === 0 ? (
                 <div className="text-center py-8">
-                  <CreditCard className="h-12 w-12 mx-auto text-gray-400" />
+                  <Icon icon="solar:card-broken" className="h-12 w-12 mx-auto text-gray-400" />
                   <p className="mt-4 font-semibold text-gray-500">No payments recorded</p>
                   <p className="text-sm text-gray-400">Payments for this lease will appear here</p>
                 </div>
@@ -574,15 +579,15 @@ export default function TenantDetailsPage() {
                         <TableCell>
                           {payment.paidDate
                             ? new Date(payment.paidDate).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })
                             : new Date(payment.createdAt).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric'
-                              })}
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric'
+                            })}
                         </TableCell>
                         <TableCell className="font-medium">
                           {formatUGX(payment.amount)}
@@ -602,12 +607,12 @@ export default function TenantDetailsPage() {
                               payment.status === 'completed'
                                 ? ''
                                 : payment.status === 'pending'
-                                ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
-                                : payment.status === 'processing'
-                                ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
-                                : payment.status === 'failed'
-                                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/80'
-                                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                                  ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100'
+                                  : payment.status === 'processing'
+                                    ? 'bg-blue-100 text-blue-800 hover:bg-blue-100'
+                                    : payment.status === 'failed'
+                                      ? 'bg-destructive text-destructive-foreground hover:bg-destructive/80'
+                                      : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                             }
                           >
                             {payment.status}

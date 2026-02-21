@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {Dialog,DialogContent,DialogHeader,DialogTitle,DialogFooter} from '@/components/ui/dialog';
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import {Select,SelectContent,SelectItem,SelectTrigger,SelectValue} from '@/components/ui/select';
-import api, { leasesApi } from '@/lib/api';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import api, { leasesApi, propertiesApi } from '@/lib/api';
+import type { Property } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -33,9 +35,26 @@ export function RegisterPaymentModal({
     preSelectedLeaseId,
 }: RegisterPaymentModalProps) {
     // const { toast } = useToast();
-    const [leases, setLeases] = useState<Lease[]>([]);
-    const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [selectedPropertyId, setSelectedPropertyId] = useState('');
+
+    const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
+        queryKey: ['properties'],
+        queryFn: () => propertiesApi.getAll(),
+        enabled: isOpen,
+    });
+    const properties: Property[] = propertiesData?.data ?? [];
+
+    const { data: leasesData, isLoading: leasesLoading } = useQuery({
+        queryKey: ['active-leases', selectedPropertyId],
+        queryFn: () => leasesApi.getAll({
+            status: 'active',
+            propertyId: selectedPropertyId || undefined,
+        }),
+        enabled: isOpen && (!!preSelectedLeaseId || !!selectedPropertyId),
+    });
+
+    const leases = (leasesData?.data ?? []) as unknown as Lease[];
 
     // Form State
     const [leaseId, setLeaseId] = useState(preSelectedLeaseId || '');
@@ -44,31 +63,9 @@ export function RegisterPaymentModal({
     const [paymentMethod, setPaymentMethod] = useState('cash');
     const [notes, setNotes] = useState('');
 
-    // Fetch active leases on mount
-    useEffect(() => {
-        if (isOpen) {
-            fetchLeases();
-        }
-    }, [isOpen]);
-
-    const fetchLeases = async () => {
-        setLoading(true);
-        try {
-            const response = await leasesApi.getAll({ status: 'active' });
-            if (response.success && response.data) {
-                setLeases(response.data as unknown as Lease[]);
-            }
-        } catch (error) {
-            console.error('Failed to fetch leases:', error);
-            alert('Failed to load leases');
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-  
+
         if (!leaseId || !amount || !paidDate || !paymentMethod) {
             alert("Please fill in all required fields");
             return;
@@ -99,6 +96,7 @@ export function RegisterPaymentModal({
     };
 
     const resetForm = () => {
+        setSelectedPropertyId('');
         setLeaseId(preSelectedLeaseId || '');
         setAmount('');
         setPaidDate(format(new Date(), 'yyyy-MM-dd'));
@@ -108,34 +106,65 @@ export function RegisterPaymentModal({
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[800px]">
                 <DialogHeader>
-                    <DialogTitle>Register Manual Payment</DialogTitle>
+                    <DialogTitle>Record New Payment</DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4 py-4">
-                    {/* Lease Selection */}
-                    <div className="space-y-2">
-                        <Label htmlFor="lease">Select Lease / Tenant</Label>
+                <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 py-4">
+                    {/* Row 1: Property | Select Tenant */}
+                    {!preSelectedLeaseId && (
+                        <div className="space-y-2">
+                            <Label>Property</Label>
+                            <Select
+                                value={selectedPropertyId}
+                                onValueChange={(val) => {
+                                    setSelectedPropertyId(val);
+                                    setLeaseId('');
+                                }}
+                                disabled={propertiesLoading}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder={propertiesLoading ? 'Loading...' : 'Select property'} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {properties.map((p) => (
+                                        <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+
+                    <div className={`space-y-2 ${preSelectedLeaseId ? 'col-span-2' : ''}`}>
+                        <Label htmlFor="lease">Select Tenant</Label>
                         <Select
                             value={leaseId}
                             onValueChange={setLeaseId}
-                            disabled={loading || !!preSelectedLeaseId}
+                            disabled={leasesLoading || !!preSelectedLeaseId || (!preSelectedLeaseId && !selectedPropertyId)}
                         >
                             <SelectTrigger>
-                                <SelectValue placeholder={loading ? 'Loading leases...' : 'Select a lease'} />
+                                <SelectValue
+                                    placeholder={
+                                        leasesLoading
+                                            ? 'Loading...'
+                                            : !selectedPropertyId && !preSelectedLeaseId
+                                                ? 'Select a property first'
+                                                : 'Select tenant'
+                                    }
+                                />
                             </SelectTrigger>
                             <SelectContent>
                                 {leases.map((lease) => (
                                     <SelectItem key={lease.id} value={lease.id}>
-                                        {lease.property?.name} - Unit {lease.unit?.unitNumber} ({lease.tenant?.firstName} {lease.tenant?.lastName})
+                                        Unit {lease.unit?.unitNumber} ({lease.tenant?.firstName} {lease.tenant?.lastName})
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
 
-                    {/* Amount */}
+                    {/* Row 2: Amount | Payment Date */}
                     <div className="space-y-2">
                         <Label htmlFor="amount">Amount (UGX)</Label>
                         <Input
@@ -149,7 +178,6 @@ export function RegisterPaymentModal({
                         />
                     </div>
 
-                    {/* Date */}
                     <div className="space-y-2">
                         <Label htmlFor="date">Payment Date</Label>
                         <Input
@@ -161,7 +189,7 @@ export function RegisterPaymentModal({
                         />
                     </div>
 
-                    {/* Payment Method */}
+                    {/* Row 3: Payment Method | Notes */}
                     <div className="space-y-2">
                         <Label htmlFor="method">Payment Method</Label>
                         <Select value={paymentMethod} onValueChange={setPaymentMethod}>
@@ -177,7 +205,6 @@ export function RegisterPaymentModal({
                         </Select>
                     </div>
 
-                    {/* Notes */}
                     <div className="space-y-2">
                         <Label htmlFor="notes">Notes (Optional)</Label>
                         <Textarea
@@ -185,14 +212,15 @@ export function RegisterPaymentModal({
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
                             placeholder="Any additional details..."
+                            className="h-[38px] min-h-0 resize-none"
                         />
                     </div>
 
-                    <DialogFooter>
+                    <DialogFooter className="col-span-2">
                         <Button type="button" onClick={onClose} disabled={submitting}>
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={submitting || loading}>
+                        <Button type="submit" disabled={submitting || propertiesLoading || leasesLoading}>
                             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                             Register Payment
                         </Button>

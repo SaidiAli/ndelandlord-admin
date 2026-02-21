@@ -9,13 +9,14 @@ import { formatUGX } from '@/lib/currency';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { format } from 'date-fns';
 
 interface PaymentScheduleTabProps {
   lease: Lease;
   payments: Payment[];
 }
 
-export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps) {
+export function PaymentScheduleTab({ lease }: PaymentScheduleTabProps) {
   const [schedules, setSchedules] = useState<PaymentSchedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +98,7 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
               <TableRow key={schedule.id}>
                 <TableCell>{schedule.paymentNumber}</TableCell>
                 <TableCell>
-                  {new Date(schedule.dueDate).toLocaleDateString()}
+                  {format(new Date(schedule.dueDate), "dd/MM/yyyy")}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center space-x-2">
@@ -109,7 +110,7 @@ export function PaymentScheduleTab({ lease, payments }: PaymentScheduleTabProps)
                   </div>
                 </TableCell>
                 <TableCell>
-                  {new Date(schedule.periodStart).toLocaleDateString()} - {new Date(schedule.periodEnd).toLocaleDateString()}
+                  {format(new Date(schedule.periodStart), "dd/MM/yyyy")} - {format(new Date(schedule.periodEnd), "dd/MM/yyyy")}
                 </TableCell>
                 <TableCell className="text-right font-medium">{formatUGX(schedule.amount)}</TableCell>
                 <TableCell className="text-right text-muted-foreground">

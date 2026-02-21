@@ -4,14 +4,9 @@ import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Unit } from "@/types"
-import { capitalize } from "@/lib/unit-utils"
 import Link from "next/link"
 
-interface ColumnsProps {
-  onViewDetails: (unitId: string) => void;
-}
-
-export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Unit>[] => [
+export const getColumns = (): ColumnDef<Unit>[] => [
   {
     accessorKey: "unitNumber",
     header: ({ column }) => {
@@ -52,18 +47,6 @@ export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Unit>[] =
     cell: ({ row }) => { }
   },
   {
-    accessorKey: "propertyType",
-    header: "Type",
-    cell: ({ row }) => {
-      const propertyType = row.original.propertyType || row.original.property?.type;
-      return (
-        <Badge className={propertyType === 'commercial' ? 'bg-blue-500' : 'bg-green-500'}>
-          {capitalize(propertyType || 'residential')}
-        </Badge>
-      );
-    }
-  },
-  {
     accessorKey: "isAvailable",
     header: "Status",
     cell: ({ row }) => {
@@ -77,12 +60,12 @@ export const getColumns = ({ onViewDetails }: ColumnsProps): ColumnDef<Unit>[] =
     cell: ({ row }) => {
       const unit = row.original
       return (
-        <div
-          className="cursor-pointer"
-          onClick={() => onViewDetails(unit.id)}
-        >
-          <Eye className="h-4 w-4 mr-2" />
-        </div>
+        <Link href={`/units/${unit.id}`}>
+          <div className="flex items-center gap-2">
+            <Eye className="h-4 w-4" />
+            View
+          </div>
+        </Link>
       )
     },
   }

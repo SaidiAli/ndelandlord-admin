@@ -101,6 +101,9 @@ export interface Unit {
   };
 }
 
+const leaseStatuses = ['draft', 'active', 'expiring', 'expired', 'terminated'] as const;
+export type LeaseStatus = typeof leaseStatuses[number];
+
 export interface Lease {
   id: string;
   unitId: string;
@@ -110,7 +113,7 @@ export interface Lease {
   monthlyRent: number;
   deposit: number;
   paymentDay: number;
-  status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
+  status: LeaseStatus;
   terms?: string;
   previousLeaseId?: string; // For lease renewals
   balance?: number; // Current outstanding balance

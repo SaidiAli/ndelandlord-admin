@@ -2,7 +2,8 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { leasesApi, paymentsApi } from '@/lib/api';
+import { leasesApi, paymentsApi, exportsApi, downloadBlob } from '@/lib/api';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -27,6 +28,7 @@ export default function TenantDetailsPage() {
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDownloadingStatement, setIsDownloadingStatement] = useState(false);
 
   const { data: leaseDetailsData, isLoading } = useQuery({
     queryKey: ['lease-details', leaseId],
@@ -59,6 +61,18 @@ export default function TenantDetailsPage() {
 
   const tenantLeases: Lease[] = tenantLeasesData?.data || [];
   const otherLeases = tenantLeases.filter(l => l.id !== leaseId);
+
+  const handleDownloadStatement = async () => {
+    setIsDownloadingStatement(true);
+    try {
+      const blob = await exportsApi.downloadLeaseStatement(leaseId);
+      downloadBlob(blob, `lease-statement-${leaseId}.pdf`);
+    } catch {
+      toast.error('Failed to generate statement. Please try again.');
+    } finally {
+      setIsDownloadingStatement(false);
+    }
+  };
 
   const getStatusClassName = (status: string) => {
     switch (status) {
@@ -206,6 +220,18 @@ export default function TenantDetailsPage() {
           >
             <Icon icon="solar:pen-broken" className="h-4 w-4 mr-2" />
             Edit
+          </Button>
+          <Button
+            onClick={handleDownloadStatement}
+            disabled={isDownloadingStatement}
+            variant="outline"
+          >
+            {isDownloadingStatement ? (
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+            ) : (
+              <Icon icon="solar:file-download-broken" className="h-4 w-4 mr-2" />
+            )}
+            Download Statement
           </Button>
           <Button onClick={() => setIsCreateModalOpen(true)}>
             <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />

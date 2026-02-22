@@ -474,4 +474,35 @@ export const walletApi = {
   },
 };
 
+// ─── Download helper ────────────────────────────────────────────────────────
+export function downloadBlob(blob: Blob, filename: string): void {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ─── Exports API ─────────────────────────────────────────────────────────────
+export const exportsApi = {
+  downloadLeaseStatement: (leaseId: string): Promise<Blob> =>
+    api.get(`/exports/leases/${leaseId}/statement.pdf`, { responseType: 'blob' })
+      .then(r => r.data),
+
+  downloadPropertyReport: (propertyId: string): Promise<Blob> =>
+    api.get(`/exports/properties/${propertyId}/report.pdf`, { responseType: 'blob' })
+      .then(r => r.data),
+
+  downloadSummary: (startDate?: string, endDate?: string): Promise<Blob> => {
+    const params = new URLSearchParams();
+    if (startDate) params.set('startDate', startDate);
+    if (endDate) params.set('endDate', endDate);
+    return api.get(`/exports/summary.pdf?${params.toString()}`, { responseType: 'blob' })
+      .then(r => r.data);
+  },
+};
+
 export default api;

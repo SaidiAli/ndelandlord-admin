@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Icon } from '@iconify/react';
 import { paymentsApi } from '@/lib/api';
 import { formatUGX, formatPhoneNumber, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
+import { authStorage } from '@/lib/auth';
 import { Payment, PaymentReceipt } from '@/types';
 import { format } from 'date-fns';
 import { formatDateLong, formatDateShort } from '@/lib/utils';
@@ -64,34 +65,25 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
   };
 
   const handleDownloadReceipt = async () => {
-    if (!receipt) return;
+    if (!payment || payment.status !== 'completed') return;
 
     setIsDownloadingReceipt(true);
     try {
-      // In a real implementation, you'd generate and download a PDF receipt
-      const receiptContent = `
-PAYMENT RECEIPT
-Receipt #: ${receipt.receiptNumber}
-Date: ${new Date(receipt.paidDate).toLocaleDateString()}
+      const token = authStorage.getToken();
+      const response = await fetch(
+        `http://localhost:4000/api/exports/payments/${payment.id}/receipt.pdf`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-Tenant: ${receipt.tenant.name}
-Property: ${receipt.property.name}
-Address: ${receipt.property.address}
-Unit: ${receipt.unit.unitNumber}
+      if (!response.ok) {
+        throw new Error(`Server returned ${response.status}`);
+      }
 
-Amount Paid: ${formatUGX(receipt.amount)}
-Payment Method: ${receipt.paymentMethod}
-Transaction ID: ${receipt.transactionId}
-
-Thank you for your payment!
-Verit Property Management
-      `.trim();
-
-      const blob = new Blob([receiptContent], { type: 'text/plain' });
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `receipt-${receipt.receiptNumber}.txt`;
+      a.download = `receipt-${receipt?.receiptNumber ?? payment.id}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -102,8 +94,6 @@ Verit Property Management
       setIsDownloadingReceipt(false);
     }
   };
-
-  const periodCovered = (payment as any).periodCovered;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

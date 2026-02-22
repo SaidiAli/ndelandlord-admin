@@ -6,11 +6,12 @@ import { usePaymentUpdates, usePaymentNotifications } from '@/hooks/usePaymentUp
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DataTable } from '@/components/ui/data-table';
 import { Icon } from '@iconify/react';
-import { paymentsApi } from '@/lib/api';
-import { Payment } from '@/types';
+import { paymentsApi, propertiesApi } from '@/lib/api';
+import { Payment, Property } from '@/types';
 import { getPaymentColumns } from './columns';
 import { PaymentDetailsModal } from '@/components/payments/PaymentDetailsModal';
 import { RegisterPaymentModal } from '@/components/RegisterPaymentModal';
@@ -18,6 +19,9 @@ import { useAuth } from '@/hooks/useAuth';
 
 export default function PaymentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [propertyFilter, setPropertyFilter] = useState<string>('all');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -41,6 +45,12 @@ export default function PaymentsPage() {
     enabled: !!user,
   });
 
+  const { data: propertiesData } = useQuery({
+    queryKey: ['properties', user?.id],
+    queryFn: () => propertiesApi.getAll(),
+    enabled: !!user,
+  });
+
   const refreshMutation = useMutation({
     mutationFn: () => paymentsApi.getAll(),
     onSuccess: () => {
@@ -49,13 +59,37 @@ export default function PaymentsPage() {
   });
 
   const payments: Payment[] = paymentsData?.data || [];
+  const properties: Property[] = propertiesData?.data || [];
 
-  const filteredPayments = useMemo(
-    () => payments.filter(p => statusFilter === 'all' || p.status === statusFilter),
-    [payments, statusFilter],
-  );
+  const filteredPayments = useMemo(() => {
+    return payments.filter(p => {
+      if (statusFilter !== 'all' && p.status !== statusFilter) return false;
+
+      if (propertyFilter !== 'all' && p.lease?.unit?.property?.id !== propertyFilter) return false;
+
+      const dateStr = p.paidDate ?? p.createdAt;
+      const date = new Date(dateStr);
+      if (fromDate && date < new Date(fromDate)) return false;
+      if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        if (date > to) return false;
+      }
+
+      return true;
+    });
+  }, [payments, statusFilter, propertyFilter, fromDate, toDate]);
 
   const columns = useMemo(() => getPaymentColumns(setSelectedPayment), [setSelectedPayment]);
+
+  const hasActiveFilters = statusFilter !== 'all' || propertyFilter !== 'all' || !!fromDate || !!toDate;
+
+  const clearFilters = () => {
+    setStatusFilter('all');
+    setPropertyFilter('all');
+    setFromDate('');
+    setToDate('');
+  };
 
   return (
     <div className="space-y-6">
@@ -85,9 +119,9 @@ export default function PaymentsPage() {
         <TabsContent value="payments" className="space-y-6">
           <Card>
             <CardContent>
-              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+              <div className="flex flex-wrap gap-3 mt-4 items-center">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full sm:w-44">
+                  <SelectTrigger className="w-40">
                     <Icon icon="solar:filter-bold-duotone" className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -99,10 +133,59 @@ export default function PaymentsPage() {
                     <SelectItem value="failed">Failed</SelectItem>
                   </SelectContent>
                 </Select>
-                <Button>
-                  <Icon icon="solar:download-bold-duotone" className="h-4 w-4 mr-2" />
-                  Export
-                </Button>
+
+                <Select value={propertyFilter} onValueChange={setPropertyFilter}>
+                  <SelectTrigger className="w-48">
+                    <Icon icon="solar:buildings-bold-duotone" className="h-4 w-4 mr-2" />
+                    <SelectValue placeholder="Property" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Properties</SelectItem>
+                    {properties.map(property => (
+                      <SelectItem key={property.id} value={property.id}>
+                        {property.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="date"
+                    value={fromDate}
+                    onChange={e => setFromDate(e.target.value)}
+                    className="w-36"
+                    placeholder="From"
+                    title="From date"
+                  />
+                  <span className="text-gray-400 text-sm">to</span>
+                  <Input
+                    type="date"
+                    value={toDate}
+                    onChange={e => setToDate(e.target.value)}
+                    className="w-36"
+                    placeholder="To"
+                    title="To date"
+                    min={fromDate}
+                  />
+                </div>
+
+                {hasActiveFilters && (
+                  <Button onClick={clearFilters} className="text-white">
+                    <Icon icon="solar:close-circle-bold" className="h-4 w-4 mr-1" />
+                    Clear
+                  </Button>
+                )}
+
+                <div className="ml-auto flex items-center gap-2">
+                  <span className="text-sm text-gray-500">
+                    {filteredPayments.length} of {payments.length}
+                  </span>
+                  <Button>
+                    <Icon icon="solar:download-bold-duotone" className="h-4 w-4 mr-2" />
+                    Export
+                  </Button>
+                </div>
               </div>
 
               {paymentsLoading ? (

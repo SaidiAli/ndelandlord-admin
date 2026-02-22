@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useParams, useRouter } from 'next/navigation';
-import { propertiesApi } from '@/lib/api';
+import { propertiesApi, exportsApi, downloadBlob } from '@/lib/api';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle, Building2, Plus } from 'lucide-react';
+import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle, Building2, Plus, FileDown } from 'lucide-react';
 import { formatUGX } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal';
@@ -22,7 +23,20 @@ export default function PropertyDetailsPage() {
   const propertyId = params.id as string;
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isAddUnitModalOpen, setIsAddUnitModalOpen] = useState(false);
+  const [isDownloadingReport, setIsDownloadingReport] = useState(false);
   const { user } = useAuth();
+
+  const handleDownloadReport = async () => {
+    setIsDownloadingReport(true);
+    try {
+      const blob = await exportsApi.downloadPropertyReport(propertyId);
+      downloadBlob(blob, `property-report-${propertyId}.pdf`);
+    } catch {
+      toast.error('Failed to generate report. Please try again.');
+    } finally {
+      setIsDownloadingReport(false);
+    }
+  };
 
   const { data: propertyData, isLoading: propertyLoading } = useQuery({
     queryKey: ['property-details', propertyId, user?.id],
@@ -75,6 +89,18 @@ export default function PropertyDetailsPage() {
             <Button onClick={() => setIsEditModalOpen(true)}>
               <Pencil className="h-4 w-4 mr-2" />
               Edit Property
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDownloadReport}
+              disabled={isDownloadingReport}
+            >
+              {isDownloadingReport ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+              ) : (
+                <FileDown className="h-4 w-4 mr-2" />
+              )}
+              Download Report
             </Button>
           </div>
         </div>

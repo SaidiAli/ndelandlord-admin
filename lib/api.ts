@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { authStorage } from './auth';
-import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse, Payment, WalletSummary, WalletBalance, WalletTransaction, WalletTransactionFilters, WithdrawalRequest, WithdrawalResponse, PaginatedResponse } from '@/types';
+import { ApiResponse, AuthResponse, LoginRequest, RegisterRequest, User, LeaseApiResponse, transformLeaseResponse, Payment, WalletSummary, WalletBalance, WalletTransaction, WalletTransactionFilters, WithdrawalRequest, WithdrawalResponse, PaginatedResponse, LandlordDashboardStats, TenantsInArrearsResponse } from '@/types';
 
 // Create axios instance
 const api = axios.create({
@@ -439,7 +439,14 @@ export const maintenanceApi = {
 
 export const landlordApi = {
   getDashboardData: async () => {
-    const response = await api.get(`/landlords/dashboard/complete?_t=${Date.now()}`);
+    const response = await api.get<ApiResponse<LandlordDashboardStats>>(`/landlords/dashboard/complete?_t=${Date.now()}`);
+    return response.data;
+  },
+
+  getTenantsWithOutstandingBalance: async (limit = 5) => {
+    const response = await api.get<ApiResponse<TenantsInArrearsResponse>>(
+      `/landlords/tenants/outstanding?limit=${limit}&_t=${Date.now()}`
+    );
     return response.data;
   },
 };

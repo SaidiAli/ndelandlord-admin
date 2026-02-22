@@ -5,6 +5,7 @@ import { ArrowUpDown, Eye } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Unit } from "@/types"
 import Link from "next/link"
+import { formatUGX } from "@/lib/currency"
 
 export const getColumns = (): ColumnDef<Unit>[] => [
   {
@@ -34,17 +35,26 @@ export const getColumns = (): ColumnDef<Unit>[] => [
   {
     id: "tenant",
     header: "Tenant",
-    cell: ({ row }) => { }
+    cell: ({ row }) => {
+      const t = row.original.currentTenant;
+      return t ? `${t.firstName} ${t.lastName}` : "—";
+    }
   },
   {
     id: "rent",
     header: "Rent",
-    cell: ({ row }) => { }
+    cell: ({ row }) => {
+      const rent = row.original.currentLease?.monthlyRent;
+      return rent ? formatUGX(parseFloat(rent)) : "—";
+    }
   },
   {
     id: "outstanding",
     header: "Outstanding Balance",
-    cell: ({ row }) => { }
+    cell: ({ row }) => {
+      const val = row.original.outstanding;
+      return val !== undefined ? formatUGX(val) : "—";
+    }
   },
   {
     accessorKey: "isAvailable",

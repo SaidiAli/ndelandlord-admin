@@ -8,6 +8,9 @@ import { TenantWithFullDetails } from "@/types"
 import { formatDateShort } from "@/lib/utils"
 import { formatCompactUGX } from "@/lib/currency"
 
+const getActiveLease = (leases: TenantWithFullDetails['leases']) =>
+  leases.find(l => l.lease.status === 'active') ?? leases[0];
+
 export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
   {
     accessorKey: "tenant",
@@ -58,13 +61,9 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     header: "Move in Date",
     cell: ({ row }) => {
       const { leases } = row.original;
-      return (
-        <div className="space-y-1">
-          {leases.length > 1 ? (
-            <div className="text-xs text-gray-500">---</div>
-          ) : <div className="text-xs text-gray-500">{formatDateShort(leases[0].lease.startDate)}</div>}
-        </div>
-      );
+      if (leases.length === 0) return <div className="text-xs text-gray-500">—</div>;
+      const active = getActiveLease(leases);
+      return <div className="text-xs text-gray-500">{formatDateShort(active.lease.startDate)}</div>;
     }
   },
   {
@@ -84,13 +83,9 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     header: "Rent",
     cell: ({ row }) => {
       const { leases } = row.original;
-      return (
-        <div className="space-y-1">
-          {leases.length > 1 ? (
-            <div className="text-xs text-gray-500">---</div>
-          ) : <div className="text-xs text-gray-500">{formatCompactUGX(Number(leases[0].lease.monthlyRent))}</div>}
-        </div>
-      );
+      if (leases.length === 0) return <div className="text-xs text-gray-500">—</div>;
+      const active = getActiveLease(leases);
+      return <div className="text-xs text-gray-500">{formatCompactUGX(Number(active.lease.monthlyRent))}</div>;
     }
   },
   {
@@ -98,9 +93,10 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     header: "Outstanding Balance",
     cell: ({ row }) => {
       const { paymentSummary } = row.original;
+      const bal = paymentSummary.outstandingBalance;
       return (
-        <div className="space-y-1">
-          <div className="text-xs text-gray-500">{formatCompactUGX(paymentSummary.outstandingBalance)}</div>
+        <div className={`text-xs font-medium ${bal > 0 ? 'text-red-600' : 'text-green-600'}`}>
+          {formatCompactUGX(bal)}
         </div>
       );
     }

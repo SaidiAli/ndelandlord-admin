@@ -39,10 +39,15 @@ export default function TenantsPage() {
   
   const paymentSummaries = tenants.map((l: any) => l.paymentSummary);
 
+  const onTrack = tenants.filter((t: any) => t.paymentSummary.paymentStatus === 'current');
+  const collectionHealth = tenants.length > 0
+    ? Math.round((onTrack.length / tenants.length) * 100)
+    : 100;
+
   const tenantStats = {
     total: tenants.length,
-    totalActive: tenants.filter((t: any) => t.leases.some((l: any) => l.status === 'active')).length,
-    collectionHealth: 'n/a',
+    totalActive: tenants.filter((t: any) => t.leases.some((l: any) => l.lease.status === 'active')).length,
+    collectionHealth,
     totalBalance: paymentSummaries.reduce((acc: any, ps: any) => acc + ps.outstandingBalance, 0),
   }
 

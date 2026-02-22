@@ -68,6 +68,10 @@ export interface Property {
   updatedAt: string;
   landlord?: User;
   units?: Unit[];
+  occupiedUnits?: number; // Count of units with an active lease
+  occupancy?: number;     // % units occupied (0–100)
+  expected?: number;      // Sum of active lease monthly rents (UGX)
+  outstanding?: number;   // Sum of unpaid past-due schedule amounts (UGX)
 }
 
 export interface Unit {
@@ -91,7 +95,9 @@ export interface Unit {
     status: string;
     startDate: string;
     endDate: string;
+    monthlyRent?: string;
   };
+  outstanding?: number;
   currentTenant?: {
     id: string;
     firstName: string;
@@ -500,6 +506,17 @@ export interface TenantWithFullDetails {
   };
 }
 
+export interface LandlordDashboardStats {
+  totalProperties: number;
+  totalUnits: number;
+  occupiedUnits: number;
+  totalTenants: number;
+  totalMonthlyRevenueExpected: number;
+  occupancyRate: number;
+  totalOutstandingBalance: number;
+  totalPaymentsReceivedCurrentMonth: number;
+}
+
 // Property Details API Response Types (from /properties/{id}/details endpoint)
 export interface PropertyDashboardData {
   property: {
@@ -752,6 +769,37 @@ export interface WithdrawalResponse {
   gatewayReference?: string;
   status: 'pending' | 'completed' | 'failed';
   message: string;
+}
+
+export interface TenantInArrears {
+  tenant: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string | null;
+    phone: string | null;
+  };
+  outstandingBalance: number;
+  overdueCount: number;
+  oldestDueDate: string;
+  daysOverdue: number;
+  lease: { id: string; unitId: string };
+  unit: { id: string; unitNumber: string };
+  property: { id: string; name: string };
+}
+
+export interface TenantsInArrearsResponse {
+  summary: {
+    totalTenantsWithBalance: number;
+    totalOutstandingAmount: number;
+  };
+  tenants: TenantInArrears[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
 }
 
 export interface WalletTransactionFilters {

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Icon } from '@iconify/react';
 import { landlordApi, paymentsApi } from '@/lib/api';
 import { formatUGX } from '@/lib/currency';
-import { Payment } from '@/types';
+import { Payment, TenantInArrears } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -25,9 +25,18 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
-  const summary = dashboardData?.data?.summary;
+  const { data: arrearsData, isLoading: arrearsLoading } = useQuery({
+    queryKey: ['tenants-in-arrears', user?.id],
+    queryFn: () => landlordApi.getTenantsWithOutstandingBalance(5),
+    enabled: !!user,
+  });
+
+  console.log({ dashboardData })
+
+  const summary = dashboardData?.data;
   const recentPayments: Payment[] = paymentsData?.data?.slice(0, 5) || [];
-  const isLoading = dashboardLoading || paymentsLoading;
+  const tenantsInArrears: TenantInArrears[] = arrearsData?.data?.tenants ?? [];
+  const isLoading = dashboardLoading || paymentsLoading || arrearsLoading;
 
   return (
     <div className="space-y-6">
@@ -66,7 +75,7 @@ export default function DashboardPage() {
               <Icon icon="solar:money-bag-bold-duotone" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{"n/a"}</div>
+              <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenueExpected)}</div>
             </CardContent>
           </Card>
 
@@ -78,7 +87,7 @@ export default function DashboardPage() {
                 <Icon icon="solar:hand-money-line-duotone" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenue)}</div>
+                <div className="text-2xl font-bold">{formatUGX(summary.totalPaymentsReceivedCurrentMonth)}</div>
               </CardContent>
             </Card>
           </Link>
@@ -89,8 +98,8 @@ export default function DashboardPage() {
               <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary.overduePayments}</div>
-              <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOverdueAmount)} overdue</p>
+              <div className="text-2xl font-bold">{summary.totalOutstandingBalance}</div>
+              <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOutstandingBalance)} overdue</p>
             </CardContent>
           </Card>
 
@@ -111,7 +120,7 @@ export default function DashboardPage() {
               <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{"n/a"}</div>
+              <div className="text-2xl font-bold">{summary.occupiedUnits}</div>
             </CardContent>
           </Card>
           </Link>
@@ -122,7 +131,7 @@ export default function DashboardPage() {
               <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{"n/a"}</div>
+              <div className="text-2xl font-bold">{summary.totalUnits - summary.occupiedUnits}</div>
             </CardContent>
           </Card>
           </Link>
@@ -133,7 +142,7 @@ export default function DashboardPage() {
               <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{"n/a"}</div>
+              <div className="text-2xl font-bold">{Math.round(summary.occupancyRate)}</div>
             </CardContent>
           </Card>
           </Link>
@@ -141,7 +150,51 @@ export default function DashboardPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div></div>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle>Tenants in Arrears</CardTitle>
+              <CardDescription>Tenants with outstanding balances</CardDescription>
+            </div>
+            <Link href="/payments">
+              <Button>
+                <Icon icon="solar:eye-broken" className="h-4 w-4 mr-2" />
+                View All
+              </Button>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {arrearsLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
+                <p className="text-sm text-gray-500 mt-2">Loading...</p>
+              </div>
+            ) : tenantsInArrears.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No tenants in arrears
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {tenantsInArrears.map((item) => (
+                  <div key={item.tenant.id} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div>
+                      <p className="font-medium text-sm">
+                        {item.tenant.firstName} {item.tenant.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Unit {item.unit.unitNumber} — {item.property.name}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-medium text-sm text-red-600">{formatUGX(item.outstandingBalance)}</p>
+                      <p className="text-xs text-gray-500">{item.daysOverdue} days overdue</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>

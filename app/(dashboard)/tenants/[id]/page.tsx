@@ -1,8 +1,8 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
-import { useQuery } from '@tanstack/react-query';
-import { leasesApi, paymentsApi, exportsApi, downloadBlob } from '@/lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { leasesApi, paymentsApi, exportsApi, downloadBlob, tenantsApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +25,8 @@ export default function TenantDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const leaseId = params.id as string;
+
+  const queryClient = useQueryClient();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -61,6 +63,40 @@ export default function TenantDetailsPage() {
 
   const tenantLeases: Lease[] = tenantLeasesData?.data || [];
   const otherLeases = tenantLeases.filter(l => l.id !== leaseId);
+
+  const activateMutation = useMutation({
+    mutationFn: async () => {
+      await Promise.all([
+        leasesApi.update(leaseId, { status: 'active' }),
+        tenantsApi.update(leaseDetails!.tenantId, { isActive: true }),
+      ]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Lease activated successfully!');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to activate: ${error.response?.data?.message || error.message}`);
+    },
+  });
+
+  const terminateMutation = useMutation({
+    mutationFn: async () => {
+      await Promise.all([
+        leasesApi.update(leaseId, { status: 'terminated' }),
+        tenantsApi.update(leaseDetails!.tenantId, { isActive: false }),
+      ]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['lease-details', leaseId] });
+      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      toast.success('Lease terminated.');
+    },
+    onError: (error: any) => {
+      toast.error(`Failed to terminate: ${error.response?.data?.message || error.message}`);
+    },
+  });
 
   const handleDownloadStatement = async () => {
     setIsDownloadingStatement(true);
@@ -221,10 +257,13 @@ export default function TenantDetailsPage() {
             <Icon icon="solar:pen-broken" className="h-4 w-4 mr-2" />
             Edit
           </Button>
+          <Button onClick={() => setIsCreateModalOpen(true)}>
+            <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
+            Create Lease
+          </Button>
           <Button
             onClick={handleDownloadStatement}
             disabled={isDownloadingStatement}
-            variant="outline"
           >
             {isDownloadingStatement ? (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
@@ -233,34 +272,30 @@ export default function TenantDetailsPage() {
             )}
             Download Statement
           </Button>
-          <Button onClick={() => setIsCreateModalOpen(true)}>
-            <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
-            Create Lease
-          </Button>
           {leaseDetails.status === 'draft' && (
             <Button
-              onClick={() => null}
-              disabled={true}
+              onClick={() => activateMutation.mutate()}
+              disabled={activateMutation.isPending}
             >
-              <Icon icon="solar:verified-check-broken" className="h-4 w-4 mr-2" />
-              Approve
-            </Button>
-          )}
-          {leaseDetails.status === 'draft' && (
-            <Button
-              onClick={() => null}
-              disabled={true}
-            >
-              <Icon icon="solar:settings-broken" className="h-4 w-4 mr-2" />
+              {activateMutation.isPending
+                ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                : <Icon icon="solar:fire-bold" className="h-4 w-4 mr-2" />}
               Activate
             </Button>
           )}
           {(leaseDetails.status === 'active' || leaseDetails.status === 'expiring') && (
             <Button
-              onClick={() => null}
-              disabled={true}
+              onClick={() => {
+                if (window.confirm('Are you sure you want to terminate this lease? This will deactivate the tenant account.')) {
+                  terminateMutation.mutate();
+                }
+              }}
+              disabled={terminateMutation.isPending}
+              className="bg-red-500 hover:bg-red-600"
             >
-              <Icon icon="solar:danger-circle-broken" className="h-4 w-4 mr-2" />
+              {terminateMutation.isPending
+                ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
+                : <Icon icon="solar:danger-circle-broken" className="h-4 w-4 mr-2" />}
               Terminate
             </Button>
           )}

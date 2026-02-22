@@ -5,6 +5,7 @@ import { ArrowUpDown, Eye, Edit } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Property } from "@/types"
+import { formatUGX } from "@/lib/currency"
 import Link from "next/link"
 
 export const getColumns = (): ColumnDef<Property>[] => [
@@ -31,12 +32,12 @@ export const getColumns = (): ColumnDef<Property>[] => [
     },
   },
   {
-    accessorKey: "address",
+    id: "location",
     header: "Address",
-  },
-  {
-    accessorKey: "city",
-    header: "City",
+    cell: ({ row }) => {
+      const { address, city } = row.original;
+      return `${address} - ${city}`;
+    },
   },
   {
     accessorKey: "type",
@@ -51,20 +52,46 @@ export const getColumns = (): ColumnDef<Property>[] => [
     },
   },
   {
-    accessorKey: "units",
+    accessorKey: "numberOfUnits",
     header: "Units",
+  },
+  {
+    accessorKey: "occupiedUnits",
+    header: "Occupied",
+    cell: ({ row }) => row.original.occupiedUnits ?? "—",
+  },
+  {
+    id: "emptyUnits",
+    header: "Empty",
+    cell: ({ row }) => {
+      const { numberOfUnits, occupiedUnits } = row.original;
+      if (numberOfUnits == null || occupiedUnits == null) return "—";
+      return numberOfUnits - occupiedUnits;
+    },
   },
   {
     accessorKey: "occupancy",
     header: "% Occupancy",
+    cell: ({ row }) => {
+      const value = row.original.occupancy;
+      return value !== undefined ? `${value}%` : "—";
+    },
   },
   {
     accessorKey: "expected",
     header: "Expected",
+    cell: ({ row }) => {
+      const value = row.original.expected;
+      return value !== undefined ? formatUGX(value) : "—";
+    },
   },
   {
     accessorKey: "outstanding",
     header: "Outstanding Balance",
+    cell: ({ row }) => {
+      const value = row.original.outstanding;
+      return value !== undefined ? formatUGX(value) : "—";
+    },
   },
   {
     id: "viewDetails",

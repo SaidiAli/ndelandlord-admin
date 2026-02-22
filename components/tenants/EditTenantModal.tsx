@@ -8,15 +8,7 @@ import { tenantsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
+import {Dialog,DialogContent,DialogDescription,DialogHeader,DialogTitle,DialogFooter,DialogClose} from '@/components/ui/dialog';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
 

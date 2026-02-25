@@ -217,12 +217,12 @@ export function RegisterPaymentModal({
                     </div>
 
                     <DialogFooter className="col-span-2">
-                        <Button type="button" onClick={onClose} disabled={submitting}>
+                        <Button type="button" className='bg-red-500' onClick={onClose} disabled={submitting}>
                             Cancel
                         </Button>
                         <Button type="submit" disabled={submitting || propertiesLoading || leasesLoading}>
                             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Register Payment
+                            Record Payment
                         </Button>
                     </DialogFooter>
                 </form>

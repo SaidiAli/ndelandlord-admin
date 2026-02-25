@@ -61,7 +61,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
-                <Icon icon="solar:buildings-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+                <Icon icon="solar:buildings-broken" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{summary.totalProperties}</div>
@@ -72,7 +72,7 @@ export default function DashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Expected Income</CardTitle>
-              <Icon icon="solar:money-bag-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+              <Icon icon="solar:money-bag-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatUGX(summary.totalMonthlyRevenueExpected)}</div>
@@ -84,7 +84,7 @@ export default function DashboardPage() {
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Received payments <span className='text-[10px]'>(This Month)</span></CardTitle>
-                <Icon icon="solar:hand-money-line-duotone" className="h-8 w-8 text-muted-foreground" />
+                <Icon icon="solar:hand-money-broken" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{formatUGX(summary.totalPaymentsReceivedCurrentMonth)}</div>
@@ -98,15 +98,14 @@ export default function DashboardPage() {
               <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{summary.totalOutstandingBalance}</div>
-              <p className="text-xs text-muted-foreground">{formatUGX(summary.totalOutstandingBalance)} overdue</p>
+              <div className="text-2xl font-bold">{formatUGX(summary.totalOutstandingBalance)}</div>
             </CardContent>
           </Card>
 
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Units</CardTitle>
-              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+              <Icon icon="solar:info-square-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.totalUnits}</div>
@@ -117,7 +116,7 @@ export default function DashboardPage() {
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Occupied</CardTitle>
-              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+              <Icon icon="solar:info-square-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.occupiedUnits}</div>
@@ -128,7 +127,7 @@ export default function DashboardPage() {
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Empty</CardTitle>
-              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+              <Icon icon="solar:info-square-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{summary.totalUnits - summary.occupiedUnits}</div>
@@ -139,7 +138,7 @@ export default function DashboardPage() {
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">% Occupancy</CardTitle>
-              <Icon icon="solar:info-square-bold-duotone" className="h-8 w-8 text-muted-foreground" />
+              <Icon icon="solar:info-square-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{Math.round(summary.occupancyRate)}</div>

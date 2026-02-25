@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Lease, Payment, PaymentSchedule } from '@/types';
 import { paymentsApi } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatUGX } from '@/lib/currency';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info, CheckCircle, Clock, XCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
+import { useQuery } from '@tanstack/react-query';
 
 interface PaymentScheduleTabProps {
   lease: Lease;
@@ -17,38 +16,23 @@ interface PaymentScheduleTabProps {
 }
 
 export function PaymentScheduleTab({ lease }: PaymentScheduleTabProps) {
-  const [schedules, setSchedules] = useState<PaymentSchedule[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: schedules = [], isLoading, isError } = useQuery<PaymentSchedule[]>({
+    queryKey: ['paymentSchedules', lease.id],
+    queryFn: async () => {
+      const response = await paymentsApi.getPaymentSchedules(lease.id);
+      return response.data;
+    },
+    enabled: !!lease?.id,
+  });
 
-  useEffect(() => {
-    const fetchSchedules = async () => {
-      if (!lease?.id) return;
-      try {
-        setLoading(true);
-        const response = await paymentsApi.getPaymentSchedules(lease.id);
-        if (response.success) {
-          setSchedules(response.data);
-        } else {
-          setError('Failed to load payment schedule');
-        }
-      } catch (err) {
-        console.error('Error fetching schedules:', err);
-        setError('Error loading schedules');
-      } finally {
-        setLoading(false);
-      }
-    };
+  console.log({ schedules })
 
-    fetchSchedules();
-  }, [lease?.id]);
-
-  if (loading) {
+  if (isLoading) {
     return <div>Loading schedule...</div>;
   }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
+  if (isError) {
+    return <div className="text-red-500">Failed to load payment schedule</div>;
   }
 
   const getStatusIcon = (status: string) => {
@@ -103,7 +87,6 @@ export function PaymentScheduleTab({ lease }: PaymentScheduleTabProps) {
                 <TableCell>
                   <div className="flex items-center space-x-2">
                     {getStatusIcon(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}
-                    {/* The backend returns a calculated 'status' field now */}
                     <Badge className={getStatusBadgeClassName(schedule.status || (schedule.isPaid ? 'paid' : 'pending'))}>
                       {schedule.status ? schedule.status.charAt(0).toUpperCase() + schedule.status.slice(1) : (schedule.isPaid ? 'Paid' : 'Pending')}
                     </Badge>

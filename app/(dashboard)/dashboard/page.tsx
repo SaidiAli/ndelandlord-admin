@@ -31,8 +31,6 @@ export default function DashboardPage() {
     enabled: !!user,
   });
 
-  console.log({ dashboardData })
-
   const summary = dashboardData?.data;
   const recentPayments: Payment[] = paymentsData?.data?.slice(0, 5) || [];
   const tenantsInArrears: TenantInArrears[] = arrearsData?.data?.tenants ?? [];

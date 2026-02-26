@@ -120,13 +120,12 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Edit Lease</DialogTitle>
+          <DialogTitle>Edit Tenant Information</DialogTitle>
           <DialogDescription>
-            Update lease details and tenant contact information.
+            Update lease details and tenant information.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <h4 className="font-semibold text-lg">Tenant Information</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name</Label>
@@ -207,7 +206,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button">Cancel</Button>
+              <Button type="button" className='bg-red-500'>Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting || mutation.isPending}>
               {isSubmitting || mutation.isPending ? 'Saving...' : 'Save Changes'}

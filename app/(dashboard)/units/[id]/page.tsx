@@ -31,10 +31,10 @@ export default function UnitDetailsPage() {
   const unit = unitDetails?.unit;
   const details = unitData?.data.details;
   const property = unitDetails?.property;
-  const currentLease = unitDetails?.currentLease;
-  const currentTenant = unitDetails?.currentTenant;
   const leaseHistory = unitDetails?.leaseHistory || [];
   const amenities = unitDetails?.amenities || [];
+
+  console.log({ unitDetails })
 
   const propertyType: PropertyType = property?.type || unit?.propertyType || 'residential';
 
@@ -57,8 +57,8 @@ export default function UnitDetailsPage() {
     unitNumber: unit.unitNumber,
     propertyType: propertyType,
     squareFeet: unit.squareFeet,
-    monthlyRent: parseFloat(unit.monthlyRent),
-    deposit: parseFloat(unit.deposit),
+    monthlyRent: parseFloat(unitDetails?.currentLease?.monthlyRent ?? '0'),
+    deposit: parseFloat(unitDetails?.currentLease?.deposit ?? '0'),
     isAvailable: unit.isAvailable,
     description: unit.description,
     details: details,
@@ -152,7 +152,7 @@ export default function UnitDetailsPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatUGX(parseFloat(unit.monthlyRent))}</div>
+              <div className="text-2xl font-bold">{formatUGX(parseFloat(unitDetails?.currentLease?.monthlyRent ?? '0'))}</div>
             </CardContent>
           </Card>
           <Card>
@@ -161,7 +161,7 @@ export default function UnitDetailsPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold"></div>
+              <div className="text-2xl font-bold">{formatUGX(unitDetails?.outstandingBalance ?? 0)}</div>
             </CardContent>
           </Card>
           <Card>
@@ -170,7 +170,7 @@ export default function UnitDetailsPage() {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold"></div>
+              <div className="text-2xl font-bold">{formatUGX(unitDetails?.advancePayments ?? 0)}</div>
             </CardContent>
           </Card>
         </div>
@@ -245,73 +245,6 @@ export default function UnitDetailsPage() {
           </Card>
         )}
 
-        {/* Current Lease and Tenant */}
-        {currentLease && currentTenant && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                Current Lease & Tenant
-              </CardTitle>
-              <CardDescription>Active lease and tenant information</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Tenant</label>
-                    <p className="text-lg font-semibold">{currentTenant.firstName} {currentTenant.lastName}</p>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-600">
-                      <Mail className="h-4 w-4 mr-2" />
-                      {currentTenant.email}
-                    </div>
-                    {currentTenant.phone && (
-                      <div className="flex items-center text-sm text-gray-600">
-                        <Phone className="h-4 w-4 mr-2" />
-                        {currentTenant.phone}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Lease Period</label>
-                    <div className="flex items-center text-sm">
-                      <Calendar className="h-4 w-4 mr-2" />
-                      {new Date(currentLease.startDate).toLocaleDateString()} - {new Date(currentLease.endDate).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Status</label>
-                    <p className="capitalize font-semibold">{currentLease.status}</p>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Lease Rent</label>
-                    <p className="text-lg font-bold">{formatUGX(parseFloat(currentLease.monthlyRent))}</p>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Lease ID</label>
-                    <p className="text-sm font-mono">{currentLease.id}</p>
-                  </div>
-                </div>
-              </div>
-
-              {currentLease.terms && (
-                <div className="mt-6 pt-4 border-t">
-                  <label className="text-sm font-medium text-gray-500">Lease Terms</label>
-                  <p className="text-sm text-gray-700 mt-1">{currentLease.terms}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
-
         {/* Lease History */}
         <Card>
           <CardHeader>
@@ -336,21 +269,18 @@ export default function UnitDetailsPage() {
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h4 className="font-semibold">John doe</h4>
+                        <h4 className="font-semibold">
+                          {leaseData.tenant ? `${leaseData.tenant.firstName} ${leaseData.tenant.lastName}` : 'Unknown Tenant'}
+                        </h4>
                         <div className="flex items-center text-sm text-gray-600 mt-1">
                           <Calendar className="h-4 w-4 mr-1" />
-                          {new Date().toLocaleDateString()} - {new Date().toLocaleDateString()}
+                          {new Date(leaseData.lease.startDate).toLocaleDateString()} -{' '}
+                          {leaseData.lease.endDate ? new Date(leaseData.lease.endDate).toLocaleDateString() : 'Present'}
                         </div>
                       </div>
-                      {/* <div className="text-right">
-                        <Badge className={leaseData.lease.status === 'active' ? '' : 'bg-secondary text-secondary-foreground'}>
-                          {leaseData.lease.status}
-                        </Badge>
-                        <p className="text-sm font-semibold mt-1">{formatUGX(500000)}</p>
-                      </div> */}
                     </div>
                     <div className="text-xs text-gray-500">
-                      Lease ID: { }
+                      Lease ID: {leaseData.lease.id}
                     </div>
                   </div>
                 ))}
@@ -373,7 +303,7 @@ export default function UnitDetailsPage() {
                 <h3 className="font-semibold text-lg">{property?.name}</h3>
                 <div className="flex items-center text-gray-600 mt-1">
                   <MapPin className="h-4 w-4 mr-1" />
-                  {property?.address}, {property?.city}, {property?.state} {property?.postalCode}
+                  {property?.address}, {property?.city} {property?.postalCode}
                 </div>
               </div>
               <Button

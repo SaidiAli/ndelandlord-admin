@@ -580,8 +580,6 @@ export interface UnitWithDetails {
     unitNumber: string;
     propertyType?: PropertyType;
     squareFeet?: number;
-    monthlyRent: string;
-    deposit: string;
     isAvailable: boolean;
     description?: string;
     createdAt: string;
@@ -593,10 +591,12 @@ export interface UnitWithDetails {
     name: string;
     address: string;
     city: string;
-    state: string;
+    state?: string;
     postalCode?: string;
     type?: PropertyType;
   };
+  outstandingBalance: number;
+  advancePayments: number;
   currentLease?: {
     id: string;
     startDate: string;
@@ -619,7 +619,7 @@ export interface UnitWithDetails {
     lease: {
       id: string;
       startDate: string;
-      endDate: string;
+      endDate: string | null;
       monthlyRent: string;
       status: string;
       createdAt: string;
@@ -628,7 +628,7 @@ export interface UnitWithDetails {
       id: string;
       firstName: string;
       lastName: string;
-    };
+    } | null;
   }>;
   analytics: {
     occupancyRate: number;

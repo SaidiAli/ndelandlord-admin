@@ -6,7 +6,9 @@
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(find C:\\\\Users\\\\user\\\\Desktop\\\\code\\\\verit\\\\verit-server\\\\src:*)",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [],
     "ask": []

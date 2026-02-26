@@ -317,7 +317,7 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button">
+              <Button type="button" className="bg-red-500">
                 Cancel
               </Button>
             </DialogClose>

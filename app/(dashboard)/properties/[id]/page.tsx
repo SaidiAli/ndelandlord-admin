@@ -7,7 +7,7 @@ import { propertiesApi, exportsApi, downloadBlob } from '@/lib/api';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building, DollarSign, Users, BedDouble, Bath, Pencil, MapPin, Phone, Mail, Calendar, Home, TrendingUp, ArrowLeft, CheckCircle, XCircle, Building2, Plus, FileDown } from 'lucide-react';
+import { Icon } from '@iconify/react';
 import { formatUGX } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
 import { EditPropertyModal } from '@/components/properties/EditPropertyModal';
@@ -70,35 +70,34 @@ export default function PropertyDetailsPage() {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className="cursor-pointer flex items-center gap-2" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4" />
+              <Icon icon="solar:arrow-left-bold" className="h-4 w-4" />
               Back
             </div>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{property.name}</h1>
               <div className="flex items-center text-gray-600 mt-1">
-                <MapPin className="h-4 w-4 mr-1" />
+                <Icon icon="solar:map-point-bold" className="h-4 w-4 mr-1" />
                 {property.address}, {property.city}, {property.postalCode}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Button onClick={() => setIsAddUnitModalOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
+              <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
               Add Unit
             </Button>
             <Button onClick={() => setIsEditModalOpen(true)}>
-              <Pencil className="h-4 w-4 mr-2" />
+              <Icon icon="solar:pen-2-bold" className="h-4 w-4 mr-2" />
               Edit Property
             </Button>
             <Button
-              variant="outline"
               onClick={handleDownloadReport}
               disabled={isDownloadingReport}
             >
               {isDownloadingReport ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
               ) : (
-                <FileDown className="h-4 w-4 mr-2" />
+                <Icon icon="solar:download-square-broken" className="h-4 w-4 mr-2" />
               )}
               Download Report
             </Button>
@@ -110,7 +109,7 @@ export default function PropertyDetailsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Units</CardTitle>
-              <Building className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:buildings-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.totalUnits || 0}</div>
@@ -119,7 +118,7 @@ export default function PropertyDetailsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Occupied Units</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:users-group-rounded-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.occupiedUnits || 0}</div>
@@ -128,7 +127,7 @@ export default function PropertyDetailsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Available Units</CardTitle>
-              <Home className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:check-circle-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.availableUnits || 0}</div>
@@ -137,7 +136,7 @@ export default function PropertyDetailsPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Monthly Revenue</CardTitle>
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              <Icon icon="solar:dollar-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{formatUGX(stats?.monthlyRevenue || 0)}</div>
@@ -150,7 +149,7 @@ export default function PropertyDetailsPage() {
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Building className="h-5 w-5" />
+                <Icon icon="solar:buildings-broken" className="h-5 w-5" />
                 Property Information
               </CardTitle>
             </CardHeader>
@@ -185,7 +184,7 @@ export default function PropertyDetailsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
+                <Icon icon="solar:graph-up-broken" className="h-5 w-5" />
                 Recent Activity
               </CardTitle>
               <CardDescription>Last 30 days</CardDescription>
@@ -211,7 +210,7 @@ export default function PropertyDetailsPage() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Home className="h-5 w-5" />
+              <Icon icon="solar:home-broken" className="h-5 w-5" />
               Units in {property.name} ({units.length})
             </CardTitle>
             <CardDescription>
@@ -231,23 +230,23 @@ export default function PropertyDetailsPage() {
                         {isResidentialDetails(unitData.unit.details) ? (
                           <>
                             <div className="flex items-center">
-                              <BedDouble className="h-4 w-4 mr-1" />
+                              <Icon icon="solar:bed-broken" className="h-4 w-4 mr-1" />
                               {(unitData.unit.details as ResidentialUnitDetails).bedrooms} beds
                             </div>
                             <div className="flex items-center">
-                              <Bath className="h-4 w-4 mr-1" />
+                              <Icon icon="solar:bath-broken" className="h-4 w-4 mr-1" />
                               {(unitData.unit.details as ResidentialUnitDetails).bathrooms} baths
                             </div>
                           </>
                         ) : isCommercialDetails(unitData.unit.details) ? (
                           <div className="flex items-center">
-                            <Building2 className="h-4 w-4 mr-1" />
+                            <Icon icon="solar:buildings-2-broken" className="h-4 w-4 mr-1" />
                             {capitalize((unitData.unit.details as CommercialUnitDetails).unitType)}
                             {(unitData.unit.details as CommercialUnitDetails).suiteNumber && ` - Suite ${(unitData.unit.details as CommercialUnitDetails).suiteNumber}`}
                           </div>
                         ) : (
                           <div className="flex items-center">
-                            <Home className="h-4 w-4 mr-1" />
+                            <Icon icon="solar:home-broken" className="h-4 w-4 mr-1" />
                             {capitalize(unitData.unit.propertyType || property.type || 'residential')} Unit
                           </div>
                         )}
@@ -258,9 +257,9 @@ export default function PropertyDetailsPage() {
                     </div>
                     <Badge className={unitData.unit.isAvailable ? "text-secondary-foreground bg-secondary/80" : ""}>
                       {unitData.unit.isAvailable ? (
-                        <><CheckCircle className="h-3 w-3 mr-1" />Available</>
+                        <><Icon icon="solar:check-circle-broken" className="h-3 w-3 mr-1" />Available</>
                       ) : (
-                        <><XCircle className="h-3 w-3 mr-1" />Occupied</>
+                        <><Icon icon="solar:close-circle-broken" className="h-3 w-3 mr-1" />Occupied</>
                       )}
                     </Badge>
                   </div>
@@ -298,11 +297,11 @@ export default function PropertyDetailsPage() {
                             <p className="text-sm">{unitData.tenant.firstName} {unitData.tenant.lastName}</p>
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
-                            <Mail className="h-3 w-3 mr-1" />
+                            <Icon icon="solar:letter-bold" className="h-3 w-3 mr-1" />
                             {unitData.tenant.email}
                           </div>
                           <div className="flex items-center text-sm text-gray-600">
-                            <Phone className="h-3 w-3 mr-1" />
+                            <Icon icon="solar:phone-bold" className="h-3 w-3 mr-1" />
                             {unitData.tenant.phone}
                           </div>
                         </div>
@@ -310,7 +309,7 @@ export default function PropertyDetailsPage() {
                           <div>
                             <label className="text-xs font-medium text-gray-500">Lease Period</label>
                             <div className="flex items-center text-sm">
-                              <Calendar className="h-3 w-3 mr-1" />
+                              <Icon icon="solar:calendar-bold" className="h-3 w-3 mr-1" />
                               {new Date(unitData.lease.startDate).toLocaleDateString()} - {new Date(unitData.lease.endDate).toLocaleDateString()}
                             </div>
                           </div>

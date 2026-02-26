@@ -421,7 +421,7 @@ function ResidentialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProp
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button">Cancel</Button>
+          <Button type="button" className="bg-red-500">Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add Unit'}
@@ -597,7 +597,7 @@ function CommercialUnitForm({ onSuccess, userId, selectedPropertyId }: FormProps
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button">Cancel</Button>
+          <Button type="button" className='bg-red-500'>Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add Unit'}
@@ -758,7 +758,7 @@ function BulkResidentialForm({ onSuccess, userId, selectedPropertyId }: FormProp
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button">Cancel</Button>
+          <Button type="button" className='bg-red-500'>Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add All Units'}
@@ -907,7 +907,7 @@ function BulkCommercialForm({ onSuccess, userId, selectedPropertyId }: FormProps
 
       <DialogFooter>
         <DialogClose asChild>
-          <Button type="button">Cancel</Button>
+          <Button type="button" className='bg-red-500'>Cancel</Button>
         </DialogClose>
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? 'Adding...' : 'Add All Units'}

@@ -58,7 +58,7 @@ export default function DashboardPage() {
           <Link href="/properties">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Properties</CardTitle>
+                <CardTitle className="text-sm font-medium">All Properties</CardTitle>
                 <Icon icon="solar:buildings-broken" className="h-8 w-8 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -102,7 +102,7 @@ export default function DashboardPage() {
 
           <Link href="/tenants"><Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Units</CardTitle>
+              <CardTitle className="text-sm font-medium">All Units</CardTitle>
               <Icon icon="solar:info-square-broken" className="h-8 w-8 text-muted-foreground" />
             </CardHeader>
             <CardContent>

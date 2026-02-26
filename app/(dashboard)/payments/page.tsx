@@ -6,8 +6,10 @@ import { usePaymentUpdates, usePaymentNotifications } from '@/hooks/usePaymentUp
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { Calendar } from '@/components/ui/Calendar';
+import { format } from 'date-fns';
 import { DataTable } from '@/components/ui/data-table';
 import { Icon } from '@iconify/react';
 import { paymentsApi, propertiesApi } from '@/lib/api';
@@ -20,8 +22,8 @@ import { useAuth } from '@/hooks/useAuth';
 export default function PaymentsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [propertyFilter, setPropertyFilter] = useState<string>('all');
-  const [fromDate, setFromDate] = useState<string>('');
-  const [toDate, setToDate] = useState<string>('');
+  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
+  const [toDate, setToDate] = useState<Date | undefined>(undefined);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -69,7 +71,7 @@ export default function PaymentsPage() {
 
       const dateStr = p.paidDate ?? p.createdAt;
       const date = new Date(dateStr);
-      if (fromDate && date < new Date(fromDate)) return false;
+      if (fromDate && date < fromDate) return false;
       if (toDate) {
         const to = new Date(toDate);
         to.setHours(23, 59, 59, 999);
@@ -87,8 +89,8 @@ export default function PaymentsPage() {
   const clearFilters = () => {
     setStatusFilter('all');
     setPropertyFilter('all');
-    setFromDate('');
-    setToDate('');
+    setFromDate(undefined);
+    setToDate(undefined);
   };
 
   return (
@@ -100,11 +102,11 @@ export default function PaymentsPage() {
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setIsRegisterModalOpen(true)}>
-            <Icon icon="solar:card-2-bold-duotone" className="h-4 w-4 mr-2" />
+            <Icon icon="solar:card-2-broken" className="h-4 w-4 mr-2" />
             Receive Payment
           </Button>
           <Button onClick={() => refreshMutation.mutate()} disabled={refreshMutation.isPending}>
-            <Icon icon="solar:refresh-bold-duotone" className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
+            <Icon icon="solar:refresh-broken" className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -122,7 +124,7 @@ export default function PaymentsPage() {
               <div className="flex flex-wrap gap-3 mt-4 items-center">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-40">
-                    <Icon icon="solar:filter-bold-duotone" className="h-4 w-4 mr-2" />
+                    <Icon icon="solar:filter-broken" className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -136,7 +138,7 @@ export default function PaymentsPage() {
 
                 <Select value={propertyFilter} onValueChange={setPropertyFilter}>
                   <SelectTrigger className="w-48">
-                    <Icon icon="solar:buildings-bold-duotone" className="h-4 w-4 mr-2" />
+                    <Icon icon="solar:buildings-broken" className="h-4 w-4 mr-2" />
                     <SelectValue placeholder="Property" />
                   </SelectTrigger>
                   <SelectContent>
@@ -150,29 +152,43 @@ export default function PaymentsPage() {
                 </Select>
 
                 <div className="flex items-center gap-2">
-                  <Input
-                    type="date"
-                    value={fromDate}
-                    onChange={e => setFromDate(e.target.value)}
-                    className="w-36"
-                    placeholder="From"
-                    title="From date"
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button className="w-full justify-start text-left font-normal bg-transparent border-2 text-black">
+                        <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4" />
+                        {fromDate ? format(fromDate, 'dd MMM yyyy') : <span className="text-muted-foreground">From</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={fromDate}
+                        onSelect={setFromDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
                   <span className="text-gray-400 text-sm">to</span>
-                  <Input
-                    type="date"
-                    value={toDate}
-                    onChange={e => setToDate(e.target.value)}
-                    className="w-36"
-                    placeholder="To"
-                    title="To date"
-                    min={fromDate}
-                  />
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button className="w-full justify-start text-left font-normal bg-transparent border-2 text-black">
+                        <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4" />
+                        {toDate ? format(toDate, 'dd MMM yyyy') : <span className="text-muted-foreground">To</span>}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={toDate}
+                        onSelect={setToDate}
+                        disabled={(date) => !!fromDate && date < fromDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
                 </div>
 
                 {hasActiveFilters && (
                   <Button onClick={clearFilters} className="text-white">
-                    <Icon icon="solar:close-circle-bold" className="h-4 w-4 mr-1" />
+                    <Icon icon="solar:close-circle-broken" className="h-4 w-4 mr-1" />
                     Clear
                   </Button>
                 )}
@@ -182,7 +198,7 @@ export default function PaymentsPage() {
                     {filteredPayments.length} of {payments.length}
                   </span>
                   <Button>
-                    <Icon icon="solar:download-bold-duotone" className="h-4 w-4 mr-2" />
+                    <Icon icon="solar:download-broken" className="h-4 w-4 mr-2" />
                     Export
                   </Button>
                 </div>

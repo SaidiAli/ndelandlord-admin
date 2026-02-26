@@ -187,7 +187,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button type="button" className="w-full justify-start text-left font-normal bg-transparent border-2 text-black">
-                              <Icon icon="solar:calendar-bold" className="mr-2 h-4 w-4 text-black" />
+                              <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4 text-black" />
                               {selected ? format(selected, 'PPP') : <span className="text-black">Pick a date</span>}
                             </Button>
                           </PopoverTrigger>
@@ -215,7 +215,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button type="button" className="w-full justify-start text-left font-normal bg-transparent border-2 text-black">
-                              <Icon icon="solar:calendar-bold" className="mr-2 h-4 w-4 text-black" />
+                              <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4 text-black" />
                               {selected ? format(selected, 'PPP') : <span className="text-muted-foreground">Pick a date</span>}
                             </Button>
                           </PopoverTrigger>

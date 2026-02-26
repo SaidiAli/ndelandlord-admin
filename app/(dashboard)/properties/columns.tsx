@@ -90,7 +90,12 @@ export const getColumns = (): ColumnDef<Property>[] => [
     header: "Outstanding Balance",
     cell: ({ row }) => {
       const value = row.original.outstanding;
-      return value !== undefined ? formatUGX(value) : "—";
+      if (value === undefined) return "—";
+      return (
+        <span className={value > 0 ? "text-red-600 font-medium" : undefined}>
+          {formatUGX(value)}
+        </span>
+      );
     },
   },
   {

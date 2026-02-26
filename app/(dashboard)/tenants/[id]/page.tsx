@@ -261,6 +261,10 @@ export default function TenantDetailsPage() {
             <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
             Create Lease
           </Button>
+          <Button onClick={() => null}>
+            <Icon icon="f7:paperplane" className="h-4 w-4 mr-2" />
+            Send Notification
+          </Button>
           <Button
             onClick={handleDownloadStatement}
             disabled={isDownloadingStatement}

@@ -394,15 +394,6 @@ export const paymentsApi = {
     return response.data;
   },
 
-  getAnalytics: async (startDate?: string, endDate?: string) => {
-    const params = new URLSearchParams();
-    if (startDate) params.append('startDate', startDate);
-    if (endDate) params.append('endDate', endDate);
-    params.append('_t', Date.now().toString()); // Add timestamp to prevent caching
-    const response = await api.get(`/landlords/payments/analytics?${params.toString()}`);
-    return response.data;
-  },
-
   getPaymentSchedules: async (leaseId: string) => {
     const response = await api.get(`/payment-schedules?leaseId=${leaseId}`);
     return response.data;
@@ -447,6 +438,30 @@ export const landlordApi = {
     const response = await api.get<ApiResponse<TenantsInArrearsResponse>>(
       `/landlords/tenants/outstanding?limit=${limit}&_t=${Date.now()}`
     );
+    return response.data;
+  },
+
+  getPaymentOverview: async () => {
+    const response = await api.get(`/payments/landlord/overview?_t=${Date.now()}`);
+    return response.data;
+  },
+
+  getFinancialAnalytics: async (startDate?: string, endDate?: string) => {
+    const params = new URLSearchParams();
+    if (startDate) params.append('startDate', startDate);
+    if (endDate) params.append('endDate', endDate);
+    params.append('_t', Date.now().toString());
+    const response = await api.get(`/payments/analytics?${params.toString()}`);
+    return response.data;
+  },
+
+  getFinancialReport: async (body: { reportType?: 'summary' | 'detailed' | 'tax'; startDate?: string; endDate?: string; propertyId?: string }) => {
+    const response = await api.post(`/landlords/reports/financial`, body);
+    return response.data;
+  },
+
+  getAdvancePayments: async () => {
+    const response = await api.get(`/landlords/finances/advance-payments?_t=${Date.now()}`);
     return response.data;
   },
 };

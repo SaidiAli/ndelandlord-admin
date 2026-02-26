@@ -3,29 +3,18 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import {
-  Home,
-  Building,
-  Users,
-  FileText,
-  CreditCard,
-  Wallet,
-  BarChart3,
-  Settings
-} from 'lucide-react';
+import { Icon } from '@iconify/react';
 import Image from 'next/image';
 import Logo from '@/assets/logos/logos-02.svg';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: Home },
-  { name: 'Properties', href: '/properties', icon: Building },
-  { name: 'Units', href: '/units', icon: Home },
-  { name: 'Tenants', href: '/tenants', icon: Users },
-  { name: 'Payments', href: '/payments', icon: CreditCard },
-  { name: 'Wallet', href: '/wallet', icon: Wallet },
-  // { name: 'Payment History', href: '/payments/history', icon: History },
-  // { name: 'Maintenance', href: '/maintenance', icon: Wrench },
-  { name: 'Reports', href: '/reports', icon: BarChart3 },
+  { name: 'Dashboard', href: '/dashboard', icon: 'solar:hamburger-menu-broken' },
+  { name: 'Properties', href: '/properties', icon: 'solar:buildings-broken' },
+  { name: 'Units', href: '/units', icon: 'solar:home-broken' },
+  { name: 'Tenants', href: '/tenants', icon: 'solar:users-group-rounded-broken' },
+  { name: 'Payments', href: '/payments', icon: 'solar:card-broken' },
+  { name: 'Finances', href: '/finances', icon: 'solar:dollar-minimalistic-broken' },
+  { name: 'Wallet', href: '/wallet', icon: 'solar:wallet-broken' },
 ];
 
 export function Sidebar() {
@@ -39,7 +28,7 @@ export function Sidebar() {
             src={Logo}
             alt="Verit Logo"
             fill
-            className="object-contain" // Ensures the logo scales correctly within the container
+            className="object-contain"
             priority
           />
         </div>
@@ -61,7 +50,7 @@ export function Sidebar() {
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
               )}
             >
-              <item.icon className="w-5 h-5 mr-3" />
+              <Icon icon={item.icon} className="w-5 h-5 mr-3" />
               {item.name}
             </Link>
           );
@@ -78,7 +67,7 @@ export function Sidebar() {
               : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
           )}
         >
-          <Settings className="w-5 h-5 mr-3" />
+          <Icon icon="solar:settings-broken" className="w-5 h-5 mr-3" />
           Settings
         </Link>
       </div>

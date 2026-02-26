@@ -384,27 +384,6 @@ export interface LeaseAnalytics {
   renewalRate: number; // Percentage
 }
 
-export interface PaymentAnalytics {
-  totalPayments: number;
-  totalAmount: number;
-  averagePaymentTime: number;
-  paymentsByStatus: Array<{
-    status: string;
-    count: number;
-    amount: number;
-  }>;
-  paymentsByProvider: Array<{
-    provider: string;
-    count: number;
-    amount: number;
-  }>;
-  monthlyTrends: Array<{
-    month: string;
-    amount: number;
-    count: number;
-  }>;
-}
-
 // Dashboard metrics
 export interface DashboardMetrics {
   totalProperties: number;
@@ -451,23 +430,6 @@ export interface PaymentReceipt {
   };
   transactionId: string;
   paymentMethod: string;
-}
-
-export interface PaymentAnalytics {
-  totalPayments: number;
-  totalAmount: number;
-  averagePaymentTime: number;
-  paymentsByStatus: {
-    status: string;
-    count: number;
-    amount: number;
-  }[];
-  paymentsByProvider: {
-    provider: string;
-    count: number;
-    amount: number;
-  }[];
-  monthlyTrends: { month: string; amount: number; count: number; }[];
 }
 
 export interface TenantWithFullDetails {
@@ -807,4 +769,36 @@ export interface WalletTransactionFilters {
   status?: WalletTransactionStatus;
   limit?: number;
   offset?: number;
+}
+
+export interface AdvancePaymentRecord {
+  tenant: { id: string; firstName: string; lastName: string; email: string | null; phone: string | null };
+  lease: { id: string };
+  unit: { id: string; unitNumber: string };
+  property: { id: string; name: string };
+  advanceCredit: number;
+  monthsAhead: number;
+}
+
+export interface LandlordPaymentOverview {
+  summary: {
+    totalPayments: number;
+    pendingPayments: number;
+    completedPayments: number;
+    failedPayments: number;
+    totalPendingAmount: number;
+    totalCompletedAmount: number;
+    totalFailedAmount: number;
+  };
+}
+
+export interface LandlordFinancialAnalytics {
+  totalRevenue: number;
+  pendingRevenue: number;
+  overdueRevenue: number;
+  completedPayments: number;
+  pendingPayments: number;
+  overduePayments: number;
+  monthlyTrend: Array<{ month: string; revenue: number; payments: number }>;
+  propertyBreakdown: Array<{ propertyId: string; propertyName: string; revenue: number }>;
 }

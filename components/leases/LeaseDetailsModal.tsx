@@ -152,9 +152,15 @@ export function LeaseDetailsModal({ isOpen, onClose, leaseId }: LeaseDetailsModa
                       <p className="font-medium text-lg">{formatUGX(leaseDetails.monthlyRent)}</p>
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Security Deposit</p>
+                      <p className="text-sm text-gray-500">Deposit</p>
                       <p className="font-medium">{formatUGX(leaseDetails.deposit)}</p>
                     </div>
+                    {leaseDetails.securityDeposit != null && (
+                      <div>
+                        <p className="text-sm text-gray-500">Security Deposit</p>
+                        <p className="font-medium">{formatUGX(leaseDetails.securityDeposit)}</p>
+                      </div>
+                    )}
                     <div>
                       <p className="text-sm text-gray-500">Lease Duration</p>
                       <p className="font-medium">{calculateDuration(leaseDetails.startDate, leaseDetails.endDate)}</p>

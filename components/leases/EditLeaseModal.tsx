@@ -25,6 +25,7 @@ const editLeaseSchema = z.object({
   endDate: z.string().optional().refine((val) => !val || !isNaN(Date.parse(val)), { message: 'Invalid end date' }),
   monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
   deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
+  securityDeposit: z.coerce.number().min(0).optional(),
   paymentDay: z.coerce.number().int().min(1, 'Day must be between 1 and 31').max(31, 'Day must be between 1 and 31').default(1),
   status: z.enum(['draft', 'active', 'expiring', 'expired', 'terminated']),
   terms: z.string().optional(),
@@ -70,6 +71,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
         endDate: lease.endDate ? new Date(lease.endDate).toISOString().split('T')[0] : '',
         monthlyRent: parseFloat(lease.monthlyRent as any),
         deposit: parseFloat(lease.deposit as any),
+        securityDeposit: lease.securityDeposit ? parseFloat(lease.securityDeposit as any) : undefined,
         paymentDay: lease.paymentDay || 1,
         status: lease.status,
         terms: lease.terms || '',
@@ -86,6 +88,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
         startDate: new Date(leaseFields.startDate).toISOString(),
         endDate: leaseFields.endDate ? new Date(leaseFields.endDate).toISOString() : undefined,
         deposit: Number(leaseFields.deposit),
+        securityDeposit: leaseFields.securityDeposit !== undefined ? Number(leaseFields.securityDeposit) : undefined,
         terms: leaseFields.terms || undefined,
       };
 
@@ -173,6 +176,14 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
               <Label htmlFor="deposit">Deposit (UGX)</Label>
               <Input id="deposit" type="number" {...register('deposit')} />
               {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="securityDeposit">
+                Security Deposit (UGX){' '}
+                <span className="text-muted-foreground font-normal">(Optional)</span>
+              </Label>
+              <Input id="securityDeposit" type="number" {...register('securityDeposit')} />
+              {errors.securityDeposit && <p className="text-sm text-red-500">{errors.securityDeposit.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="paymentDay">Payment Day</Label>

@@ -43,6 +43,7 @@ const createLeaseSchema = z
     }).transform(val => val === '' ? undefined : val),
     monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
     deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
+    securityDeposit: z.coerce.number().min(0).optional(),
     paymentDay: z.coerce.number().int().min(1, 'Day must be between 1 and 31').max(31, 'Day must be between 1 and 31').default(1),
     terms: z.string().optional(),
   })
@@ -271,6 +272,18 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               {errors.deposit && (
                 <p className="text-sm text-red-500">
                   {errors.deposit.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="securityDeposit">
+                Security Deposit (UGX){' '}
+                <span className="text-muted-foreground font-normal">(Optional)</span>
+              </Label>
+              <Input id="securityDeposit" type="number" {...register('securityDeposit')} />
+              {errors.securityDeposit && (
+                <p className="text-sm text-red-500">
+                  {errors.securityDeposit.message}
                 </p>
               )}
             </div>

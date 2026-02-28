@@ -121,6 +121,7 @@ export interface Lease {
   endDate: string | null;
   monthlyRent: number;
   deposit: number;
+  securityDeposit?: number | null;
   paymentDay: number;
   status: LeaseStatus;
   terms?: string;
@@ -240,6 +241,7 @@ export interface LeaseApiResponse {
     endDate: Date | string | null;
     monthlyRent: string;
     deposit: string;
+    securityDeposit?: string;
     paymentDay: number;
     status: 'draft' | 'active' | 'expiring' | 'expired' | 'terminated';
     terms?: string;
@@ -299,6 +301,7 @@ export function transformLeaseResponse(response: LeaseApiResponse): Lease {
     endDate: lease.endDate ? (typeof lease.endDate === 'string' ? lease.endDate : lease.endDate.toISOString()) : null,
     monthlyRent: parseFloat(lease.monthlyRent),
     deposit: parseFloat(lease.deposit),
+    securityDeposit: lease.securityDeposit ? parseFloat(lease.securityDeposit) : undefined,
     paymentDay: lease.paymentDay,
     status: lease.status,
     terms: lease.terms,

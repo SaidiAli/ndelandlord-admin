@@ -318,6 +318,11 @@ export const leasesApi = {
     const response = await api.get(`/leases/${leaseId}/balance`);
     return response.data;
   },
+
+  activate: async (id: string) => {
+    const response = await api.post(`/leases/${id}/activate`);
+    return response.data;
+  },
 };
 
 // Payments API functions

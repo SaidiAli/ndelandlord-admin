@@ -24,7 +24,7 @@ const addPropertySchema = z.object({
   numberOfUnits: z.number().int().optional(),
   managerName: z.string().optional(),
   managerPhone: z.string().optional(),
-  managerEmail: z.string().email('Invalid email address').optional().or(z.literal('')),
+  managerEmail: z.string().email().optional().or(z.literal('')).transform((v) => (v === "" ? undefined : v)),
 });
 
 
@@ -73,84 +73,94 @@ export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add New Property</DialogTitle>
           <DialogDescription>
             Fill in the details below to add a new property to your portfolio.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Property Name</Label>
-            <Input id="name" {...register('name')} />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="address">Address</Label>
-            <Input id="address" {...register('address')} />
-            {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
-          </div>
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
-              <Input id="city" {...register('city')} />
-              {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+
+            {/* Left column: Property Details */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Property Details</h4>
+              <div className="space-y-2">
+                <Label htmlFor="name">Property Name</Label>
+                <Input id="name" {...register('name')} />
+                {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input id="address" {...register('address')} />
+                {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">City</Label>
+                  <Input id="city" {...register('city')} />
+                  {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postalCode">Postal Code <span className="text-gray-500 text-xs">(Optional)</span></Label>
+                  <Input id="postalCode" {...register('postalCode')} />
+                  {errors.postalCode && <p className="text-sm text-red-500">{errors.postalCode.message}</p>}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">Type Of Property <span className="text-gray-500 text-xs">(Optional)</span></Label>
+                <Controller
+                  name="type"
+                  control={control}
+                  render={({ field }) => (
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select property type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {propertyTypes.map((type) => (
+                          <SelectItem key={type} value={type}>
+                            {capitalize(type)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="numberOfUnits">Number of Units <span className="text-gray-500 text-xs">(Optional)</span></Label>
+                <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" min={0} />
+                {errors.numberOfUnits && <p className="text-sm text-red-500">{errors.numberOfUnits.message}</p>}
+              </div>
             </div>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="postalCode">Postal Code <span className="text-gray-500 text-xs">(Optional)</span></Label>
-            <Input id="postalCode" {...register('postalCode')} />
-            {errors.postalCode && <p className="text-sm text-red-500">{errors.postalCode.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="type">Type Of Property <span className="text-gray-500 text-xs">(Optional)</span></Label>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select property type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {propertyTypes.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {capitalize(type)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.type && <p className="text-sm text-red-500">{errors.type.message}</p>}
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="numberOfUnits">Number of Units <span className="text-gray-500 text-xs">(Optional)</span></Label>
-            <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" min={0} />
-            {errors.numberOfUnits && <p className="text-sm text-red-500">{errors.numberOfUnits.message}</p>}
-          </div>
-          <div className="space-y-3 border-t pt-4">
-            <p className="text-sm font-medium text-gray-700">Property Manager <span className="text-gray-500 font-normal">(Optional)</span></p>
-            <div className="space-y-2">
-              <Label htmlFor="managerName">Manager Name</Label>
-              <Input id="managerName" {...register('managerName')} placeholder="e.g. John Doe" />
-              {errors.managerName && <p className="text-sm text-red-500">{errors.managerName.message}</p>}
+
+            {/* Right column: Property Manager */}
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Property Manager <span className="text-gray-500 font-normal text-sm">(Optional)</span></h4>
+              <div className="space-y-2">
+                <Label htmlFor="managerName">Manager Name</Label>
+                <Input id="managerName" {...register('managerName')} placeholder="e.g. John Doe" />
+                {errors.managerName && <p className="text-sm text-red-500">{errors.managerName.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="managerPhone">Manager Phone</Label>
+                <Input id="managerPhone" {...register('managerPhone')} placeholder="e.g. 0771234567" />
+                {errors.managerPhone && <p className="text-sm text-red-500">{errors.managerPhone.message}</p>}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="managerEmail">Manager Email</Label>
+                <Input id="managerEmail" {...register('managerEmail')} type="email" placeholder="e.g. manager@example.com" />
+                {errors.managerEmail && <p className="text-sm text-red-500">{errors.managerEmail.message}</p>}
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="managerPhone">Manager Phone</Label>
-              <Input id="managerPhone" {...register('managerPhone')} placeholder="e.g. 0771234567" />
-              {errors.managerPhone && <p className="text-sm text-red-500">{errors.managerPhone.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="managerEmail">Manager Email</Label>
-              <Input id="managerEmail" {...register('managerEmail')} type="email" placeholder="e.g. manager@example.com" />
-              {errors.managerEmail && <p className="text-sm text-red-500">{errors.managerEmail.message}</p>}
-            </div>
+
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-6">
             <DialogClose asChild>
-              <Button type="button">Cancel</Button>
+              <Button className="bg-red-500" type="button">Cancel</Button>
             </DialogClose>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Adding...' : 'Add Property'}

@@ -1,12 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import { unitsApi, usersApi } from '@/lib/api';
+import { unitsApi, usersApi, leasesApi } from '@/lib/api';
+import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,6 +33,7 @@ const addTenantSchema = z.object({
     endDate: z.string().optional(),
     monthlyRent: z.coerce.number().positive('Monthly rent must be positive'),
     deposit: z.coerce.number().min(0, 'Deposit cannot be negative'),
+    securityDeposit: z.coerce.number().min(0).optional(),
   }),
 });
 
@@ -43,6 +46,7 @@ interface AddTenantModalProps {
 
 export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
   const queryClient = useQueryClient();
+  const [activateImmediately, setActivateImmediately] = useState(true);
 
   const { data: unitsData, isLoading: unitsLoading } = useQuery({
     queryKey: ['available-units'],
@@ -62,13 +66,26 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
   const startDateValue = useWatch({ control, name: 'leaseData.startDate' });
 
   const mutation = useMutation({
-    mutationFn: (newTenantWithLease: AddTenantFormData) => usersApi.createWithLease(newTenantWithLease),
+    mutationFn: async (data: AddTenantFormData) => {
+      const result = await usersApi.createWithLease(data);
+      if (activateImmediately) {
+        const leaseId = result?.data?.lease?.id;
+        if (leaseId) {
+          await leasesApi.activate(leaseId);
+        }
+      }
+      return result;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leases'] });
       queryClient.invalidateQueries({ queryKey: ['tenants'] });
       queryClient.invalidateQueries({ queryKey: ['units'] });
       queryClient.invalidateQueries({ queryKey: ['available-units'] });
-      toast.success('Tenant and lease created successfully!');
+      toast.success(
+        activateImmediately
+          ? 'Tenant created and lease activated!'
+          : 'Tenant and lease created successfully!'
+      );
       handleClose();
     },
     onError: (error: any) => {
@@ -100,7 +117,7 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
         <DialogHeader>
           <DialogTitle>Add New Tenant</DialogTitle>
           <DialogDescription>
-            Create a new tenant account and assign them to an available unit with a new lease.
+            Create a new tenant account and assign them to an available unit.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -242,15 +259,34 @@ export function AddTenantModal({ isOpen, onClose }: AddTenantModalProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
+                  <Label htmlFor="monthlyRent">Monthly Rent</Label>
                   <Input id="monthlyRent" type="number" min={0} {...register('leaseData.monthlyRent')} />
                   {errors.leaseData?.monthlyRent && <p className="text-sm text-red-500">{errors.leaseData.monthlyRent.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="deposit">Deposit (UGX)</Label>
+                  <Label htmlFor="deposit">Deposit</Label>
                   <Input id="deposit" type="number" min={0} {...register('leaseData.deposit')} />
                   {errors.leaseData?.deposit && <p className="text-sm text-red-500">{errors.leaseData.deposit.message}</p>}
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="securityDeposit">
+                    Security Deposit{' '}
+                    <span className="text-muted-foreground text-[10px]">(Optional)</span>
+                  </Label>
+                  <Input id="securityDeposit" type="number" min={0} {...register('leaseData.securityDeposit')} />
+                  {errors.leaseData?.securityDeposit && <p className="text-sm text-red-500">{errors.leaseData.securityDeposit.message}</p>}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between rounded-lg border p-3">
+                <div className="space-y-0.5">
+                  <Label>Activate Immediately</Label>
+                </div>
+                <Switch
+                  checked={activateImmediately}
+                  onCheckedChange={setActivateImmediately}
+                  disabled={mutation.isPending}
+                />
               </div>
             </div>
 

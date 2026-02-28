@@ -91,7 +91,7 @@ export default function DashboardPage() {
             </Card>
           </Link>
 
-          <Card className="bg-red-500">
+          <Card className="bg-red-500 border-red-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-white">Overdue Payments</CardTitle>
               <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-white" />
@@ -242,18 +242,6 @@ export default function DashboardPage() {
             )}
           </CardContent>
         </Card>
-
-        {/* <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Latest leases, maintenance, etc.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8 text-gray-500">
-              Activity feed coming soon.
-            </div>
-          </CardContent>
-        </Card> */}
       </div>
     </div>
   );

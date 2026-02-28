@@ -36,7 +36,7 @@ export default function TenantsPage() {
   const tenants = selectedPropertyId !== 'all'
     ? allTenants.filter((t: any) => t.leases.some((l: any) => l.property.id === selectedPropertyId))
     : allTenants;
-  
+
   const paymentSummaries = tenants.map((l: any) => l.paymentSummary);
 
   const onTrack = tenants.filter((t: any) => t.paymentSummary.paymentStatus === 'current');
@@ -61,10 +61,16 @@ export default function TenantsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Tenants</h1>
             <p className="text-gray-600">Manage your tenants</p>
           </div>
-          <Button onClick={() => setIsAddModalOpen(true)}>
-            <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
-            Add Tenant
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsAddModalOpen(true)}>
+              <Icon icon="solar:add-circle-broken" className="h-4 w-4 mr-2" />
+              Add Tenant
+            </Button>
+            <Button>
+              <Icon icon="fluent:megaphone-loud-20-regular" className="h-4 w-4 mr-2" />
+              Broadcast Message
+            </Button>
+          </div>
         </div>
 
         {properties.length > 0 && (

@@ -22,6 +22,9 @@ const addPropertySchema = z.object({
   postalCode: z.string().optional(),
   type: z.enum(propertyTypes).optional(),
   numberOfUnits: z.number().int().optional(),
+  managerName: z.string().optional(),
+  managerPhone: z.string().optional(),
+  managerEmail: z.string().email('Invalid email address').optional().or(z.literal('')),
 });
 
 
@@ -126,6 +129,24 @@ export function AddPropertyModal({ isOpen, onClose }: AddPropertyModalProps) {
             <Label htmlFor="numberOfUnits">Number of Units <span className="text-gray-500 text-xs">(Optional)</span></Label>
             <Input id="numberOfUnits" {...register('numberOfUnits', { valueAsNumber: true })} type="number" min={0} />
             {errors.numberOfUnits && <p className="text-sm text-red-500">{errors.numberOfUnits.message}</p>}
+          </div>
+          <div className="space-y-3 border-t pt-4">
+            <p className="text-sm font-medium text-gray-700">Property Manager <span className="text-gray-500 font-normal">(Optional)</span></p>
+            <div className="space-y-2">
+              <Label htmlFor="managerName">Manager Name</Label>
+              <Input id="managerName" {...register('managerName')} placeholder="e.g. John Doe" />
+              {errors.managerName && <p className="text-sm text-red-500">{errors.managerName.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="managerPhone">Manager Phone</Label>
+              <Input id="managerPhone" {...register('managerPhone')} placeholder="e.g. 0771234567" />
+              {errors.managerPhone && <p className="text-sm text-red-500">{errors.managerPhone.message}</p>}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="managerEmail">Manager Email</Label>
+              <Input id="managerEmail" {...register('managerEmail')} type="email" placeholder="e.g. manager@example.com" />
+              {errors.managerEmail && <p className="text-sm text-red-500">{errors.managerEmail.message}</p>}
+            </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>

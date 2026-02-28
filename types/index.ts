@@ -63,6 +63,9 @@ export interface Property {
   type: typeof propertyTypes[number];
   numberOfUnits: number;
   description?: string;
+  managerName?: string;
+  managerPhone?: string;
+  managerEmail?: string;
   landlordId: string;
   createdAt: string;
   updatedAt: string;
@@ -490,6 +493,9 @@ export interface PropertyDashboardData {
     numberOfUnits: number;
     postalCode?: string;
     description?: string;
+    managerName?: string;
+    managerPhone?: string;
+    managerEmail?: string;
     landlordId: string;
     createdAt: string;
     updatedAt: string;

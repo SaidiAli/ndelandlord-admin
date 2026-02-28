@@ -167,16 +167,36 @@ export default function PropertyDetailsPage() {
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-
                 <div>
                   <label className="text-sm font-medium text-gray-500">Added on</label>
                   <p className="text-sm">{formatDateShort(property.createdAt)}</p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-500">Managed by:</label>
-                  <p className="text-sm font-mono"></p>
-                </div>
               </div>
+              {(property.managerName || property.managerPhone || property.managerEmail) && (
+                <div className="border-t pt-4">
+                  <label className="text-sm font-medium text-gray-500">Property Manager</label>
+                  <div className="mt-2 space-y-1">
+                    {property.managerName && (
+                      <div className="flex items-center text-sm text-gray-900">
+                        <Icon icon="solar:user-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
+                        {property.managerName}
+                      </div>
+                    )}
+                    {property.managerPhone && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Icon icon="solar:phone-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
+                        {property.managerPhone}
+                      </div>
+                    )}
+                    {property.managerEmail && (
+                      <div className="flex items-center text-sm text-gray-600">
+                        <Icon icon="solar:letter-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
+                        {property.managerEmail}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -339,6 +359,9 @@ export default function PropertyDetailsPage() {
           type: property.type,
           numberOfUnits: property.numberOfUnits,
           description: property.description,
+          managerName: property.managerName,
+          managerPhone: property.managerPhone,
+          managerEmail: property.managerEmail,
           landlordId: property.landlordId,
           createdAt: property.createdAt,
           updatedAt: property.updatedAt,

@@ -1,12 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
+import { Calendar } from '@/components/ui/Calendar';
 import { Icon } from '@iconify/react';
 import {
   BarChart,
@@ -21,12 +24,14 @@ import {
 import {
   landlordApi,
   paymentsApi,
+  propertiesApi,
   exportsApi,
   downloadBlob,
 } from '@/lib/api';
 import { formatUGX, formatCompactUGX } from '@/lib/currency';
 import {
   Payment,
+  Property,
   TenantInArrears,
   AdvancePaymentRecord,
   LandlordPaymentOverview,
@@ -40,8 +45,17 @@ export default function FinancesPage() {
   const { user } = useAuth();
   const [paymentSearch, setPaymentSearch] = useState('');
   const [exportingPdf, setExportingPdf] = useState<string | null>(null);
+  const [propertyFilter, setPropertyFilter] = useState<string>('all');
+  const [fromDate, setFromDate] = useState<Date | undefined>(undefined);
+  const [toDate, setToDate] = useState<Date | undefined>(undefined);
 
   // ── Data queries ─────────────────────────────────────────────────────────
+  const { data: propertiesData } = useQuery({
+    queryKey: ['properties', user?.id],
+    queryFn: () => propertiesApi.getAll(),
+    enabled: !!user,
+  });
+
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
     queryKey: ['landlord-dashboard', user?.id],
     queryFn: () => landlordApi.getDashboardData(),
@@ -55,8 +69,11 @@ export default function FinancesPage() {
   });
 
   const { data: analyticsData, isLoading: analyticsLoading } = useQuery({
-    queryKey: ['financial-analytics', user?.id],
-    queryFn: () => landlordApi.getFinancialAnalytics(),
+    queryKey: ['financial-analytics', user?.id, fromDate?.toISOString(), toDate?.toISOString()],
+    queryFn: () => landlordApi.getFinancialAnalytics(
+      fromDate ? format(fromDate, 'yyyy-MM-dd') : undefined,
+      toDate ? format(toDate, 'yyyy-MM-dd') : undefined,
+    ),
     enabled: !!user,
   });
 
@@ -79,8 +96,13 @@ export default function FinancesPage() {
   });
 
   const { data: reportData, isLoading: reportLoading } = useQuery({
-    queryKey: ['financial-report', user?.id],
-    queryFn: () => landlordApi.getFinancialReport({ reportType: 'summary' }),
+    queryKey: ['financial-report', user?.id, propertyFilter, fromDate?.toISOString(), toDate?.toISOString()],
+    queryFn: () => landlordApi.getFinancialReport({
+      reportType: 'summary',
+      ...(propertyFilter !== 'all' ? { propertyId: propertyFilter } : {}),
+      ...(fromDate ? { startDate: format(fromDate, 'yyyy-MM-dd') } : {}),
+      ...(toDate ? { endDate: format(toDate, 'yyyy-MM-dd') } : {}),
+    }),
     enabled: !!user,
   });
 
@@ -93,18 +115,51 @@ export default function FinancesPage() {
   const outstandingSummary = outstandingData?.data?.summary;
   const advanceRecords: AdvancePaymentRecord[] = advanceData?.data ?? [];
   const report = reportData?.data;
+  const properties: Property[] = propertiesData?.data || [];
 
-  // ── Filter completed payments ─────────────────────────────────────────────
-  const filteredPayments = completedPayments.filter(p => {
-    if (!paymentSearch) return true;
-    const q = paymentSearch.toLowerCase();
-    return (
-      p.lease?.tenant?.firstName?.toLowerCase().includes(q) ||
-      p.lease?.tenant?.lastName?.toLowerCase().includes(q) ||
-      p.lease?.unit?.property?.name?.toLowerCase().includes(q) ||
-      p.lease?.unit?.unitNumber?.toLowerCase().includes(q)
-    );
-  });
+  // ── Filtered derived data ─────────────────────────────────────────────────
+  const filteredPayments = useMemo(() => {
+    return completedPayments.filter(p => {
+      if (paymentSearch) {
+        const q = paymentSearch.toLowerCase();
+        if (
+          !p.lease?.tenant?.firstName?.toLowerCase().includes(q) &&
+          !p.lease?.tenant?.lastName?.toLowerCase().includes(q) &&
+          !p.lease?.unit?.property?.name?.toLowerCase().includes(q) &&
+          !p.lease?.unit?.unitNumber?.toLowerCase().includes(q)
+        ) return false;
+      }
+      if (propertyFilter !== 'all' && p.lease?.unit?.property?.id !== propertyFilter) return false;
+      const dateStr = p.paidDate ?? p.createdAt;
+      const date = new Date(dateStr);
+      if (fromDate && date < fromDate) return false;
+      if (toDate) {
+        const to = new Date(toDate);
+        to.setHours(23, 59, 59, 999);
+        if (date > to) return false;
+      }
+      return true;
+    });
+  }, [completedPayments, paymentSearch, propertyFilter, fromDate, toDate]);
+
+  const filteredOutstandingTenants = useMemo(() => {
+    if (propertyFilter === 'all') return outstandingTenants;
+    return outstandingTenants.filter(t => t.property.id === propertyFilter);
+  }, [outstandingTenants, propertyFilter]);
+
+  const filteredAdvanceRecords = useMemo(() => {
+    if (propertyFilter === 'all') return advanceRecords;
+    return advanceRecords.filter(r => r.property.id === propertyFilter);
+  }, [advanceRecords, propertyFilter]);
+
+  // ── Filter helpers ────────────────────────────────────────────────────────
+  const hasActiveFilters = propertyFilter !== 'all' || !!fromDate || !!toDate;
+
+  const clearFilters = () => {
+    setPropertyFilter('all');
+    setFromDate(undefined);
+    setToDate(undefined);
+  };
 
   // ── Handlers ──────────────────────────────────────────────────────────────
   async function handleExportSummary() {
@@ -146,6 +201,60 @@ export default function FinancesPage() {
         <p className="text-gray-600">Comprehensive financial overview of your properties.</p>
       </div>
 
+      {/* ── Global filters ──────────────────────────────────────────────── */}
+      <div className="flex flex-wrap gap-3 items-center">
+        <Select value={propertyFilter} onValueChange={setPropertyFilter}>
+          <SelectTrigger className="w-48">
+            <Icon icon="solar:buildings-broken" className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="Property" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Properties</SelectItem>
+            {properties.map(p => (
+              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button className="justify-start text-left font-normal bg-transparent border-2 text-black">
+              <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4" />
+              {fromDate ? format(fromDate, 'dd MMM yyyy') : <span className="text-muted-foreground">From</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar mode="single" selected={fromDate} onSelect={setFromDate} />
+          </PopoverContent>
+        </Popover>
+
+        <span className="text-gray-400 text-sm">to</span>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button className="justify-start text-left font-normal bg-transparent border-2 text-black">
+              <Icon icon="solar:calendar-broken" className="mr-2 h-4 w-4" />
+              {toDate ? format(toDate, 'dd MMM yyyy') : <span className="text-muted-foreground">To</span>}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              mode="single"
+              selected={toDate}
+              onSelect={setToDate}
+              disabled={(date) => !!fromDate && date < fromDate}
+            />
+          </PopoverContent>
+        </Popover>
+
+        {hasActiveFilters && (
+          <Button onClick={clearFilters} className="text-white">
+            <Icon icon="solar:close-circle-broken" className="h-4 w-4 mr-1" />
+            Clear
+          </Button>
+        )}
+      </div>
+
       <Tabs defaultValue="overview">
         <TabsList className="flex-wrap h-auto gap-1">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -170,9 +279,11 @@ export default function FinancesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {formatUGX(summary?.totalPaymentsReceivedCurrentMonth ?? 0)}
+                      {formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Completed payments this month</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {hasActiveFilters ? 'Completed payments (filtered)' : 'Completed payments this month'}
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -183,9 +294,11 @@ export default function FinancesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600">
-                      {formatUGX(summary?.totalOutstandingBalance ?? 0)}
+                      {formatUGX(filteredOutstandingTenants.reduce((s, t) => s + t.outstandingBalance, 0))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Overdue across all tenants</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {hasActiveFilters ? 'Overdue (filtered)' : 'Overdue across all tenants'}
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -253,8 +366,8 @@ export default function FinancesPage() {
                       <CardTitle className="text-sm font-medium text-green-700">Completed</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="text-xl font-bold">{overview.summary.completedPayments}</div>
-                      <div className="text-sm text-gray-600">{formatUGX(overview.summary.totalCompletedAmount)}</div>
+                      <div className="text-xl font-bold">{filteredPayments.length}</div>
+                      <div className="text-sm text-gray-600">{formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -293,12 +406,12 @@ export default function FinancesPage() {
                   <Card className="px-4 py-3">
                     <div className="text-xs text-gray-500">Total Received</div>
                     <div className="text-lg font-bold">
-                      {formatUGX(completedPayments.reduce((s, p) => s + p.amount, 0))}
+                      {formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}
                     </div>
                   </Card>
                   <Card className="px-4 py-3">
                     <div className="text-xs text-gray-500">Payments</div>
-                    <div className="text-lg font-bold">{completedPayments.length}</div>
+                    <div className="text-lg font-bold">{filteredPayments.length}</div>
                   </Card>
                 </div>
                 <Button className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50" onClick={handleExportSummary}>
@@ -375,7 +488,7 @@ export default function FinancesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-red-600">
-                      {formatUGX(outstandingSummary?.totalOutstandingAmount ?? 0)}
+                      {formatUGX(filteredOutstandingTenants.reduce((s, t) => s + t.outstandingBalance, 0))}
                     </div>
                   </CardContent>
                 </Card>
@@ -385,13 +498,13 @@ export default function FinancesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold">
-                      {outstandingSummary?.totalTenantsWithBalance ?? 0}
+                      {filteredOutstandingTenants.length}
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {outstandingTenants.length === 0 ? (
+              {filteredOutstandingTenants.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   No tenants with outstanding balances.
                 </div>
@@ -408,7 +521,7 @@ export default function FinancesPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {outstandingTenants
+                      {filteredOutstandingTenants
                         .slice()
                         .sort((a, b) => b.outstandingBalance - a.outstandingBalance)
                         .map(t => (
@@ -452,7 +565,7 @@ export default function FinancesPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-2xl font-bold text-green-600">
-                      {formatUGX(advanceRecords.reduce((s, r) => s + r.advanceCredit, 0))}
+                      {formatUGX(filteredAdvanceRecords.reduce((s, r) => s + r.advanceCredit, 0))}
                     </div>
                   </CardContent>
                 </Card>
@@ -461,12 +574,12 @@ export default function FinancesPage() {
                     <CardTitle className="text-sm font-medium">Tenants Ahead</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-2xl font-bold">{advanceRecords.length}</div>
+                    <div className="text-2xl font-bold">{filteredAdvanceRecords.length}</div>
                   </CardContent>
                 </Card>
               </div>
 
-              {advanceRecords.length === 0 ? (
+              {filteredAdvanceRecords.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   No tenants with advance payments.
                 </div>
@@ -482,7 +595,7 @@ export default function FinancesPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y">
-                      {advanceRecords.map(r => (
+                      {filteredAdvanceRecords.map(r => (
                         <tr key={r.lease.id} className="hover:bg-gray-50">
                           <td className="px-4 py-3 font-medium">
                             {r.tenant.firstName} {r.tenant.lastName}

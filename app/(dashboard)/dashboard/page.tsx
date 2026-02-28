@@ -9,6 +9,7 @@ import { formatUGX } from '@/lib/currency';
 import { Payment, TenantInArrears } from '@/types';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
+import { formatDateShort } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -90,13 +91,13 @@ export default function DashboardPage() {
             </Card>
           </Link>
 
-          <Card>
+          <Card className="bg-red-500">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Overdue Payments</CardTitle>
-              <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-red-500" />
+              <CardTitle className="text-sm font-medium text-white">Overdue Payments</CardTitle>
+              <Icon icon="solar:danger-triangle-broken" className="h-8 w-8 text-white" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{formatUGX(summary.totalOutstandingBalance)}</div>
+              <div className="text-2xl font-bold text-white">{formatUGX(summary.totalOutstandingBalance)}</div>
             </CardContent>
           </Card>
 
@@ -233,6 +234,7 @@ export default function DashboardPage() {
                     <div className="text-right">
                       <p className="font-medium text-sm">{formatUGX(payment.amount)}</p>
                       <p className="text-xs capitalize text-green-600">{payment.status}</p>
+                      <p className="text-xs text-gray-500">{formatDateShort(payment.createdAt)}</p>
                     </div>
                   </div>
                 ))}

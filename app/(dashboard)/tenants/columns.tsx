@@ -36,7 +36,7 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     cell: ({ row }) => {
       const { leases } = row.original;
       if (leases.length === 0) {
-        return <span className="text-gray-500">No leases</span>;
+        return <span className="text-black">No leases</span>;
       }
       if (leases.length === 1) {
         const { property, unit } = leases[0];
@@ -50,7 +50,7 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
             </div>
           ))}
           {leases.length > 2 && (
-            <div className="text-xs text-gray-500">+{leases.length - 2} more</div>
+            <div className="text-xs text-black">+{leases.length - 2} more</div>
           )}
         </div>
       );
@@ -61,9 +61,9 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     header: "Move in Date",
     cell: ({ row }) => {
       const { leases } = row.original;
-      if (leases.length === 0) return <div className="text-xs text-gray-500">—</div>;
+      if (leases.length === 0) return <div className="text-xs text-black">—</div>;
       const active = getActiveLease(leases);
-      return <div className="text-xs text-gray-500">{formatDateShort(active.lease.startDate)}</div>;
+      return <div className="text-xs text-black">{formatDateShort(active.lease.startDate)}</div>;
     }
   },
   {
@@ -73,7 +73,7 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
       const { tenant } = row.original;
       return (
         <div className="space-y-1">
-          <div className="text-xs text-gray-500">{tenant.phone}</div>
+          <div className="text-xs text-black">{tenant.phone}</div>
         </div>
       );
     }
@@ -83,9 +83,9 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
     header: "Rent",
     cell: ({ row }) => {
       const { leases } = row.original;
-      if (leases.length === 0) return <div className="text-xs text-gray-500">—</div>;
+      if (leases.length === 0) return <div className="text-xs text-black">—</div>;
       const active = getActiveLease(leases);
-      return <div className="text-xs text-gray-500">{formatCompactUGX(Number(active.lease.monthlyRent))}</div>;
+      return <div className="text-xs text-black">{formatCompactUGX(Number(active.lease.monthlyRent))}</div>;
     }
   },
   {
@@ -120,7 +120,7 @@ export const createColumns = (): ColumnDef<TenantWithFullDetails>[] => [
             {mostRecentLease.lease.status}
           </Badge>
           {hasMultiple && (
-            <div className="text-xs text-gray-500">+{leases.length - 1} more</div>
+            <div className="text-xs text-black">+{leases.length - 1} more</div>
           )}
         </div>
       );

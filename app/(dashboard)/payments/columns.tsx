@@ -38,7 +38,7 @@ export function getPaymentColumns(
                                 {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName} - {payment.lease?.unit?.unitNumber}
                             </span>
                         </div>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-black">
                             {payment.lease?.unit?.property?.name}
                         </p>
                     </div>
@@ -58,7 +58,7 @@ export function getPaymentColumns(
             cell: ({ row }) => {
                 const periodCovered = (row.original as any).periodCovered;
                 return periodCovered
-                    ? <span className="text-xs text-gray-500">{periodCovered}</span>
+                    ? <span className="text-xs text-black">{periodCovered}</span>
                     : <span className="text-xs text-gray-300">—</span>;
             },
         },

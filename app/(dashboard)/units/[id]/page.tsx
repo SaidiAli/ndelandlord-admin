@@ -42,13 +42,13 @@ export default function UnitDetailsPage() {
     return (
       <div className="text-center py-16">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="text-sm text-gray-500 mt-4">Loading unit details...</p>
+        <p className="text-sm text-black mt-4">Loading unit details...</p>
       </div>
     );
   }
 
   if (!unit) {
-    return <div className="text-center py-16 text-gray-500">Unit not found.</div>;
+    return <div className="text-center py-16 text-black">Unit not found.</div>;
   }
 
   const transformedUnit = {
@@ -121,7 +121,7 @@ export default function UnitDetailsPage() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-3xl font-bold text-gray-900">Unit {unit.unitNumber}</h1>
+                <h1 className="text-3xl font-bold text-black">Unit {unit.unitNumber}</h1>
                 <Badge className={unit.isAvailable ? "bg-secondary text-white" : ""}>
                   {unit.isAvailable ? (
                     <><CheckCircle className="h-3 w-3 mr-1" />Not Occupied</>
@@ -130,7 +130,7 @@ export default function UnitDetailsPage() {
                   )}
                 </Badge>
               </div>
-              <div className="flex items-center text-gray-600 mt-1">
+              <div className="flex items-center text-black mt-1">
                 <Building className="h-4 w-4 mr-1" />
                 <span className="mr-2">{property?.name}</span>
               </div>
@@ -258,10 +258,10 @@ export default function UnitDetailsPage() {
           </CardHeader>
           <CardContent>
             {leaseHistory.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 <Clock className="h-12 w-12 mx-auto text-gray-400" />
                 <p className="mt-4 font-semibold">No lease history</p>
-                <p className="text-sm text-gray-500">This unit has no previous leases.</p>
+                <p className="text-sm text-black">This unit has no previous leases.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -272,14 +272,14 @@ export default function UnitDetailsPage() {
                         <h4 className="font-semibold">
                           {leaseData.tenant ? `${leaseData.tenant.firstName} ${leaseData.tenant.lastName}` : 'Unknown Tenant'}
                         </h4>
-                        <div className="flex items-center text-sm text-gray-600 mt-1">
+                        <div className="flex items-center text-sm text-black mt-1">
                           <Calendar className="h-4 w-4 mr-1" />
                           {new Date(leaseData.lease.startDate).toLocaleDateString()} -{' '}
                           {leaseData.lease.endDate ? new Date(leaseData.lease.endDate).toLocaleDateString() : 'Present'}
                         </div>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-black">
                       Lease ID: {leaseData.lease.id}
                     </div>
                   </div>
@@ -301,7 +301,7 @@ export default function UnitDetailsPage() {
             <div className="flex justify-between items-center">
               <div>
                 <h3 className="font-semibold text-lg">{property?.name}</h3>
-                <div className="flex items-center text-gray-600 mt-1">
+                <div className="flex items-center text-black mt-1">
                   <MapPin className="h-4 w-4 mr-1" />
                   {property?.address}, {property?.city} {property?.postalCode}
                 </div>

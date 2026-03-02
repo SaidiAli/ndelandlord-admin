@@ -5,8 +5,8 @@ export default function PaymentHistoryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Payment History</h1>
-        <p className="text-gray-600">A complete record of all payment transactions.</p>
+        <h1 className="text-3xl font-bold text-black">Payment History</h1>
+        <p className="text-black">A complete record of all payment transactions.</p>
       </div>
       <Card>
         <CardHeader>

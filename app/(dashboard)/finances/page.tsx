@@ -197,8 +197,8 @@ export default function FinancesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Finances</h1>
-        <p className="text-gray-600">Comprehensive financial overview of your properties.</p>
+        <h1 className="text-3xl font-bold text-black">Finances</h1>
+        <p className="text-black">Comprehensive financial overview of your properties.</p>
       </div>
 
       {/* ── Global filters ──────────────────────────────────────────────── */}
@@ -281,7 +281,7 @@ export default function FinancesPage() {
                     <div className="text-2xl font-bold">
                       {formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-black mt-1">
                       {hasActiveFilters ? 'Completed payments (filtered)' : 'Completed payments this month'}
                     </p>
                   </CardContent>
@@ -296,7 +296,7 @@ export default function FinancesPage() {
                     <div className="text-2xl font-bold text-red-600">
                       {formatUGX(filteredOutstandingTenants.reduce((s, t) => s + t.outstandingBalance, 0))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-black mt-1">
                       {hasActiveFilters ? 'Overdue (filtered)' : 'Overdue across all tenants'}
                     </p>
                   </CardContent>
@@ -311,7 +311,7 @@ export default function FinancesPage() {
                     <div className="text-2xl font-bold">
                       {overview?.summary.pendingPayments ?? 0}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-black mt-1">
                       {formatUGX(overview?.summary.totalPendingAmount ?? 0)} pending
                     </p>
                   </CardContent>
@@ -326,7 +326,7 @@ export default function FinancesPage() {
                     <div className="text-2xl font-bold">
                       {formatUGX(summary?.totalMonthlyRevenueExpected ?? 0)}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Sum of active lease rents</p>
+                    <p className="text-xs text-black mt-1">Sum of active lease rents</p>
                   </CardContent>
                 </Card>
               </div>
@@ -353,7 +353,7 @@ export default function FinancesPage() {
                 <Card>
                   <CardHeader><CardTitle>Revenue Trend</CardTitle></CardHeader>
                   <CardContent>
-                    <p className="text-gray-500 text-center py-8">No revenue data available yet.</p>
+                    <p className="text-black text-center py-8">No revenue data available yet.</p>
                   </CardContent>
                 </Card>
               )}
@@ -367,7 +367,7 @@ export default function FinancesPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-xl font-bold">{filteredPayments.length}</div>
-                      <div className="text-sm text-gray-600">{formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}</div>
+                      <div className="text-sm text-black">{formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -376,7 +376,7 @@ export default function FinancesPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-xl font-bold">{overview.summary.pendingPayments}</div>
-                      <div className="text-sm text-gray-600">{formatUGX(overview.summary.totalPendingAmount)}</div>
+                      <div className="text-sm text-black">{formatUGX(overview.summary.totalPendingAmount)}</div>
                     </CardContent>
                   </Card>
                   <Card>
@@ -385,7 +385,7 @@ export default function FinancesPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-xl font-bold">{overview.summary.failedPayments}</div>
-                      <div className="text-sm text-gray-600">{formatUGX(overview.summary.totalFailedAmount)}</div>
+                      <div className="text-sm text-black">{formatUGX(overview.summary.totalFailedAmount)}</div>
                     </CardContent>
                   </Card>
                 </div>
@@ -404,13 +404,13 @@ export default function FinancesPage() {
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
                 <div className="flex gap-4">
                   <Card className="px-4 py-3">
-                    <div className="text-xs text-gray-500">Total Received</div>
+                    <div className="text-xs text-black">Total Received</div>
                     <div className="text-lg font-bold">
                       {formatUGX(filteredPayments.reduce((s, p) => s + p.amount, 0))}
                     </div>
                   </Card>
                   <Card className="px-4 py-3">
-                    <div className="text-xs text-gray-500">Payments</div>
+                    <div className="text-xs text-black">Payments</div>
                     <div className="text-lg font-bold">{filteredPayments.length}</div>
                   </Card>
                 </div>
@@ -433,17 +433,17 @@ export default function FinancesPage() {
 
               {/* Table */}
               {filteredPayments.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No completed payments found.</div>
+                <div className="text-center py-12 text-black">No completed payments found.</div>
               ) : (
                 <div className="border rounded-lg overflow-hidden">
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Tenant</th>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Property / Unit</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Amount</th>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Date</th>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Method</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Tenant</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Property / Unit</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Amount</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Date</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Method</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -452,11 +452,11 @@ export default function FinancesPage() {
                           <td className="px-4 py-3">
                             {p.lease?.tenant?.firstName} {p.lease?.tenant?.lastName}
                           </td>
-                          <td className="px-4 py-3 text-gray-600">
+                          <td className="px-4 py-3 text-black">
                             {p.lease?.unit?.property?.name} — Unit {p.lease?.unit?.unitNumber}
                           </td>
                           <td className="px-4 py-3 text-right font-medium">{formatUGX(p.amount)}</td>
-                          <td className="px-4 py-3 text-gray-600">
+                          <td className="px-4 py-3 text-black">
                             {p.paidDate ? format(new Date(p.paidDate), 'dd MMM yyyy') : '—'}
                           </td>
                           <td className="px-4 py-3">
@@ -505,7 +505,7 @@ export default function FinancesPage() {
               </div>
 
               {filteredOutstandingTenants.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-black">
                   No tenants with outstanding balances.
                 </div>
               ) : (
@@ -513,11 +513,11 @@ export default function FinancesPage() {
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Tenant</th>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Property / Unit</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Outstanding</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Overdue Periods</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Days Overdue</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Tenant</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Property / Unit</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Outstanding</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Overdue Periods</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Days Overdue</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -529,7 +529,7 @@ export default function FinancesPage() {
                             <td className="px-4 py-3 font-medium">
                               {t.tenant.firstName} {t.tenant.lastName}
                             </td>
-                            <td className="px-4 py-3 text-gray-600">
+                            <td className="px-4 py-3 text-black">
                               {t.property.name} — Unit {t.unit.unitNumber}
                             </td>
                             <td className="px-4 py-3 text-right font-medium text-red-600">
@@ -580,7 +580,7 @@ export default function FinancesPage() {
               </div>
 
               {filteredAdvanceRecords.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-black">
                   No tenants with advance payments.
                 </div>
               ) : (
@@ -588,10 +588,10 @@ export default function FinancesPage() {
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Tenant</th>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Property / Unit</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Credit Amount</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Months Ahead</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Tenant</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Property / Unit</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Credit Amount</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Months Ahead</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -600,7 +600,7 @@ export default function FinancesPage() {
                           <td className="px-4 py-3 font-medium">
                             {r.tenant.firstName} {r.tenant.lastName}
                           </td>
-                          <td className="px-4 py-3 text-gray-600">
+                          <td className="px-4 py-3 text-black">
                             {r.property.name} — Unit {r.unit.unitNumber}
                           </td>
                           <td className="px-4 py-3 text-right font-medium text-green-600">
@@ -624,7 +624,7 @@ export default function FinancesPage() {
           {reportLoading ? (
             <Spinner />
           ) : !report ? (
-            <div className="text-center py-12 text-gray-500">No report data available.</div>
+            <div className="text-center py-12 text-black">No report data available.</div>
           ) : (
             <>
               {/* Revenue by property bar chart */}
@@ -655,10 +655,10 @@ export default function FinancesPage() {
                   <table className="w-full text-sm">
                     <thead className="bg-gray-50 border-b">
                       <tr>
-                        <th className="text-left px-4 py-3 font-medium text-gray-600">Property</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Total Revenue</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Pending Revenue</th>
-                        <th className="text-right px-4 py-3 font-medium text-gray-600">Download</th>
+                        <th className="text-left px-4 py-3 font-medium text-black">Property</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Total Revenue</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Pending Revenue</th>
+                        <th className="text-right px-4 py-3 font-medium text-black">Download</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -688,7 +688,7 @@ export default function FinancesPage() {
                   </table>
                 </div>
               ) : (
-                <div className="text-center py-12 text-gray-500">No property revenue data available.</div>
+                <div className="text-center py-12 text-black">No property revenue data available.</div>
               )}
 
               {/* Overall summary */}

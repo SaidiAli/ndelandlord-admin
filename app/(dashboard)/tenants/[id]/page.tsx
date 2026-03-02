@@ -188,7 +188,7 @@ export default function TenantDetailsPage() {
         </div>
         <div className="flex items-center justify-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          <span className="ml-2 text-sm text-gray-500">Loading tenant details...</span>
+          <span className="ml-2 text-sm text-black">Loading tenant details...</span>
         </div>
       </div>
     );
@@ -204,7 +204,7 @@ export default function TenantDetailsPage() {
           </Button>
         </div>
         <div className="text-center py-8">
-          <p className="text-gray-500">Tenant details not found.</p>
+          <p className="text-black">Tenant details not found.</p>
           <Button onClick={() => router.push('/tenants')} className="mt-4">
             Return to Tenants page
           </Button>
@@ -223,7 +223,7 @@ export default function TenantDetailsPage() {
             Back
           </Button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{leaseDetails.tenant?.firstName} {leaseDetails.tenant?.lastName}</h1>
+            <h1 className="text-2xl font-bold text-black">{leaseDetails.tenant?.firstName} {leaseDetails.tenant?.lastName}</h1>
           </div>
         </div>
       </div>
@@ -232,21 +232,21 @@ export default function TenantDetailsPage() {
       <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
         <div className="flex items-center gap-6">
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Status</h3>
+            <h3 className="text-sm font-medium text-black">Status</h3>
             <Badge className={`${getStatusClassName(leaseDetails.status)} mt-1`}>
               {leaseDetails.status}
             </Badge>
           </div>
           {leaseBalance && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Current Balance</h3>
+              <h3 className="text-sm font-medium text-black">Current Balance</h3>
               <p className={`text-lg font-bold ${leaseBalance.outstandingBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
                 {formatUGX(leaseBalance.outstandingBalance)}
               </p>
             </div>
           )}
           <div>
-            <h3 className="text-sm font-medium text-gray-500">Payment Day</h3>
+            <h3 className="text-sm font-medium text-black">Payment Day</h3>
             <p className="text-lg font-bold">{getOrdinalSuffix(leaseDetails.paymentDay)} of each month</p>
           </div>
         </div>
@@ -327,27 +327,27 @@ export default function TenantDetailsPage() {
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Full Name</p>
+                    <p className="text-sm text-black">Full Name</p>
                     <p className="font-medium">{leaseDetails.tenant.firstName} {leaseDetails.tenant.lastName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Username</p>
+                    <p className="text-sm text-black">Username</p>
                     <p className="font-medium">{leaseDetails.tenant.userName}</p>
                   </div>
                   <div className="flex items-center gap-2">
                     <div>
-                      <p className="text-sm text-gray-500">Email</p>
+                      <p className="text-sm text-black">Email</p>
                       <p className="font-medium">{leaseDetails.tenant.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <div>
-                      <p className="text-sm text-gray-500">Phone</p>
+                      <p className="text-sm text-black">Phone</p>
                       <p className="font-medium">{leaseDetails.tenant.phone || 'Not provided'}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Account Status</p>
+                    <p className="text-sm text-black">Account Status</p>
                     <Badge className={leaseDetails.tenant.isActive ? '' : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'}>
                       {leaseDetails.tenant.isActive ? 'Active' : 'Inactive'}
                     </Badge>
@@ -367,23 +367,23 @@ export default function TenantDetailsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Monthly Rent</p>
+                  <p className="text-sm text-black">Monthly Rent</p>
                   <p className="font-medium text-lg">{formatUGX(leaseDetails.monthlyRent)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Security Deposit</p>
+                  <p className="text-sm text-black">Security Deposit</p>
                   <p className="font-medium">{formatUGX(leaseDetails.deposit)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Move in Date</p>
+                  <p className="text-sm text-black">Move in Date</p>
                   <p className="font-medium font-mono text-sm">{formatDateShort(leaseDetails.startDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Lease Duration</p>
+                  <p className="text-sm text-black">Lease Duration</p>
                   <p className="font-medium">{calculateDuration(leaseDetails.startDate, leaseDetails.endDate)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Time Remaining</p>
+                  <p className="text-sm text-black">Time Remaining</p>
                   {calculateRemainingTime(leaseDetails.endDate) && (
                     <p className={`font-medium ${calculateRemainingTime(leaseDetails.endDate)?.color}`}>
                       {calculateRemainingTime(leaseDetails.endDate)?.text}
@@ -405,7 +405,7 @@ export default function TenantDetailsPage() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Start Date</p>
+                  <p className="text-sm text-black">Start Date</p>
                   <p className="font-medium">{new Date(leaseDetails.startDate).toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
@@ -414,7 +414,7 @@ export default function TenantDetailsPage() {
                   })}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">End Date</p>
+                  <p className="text-sm text-black">End Date</p>
                   <p className="font-medium">{leaseDetails.endDate ? new Date(leaseDetails.endDate).toLocaleDateString('en-US', {
                     weekday: 'long',
                     year: 'numeric',
@@ -423,11 +423,11 @@ export default function TenantDetailsPage() {
                   }) : 'Open (Indefinite)'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Created</p>
+                  <p className="text-sm text-black">Created</p>
                   <p className="font-medium">{new Date(leaseDetails.createdAt).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Last Updated</p>
+                  <p className="text-sm text-black">Last Updated</p>
                   <p className="font-medium">{new Date(leaseDetails.updatedAt).toLocaleDateString()}</p>
                 </div>
               </div>
@@ -472,7 +472,7 @@ export default function TenantDetailsPage() {
                           <p className="font-medium">
                             {lease.unit?.property?.name || 'Property'} - Unit {lease.unit?.unitNumber || 'N/A'}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-black">
                             {new Date(lease.startDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
                             {' - '}
                             {lease.endDate
@@ -525,14 +525,14 @@ export default function TenantDetailsPage() {
                         <h4 className="font-medium mb-2">Property Information</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex items-center gap-2">
-                            <Icon icon="solar:map-point-broken" className="h-4 w-4 text-gray-500" />
+                            <Icon icon="solar:map-point-broken" className="h-4 w-4 text-black" />
                             <div>
-                              <p className="text-sm text-gray-500">Property Name</p>
+                              <p className="text-sm text-black">Property Name</p>
                               <p className="font-medium">{leaseDetails.unit.property.name}</p>
                             </div>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500">Address</p>
+                            <p className="text-sm text-black">Address</p>
                             <p className="font-medium">
                               {leaseDetails.unit.property.address}, {leaseDetails.unit.property.city}, {leaseDetails.unit.property.city}
                             </p>
@@ -547,22 +547,22 @@ export default function TenantDetailsPage() {
                     <h4 className="font-medium mb-2">Unit Information</h4>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       <div>
-                        <p className="text-sm text-gray-500">Unit Number</p>
+                        <p className="text-sm text-black">Unit Number</p>
                         <p className="font-medium">Unit {leaseDetails.unit.unitNumber}</p>
                       </div>
                       {isResidentialDetails(leaseDetails.unit.details) ? (
                         <>
                           <div>
-                            <p className="text-sm text-gray-500">Bedrooms</p>
+                            <p className="text-sm text-black">Bedrooms</p>
                             <p className="font-medium">{(leaseDetails.unit.details as ResidentialUnitDetails).bedrooms}</p>
                           </div>
                           <div>
-                            <p className="text-sm text-gray-500">Bathrooms</p>
+                            <p className="text-sm text-black">Bathrooms</p>
                             <p className="font-medium">{(leaseDetails.unit.details as ResidentialUnitDetails).bathrooms}</p>
                           </div>
                           {(leaseDetails.unit.details as ResidentialUnitDetails).isFurnished !== undefined && (
                             <div>
-                              <p className="text-sm text-gray-500">Furnished</p>
+                              <p className="text-sm text-black">Furnished</p>
                               <p className="font-medium">{(leaseDetails.unit.details as ResidentialUnitDetails).isFurnished ? 'Yes' : 'No'}</p>
                             </div>
                           )}
@@ -570,37 +570,37 @@ export default function TenantDetailsPage() {
                       ) : isCommercialDetails(leaseDetails.unit.details) ? (
                         <>
                           <div>
-                            <p className="text-sm text-gray-500">Unit Type</p>
+                            <p className="text-sm text-black">Unit Type</p>
                             <p className="font-medium">{capitalize((leaseDetails.unit.details as CommercialUnitDetails).unitType)}</p>
                           </div>
                           {(leaseDetails.unit.details as CommercialUnitDetails).suiteNumber && (
                             <div>
-                              <p className="text-sm text-gray-500">Suite Number</p>
+                              <p className="text-sm text-black">Suite Number</p>
                               <p className="font-medium">{(leaseDetails.unit.details as CommercialUnitDetails).suiteNumber}</p>
                             </div>
                           )}
                           {(leaseDetails.unit.details as CommercialUnitDetails).maxOccupancy && (
                             <div>
-                              <p className="text-sm text-gray-500">Max Occupancy</p>
+                              <p className="text-sm text-black">Max Occupancy</p>
                               <p className="font-medium">{(leaseDetails.unit.details as CommercialUnitDetails).maxOccupancy}</p>
                             </div>
                           )}
                         </>
                       ) : (
                         <div>
-                          <p className="text-sm text-gray-500">Property Type</p>
+                          <p className="text-sm text-black">Property Type</p>
                           <p className="font-medium">{capitalize(leaseDetails.unit.propertyType || 'residential')}</p>
                         </div>
                       )}
                       {leaseDetails.unit.squareFeet && (
                         <div>
-                          <p className="text-sm text-gray-500">Square Feet</p>
+                          <p className="text-sm text-black">Square Feet</p>
                           <p className="font-medium">{leaseDetails.unit.squareFeet} sq ft</p>
                         </div>
                       )}
                       {leaseDetails.unit.description && (
                         <div className="md:col-span-2 lg:col-span-3">
-                          <p className="text-sm text-gray-500">Description</p>
+                          <p className="text-sm text-black">Description</p>
                           <p className="font-medium">{leaseDetails.unit.description}</p>
                         </div>
                       )}
@@ -624,7 +624,7 @@ export default function TenantDetailsPage() {
               {payments.length === 0 ? (
                 <div className="text-center py-8">
                   <Icon icon="solar:card-broken" className="h-12 w-12 mx-auto text-gray-400" />
-                  <p className="mt-4 font-semibold text-gray-500">No payments recorded</p>
+                  <p className="mt-4 font-semibold text-black">No payments recorded</p>
                   <p className="text-sm text-gray-400">Payments for this lease will appear here</p>
                 </div>
               ) : (
@@ -683,7 +683,7 @@ export default function TenantDetailsPage() {
                             {payment.status}
                           </Badge>
                         </TableCell>
-                        <TableCell className="font-mono text-sm text-gray-500">
+                        <TableCell className="font-mono text-sm text-black">
                           {payment.transactionId || '--'}
                         </TableCell>
                       </TableRow>

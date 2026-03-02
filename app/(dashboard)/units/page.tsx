@@ -47,8 +47,8 @@ export default function UnitsPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Units</h1>
-            <p className="text-gray-600">Manage rental units across your properties</p>
+            <h1 className="text-3xl font-bold text-black">Units</h1>
+            <p className="text-black">Manage rental units across your properties</p>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />
@@ -58,7 +58,7 @@ export default function UnitsPage() {
 
         {properties.length > 0 && (
           <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600 font-medium">Property</span>
+            <span className="text-sm text-black font-medium">Property</span>
             <Select value={selectedPropertyId} onValueChange={setSelectedPropertyId}>
               <SelectTrigger className="w-64">
                 <SelectValue placeholder="Select a property" />
@@ -80,13 +80,13 @@ export default function UnitsPage() {
             {unitsLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Loading units...</p>
+                <p className="text-sm text-black mt-2">Loading units...</p>
               </div>
             ) : units.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 <DoorOpen className="h-12 w-12 mx-auto text-gray-400" />
                 <p className="mt-4 font-semibold">No units found</p>
-                <p className="text-sm text-gray-500">Get started by adding a new unit.</p>
+                <p className="text-sm text-black">Get started by adding a new unit.</p>
                 <Button className="mt-4" onClick={() => setIsAddModalOpen(true)}>
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Add Unit

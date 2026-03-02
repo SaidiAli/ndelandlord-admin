@@ -54,13 +54,13 @@ export default function PropertyDetailsPage() {
     return (
       <div className="text-center py-16">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-        <p className="text-sm text-gray-500 mt-4">Loading property details...</p>
+        <p className="text-sm text-black mt-4">Loading property details...</p>
       </div>
     );
   }
 
   if (!property) {
-    return <div className="text-center py-16 text-gray-500">Property not found.</div>;
+    return <div className="text-center py-16 text-black">Property not found.</div>;
   }
 
   return (
@@ -74,8 +74,8 @@ export default function PropertyDetailsPage() {
               Back
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">{property.name}</h1>
-              <div className="flex items-center text-gray-600 mt-1">
+              <h1 className="text-3xl font-bold text-black">{property.name}</h1>
+              <div className="flex items-center text-black mt-1">
                 <Icon icon="solar:map-point-bold" className="h-4 w-4 mr-1" />
                 {property.address}, {property.city}, {property.postalCode}
               </div>
@@ -156,40 +156,40 @@ export default function PropertyDetailsPage() {
             <CardContent className="space-y-4">
               {property.description && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Description</label>
-                  <p className="text-gray-900">{property.description}</p>
+                  <label className="text-sm font-medium text-black">Description</label>
+                  <p className="text-black">{property.description}</p>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Property address</label>
+                  <label className="text-sm font-medium text-black">Property address</label>
                   <p className="text-sm font-mono">{property.address}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Added on</label>
+                  <label className="text-sm font-medium text-black">Added on</label>
                   <p className="text-sm">{formatDateShort(property.createdAt)}</p>
                 </div>
               </div>
               {(property.managerName || property.managerPhone || property.managerEmail) && (
                 <div className="border-t pt-4">
-                  <label className="text-sm font-medium text-gray-500">Property Manager</label>
+                  <label className="text-sm font-medium text-black">Property Manager</label>
                   <div className="mt-2 space-y-1">
                     {property.managerName && (
-                      <div className="flex items-center text-sm text-gray-900">
+                      <div className="flex items-center text-sm text-black">
                         <Icon icon="solar:user-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
                         {property.managerName}
                       </div>
                     )}
                     {property.managerPhone && (
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-black">
                         <Icon icon="solar:phone-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
                         {property.managerPhone}
                       </div>
                     )}
                     {property.managerEmail && (
-                      <div className="flex items-center text-sm text-gray-600">
+                      <div className="flex items-center text-sm text-black">
                         <Icon icon="solar:letter-bold" className="h-3.5 w-3.5 mr-2 text-gray-400" />
                         {property.managerEmail}
                       </div>
@@ -246,7 +246,7 @@ export default function PropertyDetailsPage() {
                       <a href={`/units/${unitData.unit.id}`}>
                         <h3 className="text-lg font-semibold">Unit {unitData.unit.unitNumber}</h3>
                       </a>
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mt-1">
+                      <div className="flex items-center gap-4 text-sm text-black mt-1">
                         {isResidentialDetails(unitData.unit.details) ? (
                           <>
                             <div className="flex items-center">
@@ -285,22 +285,22 @@ export default function PropertyDetailsPage() {
                   </div>
 
                   {unitData.unit.description && (
-                    <p className="text-sm text-gray-600 mb-4">{unitData.unit.description}</p>
+                    <p className="text-sm text-black mb-4">{unitData.unit.description}</p>
                   )}
 
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                     <div>
-                      <label className="text-xs font-medium text-gray-500">Monthly Rent</label>
+                      <label className="text-xs font-medium text-black">Monthly Rent</label>
                       <p className="font-semibold">{formatUGX(parseFloat(unitData.unit.monthlyRent))}</p>
                     </div>
                     {unitData.lease && (
                       <>
                         <div>
-                          <label className="text-xs font-medium text-gray-500">Lease Status</label>
+                          <label className="text-xs font-medium text-black">Lease Status</label>
                           <p className="font-semibold capitalize">{unitData.lease.status}</p>
                         </div>
                         <div>
-                          <label className="text-xs font-medium text-gray-500">Lease Rent</label>
+                          <label className="text-xs font-medium text-black">Lease Rent</label>
                           <p className="font-semibold">{formatUGX(parseFloat(unitData.lease.monthlyRent))}</p>
                         </div>
                       </>
@@ -313,28 +313,28 @@ export default function PropertyDetailsPage() {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <div>
-                            <label className="text-xs font-medium text-gray-500">Tenant Name</label>
+                            <label className="text-xs font-medium text-black">Tenant Name</label>
                             <p className="text-sm">{unitData.tenant.firstName} {unitData.tenant.lastName}</p>
                           </div>
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-sm text-black">
                             <Icon icon="solar:letter-bold" className="h-3 w-3 mr-1" />
                             {unitData.tenant.email}
                           </div>
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-sm text-black">
                             <Icon icon="solar:phone-bold" className="h-3 w-3 mr-1" />
                             {unitData.tenant.phone}
                           </div>
                         </div>
                         <div className="space-y-2">
                           <div>
-                            <label className="text-xs font-medium text-gray-500">Lease Period</label>
+                            <label className="text-xs font-medium text-black">Lease Period</label>
                             <div className="flex items-center text-sm">
                               <Icon icon="solar:calendar-bold" className="h-3 w-3 mr-1" />
                               {new Date(unitData.lease.startDate).toLocaleDateString()} - {new Date(unitData.lease.endDate).toLocaleDateString()}
                             </div>
                           </div>
                           <div>
-                            <label className="text-xs font-medium text-gray-500">Lease ID</label>
+                            <label className="text-xs font-medium text-black">Lease ID</label>
                             <p className="text-sm font-mono">{unitData.lease.id}</p>
                           </div>
                         </div>

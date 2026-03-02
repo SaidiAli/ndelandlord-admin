@@ -40,8 +40,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600">Overview of your property management activity.</p>
+        <h1 className="text-3xl font-bold text-black">Dashboard</h1>
+        <p className="text-black">Overview of your property management activity.</p>
       </div>
 
 
@@ -49,7 +49,7 @@ export default function DashboardPage() {
       {isLoading && (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="text-sm text-gray-500 mt-2">Loading dashboard data...</p>
+          <p className="text-sm text-black mt-2">Loading dashboard data...</p>
         </div>
       )}
 
@@ -166,10 +166,10 @@ export default function DashboardPage() {
             {arrearsLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Loading...</p>
+                <p className="text-sm text-black mt-2">Loading...</p>
               </div>
             ) : tenantsInArrears.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 No tenants in arrears
               </div>
             ) : (
@@ -180,13 +180,13 @@ export default function DashboardPage() {
                       <p className="font-medium text-sm">
                         {item.tenant.firstName} {item.tenant.lastName}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-black">
                         Unit {item.unit.unitNumber} — {item.property.name}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-medium text-sm text-red-600">{formatUGX(item.outstandingBalance)}</p>
-                      <p className="text-xs text-gray-500">{item.daysOverdue} days overdue</p>
+                      <p className="text-xs text-black">{item.daysOverdue} days overdue</p>
                     </div>
                   </div>
                 ))}
@@ -211,10 +211,10 @@ export default function DashboardPage() {
             {paymentsLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Loading payments...</p>
+                <p className="text-sm text-black mt-2">Loading payments...</p>
               </div>
             ) : recentPayments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 No payments yet
               </div>
             ) : (
@@ -226,7 +226,7 @@ export default function DashboardPage() {
                         <p className="font-medium text-sm">
                           {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-black">
                           Unit {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
                         </p>
                       </div>
@@ -234,7 +234,7 @@ export default function DashboardPage() {
                     <div className="text-right">
                       <p className="font-medium text-sm">{formatUGX(payment.amount)}</p>
                       <p className="text-xs capitalize text-green-600">{payment.status}</p>
-                      <p className="text-xs text-gray-500">{formatDateShort(payment.createdAt)}</p>
+                      <p className="text-xs text-black">{formatDateShort(payment.createdAt)}</p>
                     </div>
                   </div>
                 ))}

@@ -32,8 +32,8 @@ export default function PropertiesPage() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Properties</h1>
-            <p className="text-gray-600">Manage your rental properties</p>
+            <h1 className="text-3xl font-bold text-black">Properties</h1>
+            <p className="text-black">Manage your rental properties</p>
           </div>
           <Button onClick={() => setIsAddModalOpen(true)}>
             <PlusCircle className="h-4 w-4 mr-2" />
@@ -46,13 +46,13 @@ export default function PropertiesPage() {
             {propertiesLoading ? (
               <div className="text-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Loading properties...</p>
+                <p className="text-sm text-black mt-2">Loading properties...</p>
               </div>
             ) : properties.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-black">
                 <Building className="h-12 w-12 mx-auto text-gray-400" />
                 <p className="mt-4 font-semibold">No properties found</p>
-                <p className="text-sm text-gray-500">Get started by adding a new property.</p>
+                <p className="text-sm text-black">Get started by adding a new property.</p>
                 <Button className="mt-4" onClick={() => setIsAddModalOpen(true)}>
                   <PlusCircle className="h-4 w-4 mr-2" />
                   Add Property

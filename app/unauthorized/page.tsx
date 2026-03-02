@@ -23,7 +23,7 @@ export default function UnauthorizedPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-gray-600 text-center">
+            <p className="text-sm text-black text-center">
               This page is restricted to administrators and landlords only.
             </p>
             <div className="flex flex-col space-y-2">

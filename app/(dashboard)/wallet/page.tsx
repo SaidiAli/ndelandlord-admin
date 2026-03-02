@@ -35,8 +35,8 @@ export default function WalletPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Wallet</h1>
-          <p className="text-gray-600">Manage your collected rent funds and withdrawals.</p>
+          <h1 className="text-3xl font-bold text-black">Wallet</h1>
+          <p className="text-black">Manage your collected rent funds and withdrawals.</p>
         </div>
         <Button
           onClick={() => setShowWithdrawModal(true)}

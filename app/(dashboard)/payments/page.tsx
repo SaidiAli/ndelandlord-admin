@@ -97,8 +97,8 @@ export default function PaymentsPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Payments</h1>
-          <p className="text-gray-600">Manage rent payments and view analytics</p>
+          <h1 className="text-3xl font-bold text-black">Payments</h1>
+          <p className="text-black">Manage rent payments and view analytics</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setIsRegisterModalOpen(true)}>
@@ -194,7 +194,7 @@ export default function PaymentsPage() {
                 )}
 
                 <div className="ml-auto flex items-center gap-2">
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-black">
                     {filteredPayments.length} of {payments.length}
                   </span>
                   <Button>

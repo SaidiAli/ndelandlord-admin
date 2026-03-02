@@ -23,8 +23,8 @@ export default function ManageUsersPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Manage Users</h1>
-                    <p className="text-gray-600">Administer all users in the system</p>
+                    <h1 className="text-3xl font-bold text-black">Manage Users</h1>
+                    <p className="text-black">Administer all users in the system</p>
                 </div>
                 <Button>
                     <PlusCircle className="h-4 w-4 mr-2" />
@@ -41,10 +41,10 @@ export default function ManageUsersPage() {
                     {usersLoading ? (
                         <div className="text-center py-8">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                            <p className="text-sm text-gray-500 mt-2">Loading users...</p>
+                            <p className="text-sm text-black mt-2">Loading users...</p>
                         </div>
                     ) : users.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-black">
                             <User className="h-12 w-12 mx-auto text-gray-400" />
                             <p className="mt-4 font-semibold">No users found</p>
                         </div>
@@ -54,7 +54,7 @@ export default function ManageUsersPage() {
                                 <div key={user.id} className="grid grid-cols-4 items-center py-4">
                                     <div className="col-span-2 space-y-1">
                                         <p className="font-medium">{user.firstName} {user.lastName}</p>
-                                        <p className="text-sm text-gray-500">{user.email}</p>
+                                        <p className="text-sm text-black">{user.email}</p>
                                     </div>
                                     <div className="text-sm">
                                         <Badge className={user.role === 'admin' ? 'bg-destructive text-destructive-foreground hover:bg-destructive/80' : ''}>{user.role}</Badge>

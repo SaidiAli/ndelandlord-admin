@@ -19,7 +19,7 @@ export default function AuthLayout({
               priority
             />
           </div>
-          <p className="mt-2 text-gray-600">Property Management Dashboard</p>
+          <p className="mt-2 text-black">Property Management Dashboard</p>
         </div>
         {children}
       </div>

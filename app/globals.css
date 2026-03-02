@@ -55,13 +55,22 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Nunito', system-ui, -apple-system, sans-serif;
   }
 }
 
-h1,h2,h3,h4,p,a,td,div {
+h1,
+h2,
+h3,
+h4,
+p,
+a,
+th,
+td,
+div {
   font-family: 'Nunito', system-ui, -apple-system, sans-serif;
 }
 

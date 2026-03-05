@@ -327,9 +327,13 @@ export const leasesApi = {
 
 // Payments API functions
 export const paymentsApi = {
-  getAll: async (filters?: { status?: string }) => {
+  getAll: async (filters?: { status?: string; page?: number; limit?: number }) => {
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
+    if (filters?.limit) params.append('limit', filters.limit.toString());
+    if (filters?.page && filters?.limit) {
+      params.append('offset', ((filters.page - 1) * filters.limit).toString());
+    }
     params.append('_t', Date.now().toString());
     const response = await api.get(`/payments?${params.toString()}`);
 
@@ -439,9 +443,10 @@ export const landlordApi = {
     return response.data;
   },
 
-  getTenantsWithOutstandingBalance: async (limit = 5) => {
+  getTenantsWithOutstandingBalance: async (params: { page?: number; limit?: number } = {}) => {
+    const { page = 1, limit = 5 } = params;
     const response = await api.get<ApiResponse<TenantsInArrearsResponse>>(
-      `/landlords/tenants/outstanding?limit=${limit}&_t=${Date.now()}`
+      `/landlords/tenants/outstanding?page=${page}&limit=${limit}&_t=${Date.now()}`
     );
     return response.data;
   },

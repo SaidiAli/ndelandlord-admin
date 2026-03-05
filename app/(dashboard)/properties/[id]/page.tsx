@@ -113,6 +113,7 @@ export default function PropertyDetailsPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stats?.totalUnits || 0}</div>
+              <p className='text-green-500'>{`${stats?.totalUnitsAdded} / ${stats?.totalUnits} added`}</p>
             </CardContent>
           </Card>
           <Card>
@@ -240,7 +241,7 @@ export default function PropertyDetailsPage() {
           <CardContent>
             <div className="space-y-6">
               {units.map((unitData) => (
-                <div key={unitData.unit.id} className="border rounded-lg p-6">
+                <div key={unitData.unit.id} className="border border-primary rounded-lg p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <a href={`/units/${unitData.unit.id}`}>
@@ -389,6 +390,7 @@ export default function PropertyDetailsPage() {
         }}
       />
       <AddUnitModal
+        propertyId={property.id}
         isOpen={isAddUnitModalOpen}
         onClose={() => setIsAddUnitModalOpen(false)}
       />

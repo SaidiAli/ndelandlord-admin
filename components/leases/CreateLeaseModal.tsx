@@ -8,28 +8,11 @@ import { unitsApi, leasesApi, tenantsApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogClose,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TenantWithFullDetails } from '@/types';
 import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
-import { formatUGX } from '@/lib/currency';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Info } from 'lucide-react';
+import { useEffect } from 'react';
 
 const createLeaseSchema = z
   .object({
@@ -63,18 +46,19 @@ const createLeaseSchema = z
 type CreateLeaseFormData = z.infer<typeof createLeaseSchema>;
 
 interface CreateLeaseModalProps {
+  tenantId?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
+export function CreateLeaseModal({ isOpen, onClose, tenantId }: CreateLeaseModalProps) {
   const queryClient = useQueryClient();
-  const [proratedFirstMonth, setProratedFirstMonth] = useState<number | null>(
-    null
-  );
-  const [proratedLastMonth, setProratedLastMonth] = useState<number | null>(
-    null
-  );
+  // const [proratedFirstMonth, setProratedFirstMonth] = useState<number | null>(
+  //   null
+  // );
+  // const [proratedLastMonth, setProratedLastMonth] = useState<number | null>(
+  //   null
+  // );
 
   const { data: unitsData, isLoading: unitsLoading } = useQuery({
     queryKey: ['available-units'],
@@ -99,33 +83,41 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
     resolver: zodResolver(createLeaseSchema),
   });
 
-  const watchAllFields = watch();
-
   useEffect(() => {
-    const calculateProration = () => {
-      const { startDate, endDate, monthlyRent } = watchAllFields;
-      if (startDate && endDate && monthlyRent > 0) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
+    if (tenantId) {
+      reset({
+        tenantId,
+      });
+    }
+  }, [tenantId, reset]);
 
-        if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-          // Prorate first month
-          const daysInStartMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
-          const daysRemaining = daysInStartMonth - start.getDate() + 1;
-          setProratedFirstMonth((daysRemaining / daysInStartMonth) * monthlyRent);
+  // const watchAllFields = watch();
 
-          // Prorate last month
-          const daysInEndMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
-          const daysUsed = end.getDate();
-          setProratedLastMonth((daysUsed / daysInEndMonth) * monthlyRent);
-        }
-      } else {
-        setProratedFirstMonth(null);
-        setProratedLastMonth(null);
-      }
-    };
-    calculateProration();
-  }, [watchAllFields]);
+  // useEffect(() => {
+  //   const calculateProration = () => {
+  //     const { startDate, endDate, monthlyRent } = watchAllFields;
+  //     if (startDate && endDate && monthlyRent > 0) {
+  //       const start = new Date(startDate);
+  //       const end = new Date(endDate);
+
+  //       if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+  //         // Prorate first month
+  //         const daysInStartMonth = new Date(start.getFullYear(), start.getMonth() + 1, 0).getDate();
+  //         const daysRemaining = daysInStartMonth - start.getDate() + 1;
+  //         setProratedFirstMonth((daysRemaining / daysInStartMonth) * monthlyRent);
+
+  //         // Prorate last month
+  //         const daysInEndMonth = new Date(end.getFullYear(), end.getMonth() + 1, 0).getDate();
+  //         const daysUsed = end.getDate();
+  //         setProratedLastMonth((daysUsed / daysInEndMonth) * monthlyRent);
+  //       }
+  //     } else {
+  //       setProratedFirstMonth(null);
+  //       setProratedLastMonth(null);
+  //     }
+  //   };
+  //   calculateProration();
+  // }, [watchAllFields]);
 
 
   const mutation = useMutation({
@@ -297,22 +289,6 @@ export function CreateLeaseModal({ isOpen, onClose }: CreateLeaseModalProps) {
               )}
             </div>
           </div>
-          {proratedFirstMonth !== null && proratedLastMonth !== null && (
-            <Alert>
-              <Info className="h-4 w-4" />
-              <AlertTitle>Proration Preview</AlertTitle>
-              <AlertDescription>
-                <p>
-                  First month&apos;s prorated rent:{' '}
-                  <strong>{formatUGX(proratedFirstMonth)}</strong>
-                </p>
-                <p>
-                  Last month&apos;s prorated rent:{' '}
-                  <strong>{formatUGX(proratedLastMonth)}</strong>
-                </p>
-              </AlertDescription>
-            </Alert>
-          )}
 
           <div className="space-y-2">
             <Label htmlFor="terms">Lease Terms (Optional)</Label>

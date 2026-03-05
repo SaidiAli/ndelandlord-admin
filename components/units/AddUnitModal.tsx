@@ -95,13 +95,14 @@ type BulkResidentialFormData = z.infer<typeof bulkResidentialSchema>;
 type BulkCommercialFormData = z.infer<typeof bulkCommercialSchema>;
 
 interface AddUnitModalProps {
+  propertyId?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function AddUnitModal({ isOpen, onClose }: AddUnitModalProps) {
+export function AddUnitModal({ propertyId, isOpen, onClose }: AddUnitModalProps) {
   const { user } = useAuth();
-  const [selectedPropertyId, setSelectedPropertyId] = useState<string>('');
+  const [selectedPropertyId, setSelectedPropertyId] = useState<string>(propertyId || '');
 
   const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
     queryKey: ['properties', user?.id],

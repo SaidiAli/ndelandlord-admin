@@ -532,6 +532,7 @@ export interface PropertyDashboardData {
   };
   stats: {
     totalUnits: number;
+    totalUnitsAdded: number;
     occupiedUnits: number;
     availableUnits: number;
     monthlyRevenue: number;

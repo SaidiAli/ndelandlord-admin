@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Logo from '@/assets/logos/logos-02.svg';
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: 'solar:hamburger-menu-broken' },
+  { name: 'Dashboard', href: '/dashboard', icon: 'solar:spedometer-max-broken' },
   { name: 'Properties', href: '/properties', icon: 'solar:buildings-broken' },
   { name: 'Units', href: '/units', icon: 'solar:home-broken' },
   { name: 'Tenants', href: '/tenants', icon: 'solar:users-group-rounded-broken' },

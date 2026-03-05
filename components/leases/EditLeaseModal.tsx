@@ -121,7 +121,7 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-5xl">
         <DialogHeader>
           <DialogTitle>Edit Tenant Information</DialogTitle>
           <DialogDescription>
@@ -129,90 +129,97 @@ export function EditLeaseModal({ isOpen, onClose, lease }: EditLeaseModalProps) 
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name</Label>
-              <Input id="firstName" {...register('firstName')} />
-              {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Tenant Information</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input id="firstName" {...register('firstName')} />
+                  {errors.firstName && <p className="text-sm text-red-500">{errors.firstName.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input id="lastName" {...register('lastName')} />
+                  {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input id="phone" {...register('phone')} />
+                  {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email (Optional)</Label>
+                  <Input id="email" type="email" {...register('email')} />
+                  {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+                </div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input id="lastName" {...register('lastName')} />
-              {errors.lastName && <p className="text-sm text-red-500">{errors.lastName.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" {...register('phone')} />
-              {errors.phone && <p className="text-sm text-red-500">{errors.phone.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email (Optional)</Label>
-              <Input id="email" type="email" {...register('email')} />
-              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-            </div>
-          </div>
 
-          <h4 className="font-semibold text-lg pt-2">Lease Details</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="startDate">Lease Start Date</Label>
-              <Input id="startDate" type="date" {...register('startDate')} disabled />
-              {errors.startDate && <p className="text-sm text-red-500">{errors.startDate.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="endDate">Lease End Date</Label>
-              <Input id="endDate" type="date" {...register('endDate')} disabled />
-              {errors.endDate && <p className="text-sm text-red-500">{errors.endDate.message}</p>}
-            </div>
-          </div>
+            <div className="space-y-4">
+              <h4 className="font-semibold text-lg">Lease Details</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="startDate">Lease Start Date</Label>
+                  <Input id="startDate" type="date" {...register('startDate')} disabled />
+                  {errors.startDate && <p className="text-sm text-red-500">{errors.startDate.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="endDate">Lease End Date</Label>
+                  <Input id="endDate" type="date" {...register('endDate')} disabled />
+                  {errors.endDate && <p className="text-sm text-red-500">{errors.endDate.message}</p>}
+                </div>
+              </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
-              <Input id="monthlyRent" type="number" {...register('monthlyRent')} disabled />
-              {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="deposit">Deposit (UGX)</Label>
-              <Input id="deposit" type="number" {...register('deposit')} />
-              {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="securityDeposit">
-                Security Deposit (UGX){' '}
-                <span className="text-muted-foreground font-normal">(Optional)</span>
-              </Label>
-              <Input id="securityDeposit" type="number" {...register('securityDeposit')} />
-              {errors.securityDeposit && <p className="text-sm text-red-500">{errors.securityDeposit.message}</p>}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="paymentDay">Payment Day</Label>
-              <Input id="paymentDay" type="number" {...register('paymentDay')} disabled />
-              {errors.paymentDay && <p className="text-sm text-red-500">{errors.paymentDay.message}</p>}
-            </div>
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="monthlyRent">Monthly Rent (UGX)</Label>
+                  <Input id="monthlyRent" type="number" {...register('monthlyRent')} disabled />
+                  {errors.monthlyRent && <p className="text-sm text-red-500">{errors.monthlyRent.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="deposit">Deposit (UGX)</Label>
+                  <Input id="deposit" type="number" {...register('deposit')} />
+                  {errors.deposit && <p className="text-sm text-red-500">{errors.deposit.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="securityDeposit">
+                    Security Deposit (UGX){' '}
+                    <span className="text-muted-foreground font-normal">(Optional)</span>
+                  </Label>
+                  <Input id="securityDeposit" type="number" {...register('securityDeposit')} />
+                  {errors.securityDeposit && <p className="text-sm text-red-500">{errors.securityDeposit.message}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="paymentDay">Payment Day</Label>
+                  <Input id="paymentDay" type="number" {...register('paymentDay')} disabled />
+                  {errors.paymentDay && <p className="text-sm text-red-500">{errors.paymentDay.message}</p>}
+                </div>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="status">Lease Status</Label>
-            <Controller
-              name="status"
-              control={control}
-              render={({ field }) => (
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="draft">Draft</SelectItem>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="expiring">Expiring</SelectItem>
-                    <SelectItem value="expired">Expired</SelectItem>
-                    <SelectItem value="terminated">Terminated</SelectItem>
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+              <div className="space-y-2">
+                <Label htmlFor="status">Lease Status</Label>
+                <Controller
+                  name="status"
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="draft">Draft</SelectItem>
+                        <SelectItem value="active">Active</SelectItem>
+                        <SelectItem value="expiring">Expiring</SelectItem>
+                        <SelectItem value="expired">Expired</SelectItem>
+                        <SelectItem value="terminated">Terminated</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                {errors.status && <p className="text-sm text-red-500">{errors.status.message}</p>}
+              </div>
+            </div>
           </div>
 
           <DialogFooter>

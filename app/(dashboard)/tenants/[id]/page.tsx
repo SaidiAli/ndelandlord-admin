@@ -696,7 +696,7 @@ export default function TenantDetailsPage() {
         </TabsContent>
       </Tabs>
 
-      <CreateLeaseModal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
+      <CreateLeaseModal tenantId={leaseDetails.tenantId} isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)} />
       <EditLeaseModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} lease={leaseDetails} />
     </div>
   );

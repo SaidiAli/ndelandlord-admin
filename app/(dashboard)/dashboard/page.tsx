@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,8 @@ import { formatDateShort } from '@/lib/utils';
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [arrearsPage, setArrearsPage] = useState(1);
+  const [paymentsPage, setPaymentsPage] = useState(1);
 
   const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
     queryKey: ['landlord-dashboard', user?.id],
@@ -21,20 +24,22 @@ export default function DashboardPage() {
   });
 
   const { data: paymentsData, isLoading: paymentsLoading } = useQuery({
-    queryKey: ['recent-payments', user?.id],
-    queryFn: () => paymentsApi.getAll(),
+    queryKey: ['recent-payments', user?.id, paymentsPage],
+    queryFn: () => paymentsApi.getAll({ page: paymentsPage, limit: 5 }),
     enabled: !!user,
   });
 
   const { data: arrearsData, isLoading: arrearsLoading } = useQuery({
-    queryKey: ['tenants-in-arrears', user?.id],
-    queryFn: () => landlordApi.getTenantsWithOutstandingBalance(5),
+    queryKey: ['tenants-in-arrears', user?.id, arrearsPage],
+    queryFn: () => landlordApi.getTenantsWithOutstandingBalance({ page: arrearsPage, limit: 5 }),
     enabled: !!user,
   });
 
   const summary = dashboardData?.data;
-  const recentPayments: Payment[] = paymentsData?.data?.slice(0, 5) || [];
+  const recentPayments: Payment[] = paymentsData?.data || [];
   const tenantsInArrears: TenantInArrears[] = arrearsData?.data?.tenants ?? [];
+  const arrearsPagination = arrearsData?.data?.pagination;
+  const paymentsPagination = paymentsData?.pagination;
   const isLoading = dashboardLoading || paymentsLoading || arrearsLoading;
 
   return (
@@ -173,24 +178,41 @@ export default function DashboardPage() {
                 No tenants in arrears
               </div>
             ) : (
-              <div className="space-y-4">
-                {tenantsInArrears.map((item) => (
-                  <div key={item.tenant.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div>
-                      <p className="font-medium text-sm">
-                        {item.tenant.firstName} {item.tenant.lastName}
-                      </p>
-                      <p className="text-xs text-black">
-                        Unit {item.unit.unitNumber} — {item.property.name}
-                      </p>
+              <>
+                <div className="space-y-4">
+                  {tenantsInArrears.map((item) => (
+                    <div key={item.tenant.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div>
+                        <p className="font-medium text-sm">
+                          {item.tenant.firstName} {item.tenant.lastName}
+                        </p>
+                        <p className="text-xs text-black">
+                          Unit {item.unit.unitNumber} — {item.property.name}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-sm text-red-600">{formatUGX(item.outstandingBalance)}</p>
+                        <p className="text-xs text-black">{item.daysOverdue} days overdue</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-sm text-red-600">{formatUGX(item.outstandingBalance)}</p>
-                      <p className="text-xs text-black">{item.daysOverdue} days overdue</p>
+                  ))}
+                </div>
+                {arrearsPagination && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <span className="text-xs text-muted-foreground">
+                      Page {arrearsPage} of {arrearsPagination.pages}
+                    </span>
+                    <div className="flex gap-1">
+                      <Button onClick={() => setArrearsPage(p => p - 1)} disabled={arrearsPage <= 1}>
+                        <Icon icon="solar:arrow-left-broken" className="h-4 w-4" />
+                      </Button>
+                      <Button onClick={() => setArrearsPage(p => p + 1)} disabled={arrearsPage >= arrearsPagination.pages}>
+                        <Icon icon="solar:arrow-right-broken" className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>
@@ -218,27 +240,44 @@ export default function DashboardPage() {
                 No payments yet
               </div>
             ) : (
-              <div className="space-y-4">
-                {recentPayments.map((payment) => (
-                  <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div>
-                        <p className="font-medium text-sm">
-                          {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
-                        </p>
-                        <p className="text-xs text-black">
-                          Unit {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
-                        </p>
+              <>
+                <div className="space-y-4">
+                  {recentPayments.map((payment) => (
+                    <div key={payment.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div className="flex items-center space-x-3">
+                        <div>
+                          <p className="font-medium text-sm">
+                            {payment.lease?.tenant?.firstName} {payment.lease?.tenant?.lastName}
+                          </p>
+                          <p className="text-xs text-black">
+                            Unit {payment.lease?.unit?.unitNumber} - {payment.lease?.unit?.property?.name}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium text-sm">{formatUGX(payment.amount)}</p>
+                        <p className="text-xs capitalize text-green-600">{payment.status}</p>
+                        <p className="text-xs text-black">{formatDateShort(payment.createdAt)}</p>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-medium text-sm">{formatUGX(payment.amount)}</p>
-                      <p className="text-xs capitalize text-green-600">{payment.status}</p>
-                      <p className="text-xs text-black">{formatDateShort(payment.createdAt)}</p>
+                  ))}
+                </div>
+                {paymentsPagination && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <span className="text-xs text-muted-foreground">
+                      Page {paymentsPage} of {paymentsPagination.pages}
+                    </span>
+                    <div className="flex gap-1">
+                      <Button onClick={() => setPaymentsPage(p => p - 1)} disabled={paymentsPage <= 1}>
+                        <Icon icon="solar:arrow-left-broken" className="h-4 w-4" />
+                      </Button>
+                      <Button onClick={() => setPaymentsPage(p => p + 1)} disabled={paymentsPage >= paymentsPagination.pages}>
+                        <Icon icon="solar:arrow-right-broken" className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
-                ))}
-              </div>
+                )}
+              </>
             )}
           </CardContent>
         </Card>

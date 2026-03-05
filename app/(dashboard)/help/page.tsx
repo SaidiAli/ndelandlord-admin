@@ -94,7 +94,7 @@ export default function HelpPage() {
                 Browse articles and guides written by the Verit team.
               </p>
             </div>
-            <Button variant="outline" className="w-full uppercase tracking-wide text-xs rounded-full" asChild>
+            <Button className="w-full uppercase tracking-wide text-xs rounded-full" asChild>
               <a href="#" target="_blank" rel="noopener noreferrer">
                 Visit Help Center
               </a>
@@ -118,7 +118,7 @@ export default function HelpPage() {
                 .
               </p>
             </div>
-            <Button variant="outline" className="w-full uppercase tracking-wide text-xs rounded-full">
+            <Button className="w-full uppercase tracking-wide text-xs rounded-full">
               Chat With Us
             </Button>
           </CardContent>
@@ -141,7 +141,7 @@ export default function HelpPage() {
                 Upgrade to call our Uganda-based support team directly.
               </p>
             </div>
-            <Button variant="outline" className="w-full uppercase tracking-wide text-xs rounded-full">
+            <Button className="w-full uppercase tracking-wide text-xs rounded-full">
               Learn More
             </Button>
           </CardContent>

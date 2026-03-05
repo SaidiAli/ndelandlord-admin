@@ -59,6 +59,18 @@ export function Sidebar() {
 
       <div className="px-4 py-4 border-t border-gray-200">
         <Link
+          href="/help"
+          className={cn(
+            'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
+            pathname.startsWith('/help')
+              ? 'bg-primary text-white'
+              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+          )}
+        >
+          <Icon icon="solar:info-circle-broken" className="w-5 h-5 mr-3" />
+          Help & Support
+        </Link>
+        <Link
           href="/settings"
           className={cn(
             'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',

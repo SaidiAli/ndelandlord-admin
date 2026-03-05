@@ -535,6 +535,9 @@ export const exportsApi = {
     return api.get(`/exports/summary.pdf?${params.toString()}`, { responseType: 'blob' })
       .then(r => r.data);
   },
+  downloadPaymentReceipt: (paymentId: string): Promise<Blob> => 
+    api.get(`/exports/payments/${paymentId}/receipt.pdf`, { responseType: 'blob' })
+    .then(r => r.data),
 };
 
 export default api;

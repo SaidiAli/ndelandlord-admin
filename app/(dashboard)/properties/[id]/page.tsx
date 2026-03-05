@@ -30,7 +30,7 @@ export default function PropertyDetailsPage() {
     setIsDownloadingReport(true);
     try {
       const blob = await exportsApi.downloadPropertyReport(propertyId);
-      downloadBlob(blob, `property-report-${propertyId}.pdf`);
+      downloadBlob(blob, `${property?.name || 'vrt'}-${propertyId.slice(0, 8)}.pdf`);
     } catch {
       toast.error('Failed to generate report. Please try again.');
     } finally {

@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Icon } from '@iconify/react';
-import { paymentsApi } from '@/lib/api';
+import { downloadBlob, exportsApi, paymentsApi } from '@/lib/api';
 import { formatUGX, formatPhoneNumber, MOBILE_MONEY_PROVIDERS } from '@/lib/currency';
 import { authStorage } from '@/lib/auth';
 import { Payment, PaymentReceipt } from '@/types';
@@ -23,8 +23,6 @@ interface PaymentDetailsModalProps {
 
 export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetailsModalProps) {
   const [isDownloadingReceipt, setIsDownloadingReceipt] = useState(false);
-
-  console.log({ payment })
 
   const { data: receiptData, isLoading: receiptLoading } = useQuery({
     queryKey: ['payment-receipt', payment?.id],
@@ -69,25 +67,8 @@ export function PaymentDetailsModal({ payment, isOpen, onClose }: PaymentDetails
 
     setIsDownloadingReceipt(true);
     try {
-      const token = authStorage.getToken();
-      const response = await fetch(
-        `http://localhost:4000/api/exports/payments/${payment.id}/receipt.pdf`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Server returned ${response.status}`);
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `receipt-${receipt?.receiptNumber ?? payment.id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const blob = await exportsApi.downloadPaymentReceipt(payment.id);
+      downloadBlob(blob, `${receipt?.receiptNumber ?? payment.id}.pdf`);
     } catch (error) {
       console.error('Failed to download receipt:', error);
     } finally {

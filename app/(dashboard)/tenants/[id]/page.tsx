@@ -102,7 +102,7 @@ export default function TenantDetailsPage() {
     setIsDownloadingStatement(true);
     try {
       const blob = await exportsApi.downloadLeaseStatement(leaseId);
-      downloadBlob(blob, `lease-statement-${leaseId}.pdf`);
+      downloadBlob(blob, `${leaseDetails?.tenant?.firstName}_${leaseDetails?.tenant?.lastName}.pdf`);
     } catch {
       toast.error('Failed to generate statement. Please try again.');
     } finally {

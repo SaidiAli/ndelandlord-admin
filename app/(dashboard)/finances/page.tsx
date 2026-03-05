@@ -11,32 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/Popover';
 import { Calendar } from '@/components/ui/Calendar';
 import { Icon } from '@iconify/react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts';
-import {
-  landlordApi,
-  paymentsApi,
-  propertiesApi,
-  exportsApi,
-  downloadBlob,
-} from '@/lib/api';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { landlordApi, paymentsApi, propertiesApi, exportsApi, downloadBlob, } from '@/lib/api';
 import { formatUGX, formatCompactUGX } from '@/lib/currency';
-import {
-  Payment,
-  Property,
-  TenantInArrears,
-  AdvancePaymentRecord,
-  LandlordPaymentOverview,
-  LandlordFinancialAnalytics,
-} from '@/types';
+import { Payment, Property, TenantInArrears, AdvancePaymentRecord, LandlordPaymentOverview, LandlordFinancialAnalytics } from '@/types';
 import { useAuth } from '@/hooks/useAuth';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -112,7 +90,6 @@ export default function FinancesPage() {
   const analytics: LandlordFinancialAnalytics | undefined = analyticsData?.data;
   const completedPayments: Payment[] = completedPaymentsData?.data || [];
   const outstandingTenants: TenantInArrears[] = outstandingData?.data?.tenants ?? [];
-  const outstandingSummary = outstandingData?.data?.summary;
   const advanceRecords: AdvancePaymentRecord[] = advanceData?.data ?? [];
   const report = reportData?.data;
   const properties: Property[] = propertiesData?.data || [];

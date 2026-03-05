@@ -257,7 +257,7 @@ export default function DashboardPage() {
                       <div className="text-right">
                         <p className="font-medium text-sm">{formatUGX(payment.amount)}</p>
                         <p className="text-xs capitalize text-green-600">{payment.status}</p>
-                        <p className="text-xs text-black">{formatDateShort(payment.createdAt)}</p>
+                        <p className="text-xs text-black">{payment.paidDate ? formatDateShort(payment.paidDate) : 'N/A'}</p>
                       </div>
                     </div>
                   ))}

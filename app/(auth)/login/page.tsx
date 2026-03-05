@@ -38,7 +38,7 @@ export default function LoginPage() {
     try {
       await login(data.username, data.password);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+      setError(err.message || 'Login failed');
     } finally {
       setIsLoading(false);
     }

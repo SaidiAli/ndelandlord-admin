@@ -85,7 +85,7 @@ export default function FinancesPage() {
 
   const { data: outstandingData, isLoading: outstandingLoading } = useQuery({
     queryKey: ['outstanding-balances', user?.id],
-    queryFn: () => landlordApi.getTenantsWithOutstandingBalance(50),
+    queryFn: () => landlordApi.getTenantsWithOutstandingBalance({}),
     enabled: !!user,
   });
 
